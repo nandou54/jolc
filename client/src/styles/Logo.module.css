@@ -1,0 +1,10 @@
+.base {
+  font-family: 'Righteous', cursive;
+  font-size: 45px;
+  text-align: center;
+  margin-left: 40px;
+}
+
+.base a:hover {
+  color: rgb(170, 250, 180);
+}

@@ -1,0 +1,47 @@
+.base {
+  z-index: 10;
+  position: fixed;
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  z-index: 10;
+  background: rgb(26, 28, 39);
+  color: aliceblue;
+  width: 250px;
+  height: 100%;
+}
+
+.logoArea {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 35px 0;
+}
+
+.sidebar a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.outside {
+  z-index: 10;
+  background-color: rgba(20, 20, 20, 0.5);
+  width: calc(100vw - 250px);
+  height: 100%;
+}
+
+.outside:hover {
+  cursor: pointer;
+}
+/* 
+@media only screen and (max-width: 600px) {
+  .sidebar {
+    width: 80%;
+  }
+
+  .outside {
+    width: 20%;
+  }
+} */

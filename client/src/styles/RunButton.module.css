@@ -1,0 +1,31 @@
+.base {
+  background: rgb(77, 216, 77);
+  color: white;
+  padding: 10px 20px;
+
+  border: 5px white solid;
+  border-radius: 55px;
+
+  position: fixed;
+  bottom: 40px;
+  right: 60px;
+
+  display: flex;
+  justify-content: center;
+  text-align: center;
+
+  font-size: 22px;
+}
+
+.base:hover {
+  cursor: pointer;
+  background: rgb(120, 250, 120);
+}
+
+.base:active {
+  padding: 8px 18px;
+  bottom: 42px;
+  right: 62px;
+
+  font-size: 20px;
+}

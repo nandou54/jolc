@@ -1,0 +1,14 @@
+.base {
+  padding: 40px 50px;
+  height: calc(100vh - 80px);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title div {
+  padding: 0 10px;
+}

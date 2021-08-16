@@ -1,0 +1,6 @@
+.base {
+  background: rgb(245, 245, 248);
+  height: 100vh;
+  width: calc(100vw -50px);
+  margin-left: 50px;
+}

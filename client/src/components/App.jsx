@@ -13,6 +13,9 @@ function App() {
     <>
       <SideBar />
       <div className={styles.base}>
+        <Route path='/'>
+          <a href='client'>Ir al sitio</a>
+        </Route>
         <Router base='/client/'>
           <Route path='/'>
             <WelcomePage />

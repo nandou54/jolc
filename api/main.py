@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from grammar import parser
+from interpreter import interpret
 
 class inputData(BaseModel):
   text: str
@@ -27,5 +27,5 @@ app.add_middleware(
 
 @app.post("/api/")
 def analyze_input(input: inputData):
-  parser.parse(input.text)
-  return input.text
+  result = interpret(input.text)
+  return result

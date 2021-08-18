@@ -2,7 +2,7 @@ import editorContentReducer from '@/reducers/editorContentReducer'
 import outputReducer from '@/reducers/outputReducer'
 import { combineReducers, createStore } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
-import sideBarReducer from '@/reducers/SideBarReducer'
+import sideBarReducer from '@/reducers/sideBarReducer'
 
 const initialState = {
   editorContent: localStorage.getItem('editorContent') || '/* get started */',

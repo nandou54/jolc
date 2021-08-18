@@ -4,8 +4,10 @@
   "scripts": {
     "api": "cd api && uvicorn main:app --reload",
     "dev": "cd client && vite",
+    "start": "serve -s build",
     "build": "cd client && vite build",
-    "serve": "cd client && vite preview"
+    "serve": "cd client && vite preview",
+    "heroku-postbuild": "npm run build"
   },
   "dependencies": {
     "ace-builds": "1.4.12",

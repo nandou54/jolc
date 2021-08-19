@@ -1,4 +1,4 @@
-from symbols import *
+from interpreter.symbols import *
 
 tokens = (
   'id',
@@ -175,8 +175,8 @@ def t_error(t):
 
 
 # Analizador léxico
-import ply.lex as lex
-lexer = lex.lex()
+from interpreter.ply.lex import lex
+lexer = lex()
 
 
 # Precedencia de más a menos
@@ -519,8 +519,8 @@ def p_error(p):
     print("Error sintáctico en ''")
     print(p)
 
-import ply.yacc as yacc
-parser = yacc.yacc()
+from interpreter.ply.yacc import yacc
+parser = yacc()
 
 # TODO: array de errores (linea, columna, tipo, descripcion)
 errores:list = [] 
@@ -529,7 +529,6 @@ def parse(input):
     ast = parser.parse(input)
     return {'ast':ast, 'simbolos':[], 'errores':errores, 'output':[]}
 
-    
 
 # f = open("api\input.txt", "r")
 # input = f.read()

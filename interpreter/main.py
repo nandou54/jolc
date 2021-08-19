@@ -1,5 +1,5 @@
-from analyzer import parse
-from core import *
+from interpreter.analyzer import parse
+from interpreter.core import *
 
 output:list = []
 errores:list = []

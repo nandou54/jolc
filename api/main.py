@@ -6,7 +6,7 @@ from starlette.responses import FileResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
 from starlette.exceptions import HTTPException
 
-from interpreter import interpret
+from interpreter.main import interpret
 
 class inputData(BaseModel):
   text: str
@@ -36,11 +36,11 @@ mime_types = {
   'txt':'text/plain'
 }
 
-templates = Jinja2Templates(directory="../dist")
+templates = Jinja2Templates(directory="dist")
 
 @app.post("/api/")
 def analyze_input(input: inputData):
-  result = interpret(input.text)
+  result = interpret(input["text"])
   return result
 
 @app.get("/client")
@@ -49,7 +49,7 @@ async def serve_app(request: Request):
 
 @app.get("/client/static/{filename}")
 async def serve_file(request: Request, filename):
-  file_path ='../dist/static/'+filename
+  file_path ='dist/static/'+filename
 
   if not os.path.exists(file_path):
     return {"error":"File not found"}

@@ -36,7 +36,7 @@ templates = Jinja2Templates(directory="dist")
 
 @app.post("/api/")
 def analyze_input(input: inputData):
-  result = interpret(input["text"])
+  result = interpret(input.text)
   return result
 
 @app.get("/client")

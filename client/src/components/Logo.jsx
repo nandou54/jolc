@@ -13,7 +13,7 @@ function Logo() {
 
   return (
     <div className={styles.base}>
-      <Link onClick={handleNavigate} to='./'>
+      <Link onClick={handleNavigate} to='/client'>
         JOLC
       </Link>
     </div>

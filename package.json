@@ -1,6 +1,6 @@
 {
   "name": "jolc",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "scripts": {
     "dev": "cd client && vite",
     "build": "cd client && vite build",

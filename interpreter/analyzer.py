@@ -388,7 +388,7 @@ def p_E(p):
 
     operable, unaria, izq, der, tipo = True, False, None, None, None
 
-    if len(3)>1:
+    if len(p)>3:
         izq = p[1]
         der = p[3]
         tipo = operaciones[p[2]]

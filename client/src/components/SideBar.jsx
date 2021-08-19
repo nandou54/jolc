@@ -32,7 +32,10 @@ function SideBar() {
           <SideBarButton />
         </div>
         {Object.entries(pages).map(([page, { label }]) => (
-          <SideBarItem key={page} to={`./${page}`} onClick={() => handleNavigate(page)}>
+          <SideBarItem
+            key={page}
+            to={`/client/${page}`}
+            onClick={() => handleNavigate(page)}>
             {page == activePage ? '> ' + label : label}
           </SideBarItem>
         ))}

@@ -9,7 +9,7 @@ function EditorPage() {
   return (
     <Split
       minSize={300}
-      component={({ getGridProps, getGutterProps }) => (
+      render={({ getGridProps, getGutterProps }) => (
         <div className={styles.base} {...getGridProps()}>
           <EditorArea />
           <div className={styles.gutter} {...getGutterProps('column', 1)} />

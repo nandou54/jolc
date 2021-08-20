@@ -2,6 +2,7 @@
   "name": "jolc",
   "version": "2.0.2",
   "scripts": {
+    "start": "uvicorn api.main:app --reload",
     "dev": "cd client && vite",
     "build": "cd client && vite build",
     "serve": "cd client && vite preview"

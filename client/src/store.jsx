@@ -7,7 +7,7 @@ import sideBarReducer from '@/reducers/sideBarReducer'
 const initialState = {
   editorContent: localStorage.getItem('editorContent') || '/* get started */',
   output: [],
-  sideBar: { show: true }
+  sideBar: { show: false }
 }
 
 const reducer = combineReducers({

@@ -17,15 +17,6 @@ function DocsPage() {
           <Link to='./'>Manual técnico</Link>
         </li>
       </ul>
-      <h3>Contacto</h3>
-      <ul>
-        <li>
-          <Link to='./'>Correo: pablofernando50259107@gmail.com</Link>
-        </li>
-        <li>
-          <Link to='./'>Perfil de Linkedin</Link>
-        </li>
-      </ul>
     </div>
   )
 }

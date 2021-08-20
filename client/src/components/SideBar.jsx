@@ -4,19 +4,23 @@ import Logo from './Logo'
 import SideBarItem from './SideBarItem'
 import { useDispatch, useSelector } from 'react-redux'
 import { toggleSideBar } from '@/actions/sideBarActions'
-import { newOutput } from '@/actions/outputActions'
+import { log, newOutput } from '@/actions/outputActions'
 import SideBarButton from './SideBarButton'
 import { useLocation } from 'wouter'
+import axios from 'axios'
 
 const pages = [
   { to: 'editor', img: '', label: 'Editor' },
-  { to: 'reports', img: '', label: 'Reportes' }
-  //{to:docs, img: '', label: 'Documentación' }
+  { to: 'reports', img: '', label: 'Reportes' },
+  { to: 'docs', img: '', label: 'Documentación' }
 ]
 
 function SideBar() {
   const [activePage] = useLocation()
-  const { show } = useSelector((state) => state.sideBar)
+  const [show, content] = useSelector((state) => [
+    state.sideBar.show,
+    state.editorContent
+  ])
   const dispatch = useDispatch()
 
   const handleToggle = () => {
@@ -24,7 +28,13 @@ function SideBar() {
   }
 
   const handleRun = () => {
-    dispatch(newOutput('quepex'))
+    // dispatch(log('quepex'))
+    axios
+      .post('/api', { text: content })
+      .then((res) => {
+        console.log(res)
+      })
+      .catch((error) => console.log(error))
   }
 
   return (
@@ -42,8 +52,15 @@ function SideBar() {
           ))}
         </div>
         <div className={styles.buttons}>
-          <SideBarButton label={show ? '<' : '>'} onClick={handleToggle} />
-          <SideBarButton label={'R'} onClick={handleRun} highlight />
+          <SideBarButton
+            label={
+              <img src='https://img.icons8.com/material-outlined/24/000000/menu--v4.png' />
+            }
+            onClick={handleToggle}
+          />
+          {activePage.includes('editor') && (
+            <SideBarButton label={'R'} onClick={handleRun} highlight />
+          )}
         </div>
       </div>
       <div

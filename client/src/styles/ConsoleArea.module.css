@@ -18,8 +18,18 @@
   color: rgb(220, 230, 230);
 
   width: calc(100% - 40px);
-  height: calc(100% - 75px);
+  height: calc(100% - 55px);
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 20px 20px;
+  padding: 10px 20px;
+}
+
+.console li {
+  list-style: '‣ ';
+}
+
+@media only screen and (max-width: 768px) {
+  .base {
+    height: 80vh;
+  }
 }

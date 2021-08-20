@@ -10,7 +10,7 @@ function SideBarItem({ to, active, label }) {
     dispatch(toggleSideBar())
   }
   return (
-    <div className={styles.base} style={{ color: active && 'rgb(170, 250, 180)' }}>
+    <div className={styles.base} style={active ? { background: 'rgb(40,40,50)' } : {}}>
       <Link to={to} onClick={handleClick}>
         {(active ? '> ' : '') + label}
       </Link>

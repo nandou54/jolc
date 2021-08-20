@@ -1,11 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato&family=Poppins&family=Righteous&family=Source+Code+Pro&display=swap');
 
-/*
-font-family: 'Source Code Pro', monospace;
-*/
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@500&family=Oswald&display=swap');
 
 body {
-  font-family: 'Lato', sans-serif;
+  font-family: 'Barlow', sans-serif;
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -17,7 +15,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Oswald', sans-serif;
 }
 
 a {
@@ -30,4 +28,27 @@ a:visited {
 
 li {
   margin: 10px 0;
+}
+
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(40 42 54);
+}
+
+::-webkit-scrollbar-thumb {
+  padding: 10px;
+  border-radius: 10px;
+  background-color: rgba(60, 60, 70, 0.4);
 }

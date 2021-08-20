@@ -3,46 +3,52 @@ import styles from '@/styles/SideBar.module.css'
 import Logo from './Logo'
 import SideBarItem from './SideBarItem'
 import { useDispatch, useSelector } from 'react-redux'
-import { toggleSideBar, navigateSideBar } from '@/actions/sideBarActions'
+import { toggleSideBar } from '@/actions/sideBarActions'
+import { newOutput } from '@/actions/outputActions'
 import SideBarButton from './SideBarButton'
+import { useLocation } from 'wouter'
+
+const pages = [
+  { to: 'editor', img: '', label: 'Editor' },
+  { to: 'reports', img: '', label: 'Reportes' }
+  //{to:docs, img: '', label: 'Documentación' }
+]
 
 function SideBar() {
-  const { show, activePage } = useSelector((state) => state.sideBar)
+  const [activePage] = useLocation()
+  const { show } = useSelector((state) => state.sideBar)
   const dispatch = useDispatch()
 
-  const handleHide = () => {
+  const handleToggle = () => {
     dispatch(toggleSideBar())
   }
 
-  const handleNavigate = (to) => {
-    dispatch(navigateSideBar(to))
-  }
-
-  const pages = {
-    editor: { img: '', label: 'Editor' },
-    reports: { img: '', label: 'Reportes' },
-    docs: { img: '', label: 'Documentación' }
+  const handleRun = () => {
+    dispatch(newOutput('quepex'))
   }
 
   return (
     <div className={styles.base}>
       <div className={styles.sidebar} style={{ marginLeft: show ? 0 : -200 }}>
-        <div className={styles.logoArea}>
+        <div className={styles.pages}>
           <Logo />
-          <SideBarButton />
+          {pages.map(({ to, label }) => (
+            <SideBarItem
+              key={to}
+              to={`/client/${to}`}
+              label={label}
+              active={activePage.includes(to)}
+            />
+          ))}
         </div>
-        {Object.entries(pages).map(([page, { label }]) => (
-          <SideBarItem
-            key={page}
-            to={`/client/${page}`}
-            onClick={() => handleNavigate(page)}>
-            {page == activePage ? '> ' + label : label}
-          </SideBarItem>
-        ))}
+        <div className={styles.buttons}>
+          <SideBarButton label={show ? '<' : '>'} onClick={handleToggle} />
+          <SideBarButton label={'R'} onClick={handleRun} highlight />
+        </div>
       </div>
       <div
         className={styles.outside}
-        onClick={handleHide}
+        onClick={handleToggle}
         style={{ display: show ? 'block' : 'none' }}
       />
     </div>

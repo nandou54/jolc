@@ -7,7 +7,12 @@ function ConsoleArea() {
 
   return (
     <div className={styles.base}>
-      <textarea readOnly value={output.map((line) => '> ' + line).join('\n')} />
+      <div className={`${styles.title} unselectable`}>console</div>
+      <div className={styles.console}>
+        {output.map((line, i) => (
+          <li key={i}>{`> ${line}`}</li>
+        ))}
+      </div>
     </div>
   )
 }

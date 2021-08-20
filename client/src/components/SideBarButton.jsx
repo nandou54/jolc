@@ -1,20 +1,23 @@
 import React from 'react'
 import styles from '@/styles/SideBarButton.module.css'
-import { useDispatch, useSelector } from 'react-redux'
-import { toggleSideBar } from '@/actions/sideBarActions'
 
-function SideBarButton() {
-  const { show } = useSelector((state) => state.sideBar)
-  const dispatch = useDispatch()
-
-  const handleToggle = () => {
-    dispatch(toggleSideBar())
-  }
-
+function SideBarButton({ label, onClick, highlight = false }) {
   return (
-    <div className={styles.base} onClick={handleToggle}>
-      {show ? '<' : '>'}
-    </div>
+    <button
+      className={styles.base}
+      onClick={onClick}
+      style={
+        highlight
+          ? {
+              color: 'white',
+              background: 'rgb(110, 210, 110)',
+              borderColor: 'rgb(100, 150, 100)',
+              borserStyle: 'outset'
+            }
+          : {}
+      }>
+      {label}
+    </button>
   )
 }
 

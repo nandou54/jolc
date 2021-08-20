@@ -1,6 +1,6 @@
-const editorContentReducer = (state = '', action) => {
+const editorReducer = (state = '', action) => {
   switch (action.type) {
-    case '@editorContent/update': {
+    case '@editor/update': {
       const newEditorContent = action.payload
       save(newEditorContent)
       return newEditorContent
@@ -12,4 +12,4 @@ const editorContentReducer = (state = '', action) => {
 
 const save = (editorContent) => localStorage.setItem('editorContent', editorContent)
 
-export default editorContentReducer
+export default editorReducer

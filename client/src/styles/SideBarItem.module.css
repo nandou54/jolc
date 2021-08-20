@@ -5,6 +5,10 @@
   padding: 12px 25px;
 }
 
+.base a {
+  color: inherit;
+}
+
 .base a:hover {
   color: rgb(170, 250, 180);
 }

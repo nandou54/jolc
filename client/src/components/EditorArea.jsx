@@ -1,25 +1,18 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import styles from '@/styles/EditorArea.module.css'
 
 import AceEditor from 'react-ace'
-import axios from 'axios'
 
 import { useSelector, useDispatch } from 'react-redux'
 
-// import 'ace-builds/src-noconflict/theme-dracula'
-// import 'ace-builds/src-noconflict/ext-language_tools'
-// import 'ace-builds/src-noconflict/ext-beautify'
-import { updateEditorContent } from '@/actions/editorContentActions'
+import 'ace-builds/src-noconflict/theme-dracula'
+import 'ace-builds/src-noconflict/ext-language_tools'
+import 'ace-builds/src-noconflict/ext-beautify'
+import { updateEditorContent } from '@/actions/editorActions'
 
 function EditorArea() {
   const editorContent = useSelector((state) => state.editorContent)
   const dispatch = useDispatch()
-
-  // useEffect(async () => {
-  //   const result = await axios.post('http://127.0.0.1:8000/api', { text: '2+2' })
-  //   console.log(result)
-  //   // setContent(result)
-  // }, [])
 
   const handleChange = (newEditorContent) => {
     dispatch(updateEditorContent(newEditorContent))
@@ -27,13 +20,13 @@ function EditorArea() {
 
   return (
     <div className={styles.base}>
+      <div className={`${styles.title} unselectable`}>editor</div>
       <AceEditor
         className={styles.editor}
-        // theme='dracula'
+        theme='dracula'
         onChange={handleChange}
-        fontSize={18}
+        fontSize={20}
         showPrintMargin={true}
-        showGutter={true}
         highlightActiveLine={true}
         value={editorContent}
         setOptions={{
@@ -43,7 +36,7 @@ function EditorArea() {
           useSoftTabs: true
         }}
         width='100%'
-        height='100%'
+        height='calc(100% - 35px)'
       />
     </div>
   )

@@ -1,19 +1,22 @@
 import React from 'react'
+import Split from 'react-split-grid'
 import styles from '@/styles/EditorPage.module.css'
 
 import EditorArea from '@/components/EditorArea'
 import ConsoleArea from '@/components/ConsoleArea'
-import RunButton from '../components/RunButton'
 
 function EditorPage() {
   return (
-    <>
-      <div className={styles.base}>
-        <EditorArea />
-        <ConsoleArea />
-      </div>
-      <RunButton />
-    </>
+    <Split
+      minSize={300}
+      component={({ getGridProps, getGutterProps }) => (
+        <div className={styles.base} {...getGridProps()}>
+          <EditorArea />
+          <div className={styles.gutter} {...getGutterProps('column', 1)} />
+          <ConsoleArea />
+        </div>
+      )}
+    />
   )
 }
 

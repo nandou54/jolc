@@ -1,20 +1,25 @@
 .base {
-  color: white;
-  padding: 8px;
-  height: 25px;
-  margin-right: 8px;
+  background: transparent;
+  color: rgb(120, 250, 120);
+  padding: 2px 8px;
+  margin: 20px 0;
+  height: 34px;
 
   border: 2px rgb(40, 42, 61) solid;
-  border-radius: 10px;
+  border-radius: 8px;
 
   display: flex;
+  align-items: center;
   justify-content: center;
-  text-align: center;
 
-  font-size: 22px;
+  font-size: 20px;
 }
 
 .base:hover {
   cursor: pointer;
-  color: rgb(120, 250, 120);
+  border-color: rgb(140, 230, 140);
+}
+
+.base:active {
+  border: 2px rgb(40, 42, 61) inset;
 }

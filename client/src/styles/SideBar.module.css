@@ -7,17 +7,21 @@
 
 .sidebar {
   z-index: 10;
-  background: rgb(26, 28, 39);
+  background: rgb(25, 30, 45);
   color: aliceblue;
   width: 250px;
   height: 100%;
+  border-right: 8px rgba(50, 50, 70, 0.8) solid;
+
+  display: grid;
+  grid-template-columns: 4fr 1fr;
 }
 
-.logoArea {
+.buttons {
+  padding: 40px 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  margin: 35px 0;
 }
 
 .sidebar a {
@@ -35,13 +39,3 @@
 .outside:hover {
   cursor: pointer;
 }
-/* 
-@media only screen and (max-width: 600px) {
-  .sidebar {
-    width: 80%;
-  }
-
-  .outside {
-    width: 20%;
-  }
-} */

@@ -1,11 +1,20 @@
 .base {
   height: 100vh;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 8px 1fr;
+}
+
+.gutter {
+  background-color: rgb(60, 60, 80);
+  border-right: 3px rgb(90, 90, 90) solid;
+}
+
+.gutter:hover {
+  cursor: col-resize;
 }
 
 @media only screen and (max-width: 768px) {
-  .base > div {
-    width: 100%;
+  .base {
+    grid-template-rows: 1fr 10px 1fr;
   }
 }

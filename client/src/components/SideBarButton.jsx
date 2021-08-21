@@ -10,9 +10,7 @@ function SideBarButton({ label, onClick, highlight = false }) {
         highlight
           ? {
               color: 'white',
-              background: 'rgb(110, 210, 110)',
-              borderColor: 'rgb(100, 150, 100)',
-              borserStyle: 'outset'
+              background: 'rgb(110, 210, 110)'
             }
           : {}
       }>

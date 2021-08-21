@@ -8,7 +8,7 @@ function WelcomePage() {
     <div className={styles.base}>
       <div className={styles.title}>
         <h2>Universidad de San Carlos de Guatemala</h2>
-        <img src={logo} width={100} />
+        <img src={logo} width={80} />
       </div>
       <div className={styles.small}>Agosto de 2021</div>
       <div className={styles.group}>

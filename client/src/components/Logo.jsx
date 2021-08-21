@@ -2,21 +2,17 @@ import React from 'react'
 import styles from '@/styles/Logo.module.css'
 import { Link } from 'wouter'
 import { useDispatch } from 'react-redux'
-import { navigateSideBar } from '@/actions/sideBarActions'
+import { hideSideBar } from '../actions/appActions'
 
 function Logo() {
   const dispatch = useDispatch()
-
-  const handleNavigate = () => {
-    dispatch(navigateSideBar('/'))
+  const handleClick = () => {
+    dispatch(hideSideBar())
   }
-
   return (
-    <div className={styles.base}>
-      <Link onClick={handleNavigate} to='/client'>
-        JOLC
-      </Link>
-    </div>
+    <Link className={styles.base} to='/client' onClick={handleClick}>
+      JOLC
+    </Link>
   )
 }
 

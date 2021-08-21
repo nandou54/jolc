@@ -1,5 +1,5 @@
 const updateEditorContent = (editorContent) => ({
-  type: '@editor/update',
+  type: '@editor/updateContent',
   payload: editorContent
 })
 

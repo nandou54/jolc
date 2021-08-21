@@ -1,20 +1,22 @@
 import React from 'react'
 import styles from '@/styles/SideBarItem.module.css'
-import { toggleSideBar } from '@/actions/sideBarActions'
+import { hideSideBar } from '../actions/appActions'
 import { Link } from 'wouter'
 import { useDispatch } from 'react-redux'
 
 function SideBarItem({ to, active, label }) {
   const dispatch = useDispatch()
   const handleClick = () => {
-    dispatch(toggleSideBar())
+    dispatch(hideSideBar())
   }
   return (
-    <div className={styles.base} style={active ? { background: 'rgb(40,40,50)' } : {}}>
-      <Link to={to} onClick={handleClick}>
-        {(active ? '> ' : '') + label}
-      </Link>
-    </div>
+    <Link
+      to={to}
+      onClick={handleClick}
+      className={styles.base}
+      style={active ? { background: 'rgba(55,55,70,0.5)' } : {}}>
+      {(active ? '> ' : '') + label}
+    </Link>
   )
 }
 

@@ -1,13 +1,14 @@
 import React from 'react'
+import axios from 'axios'
 import styles from '@/styles/SideBar.module.css'
 import Logo from './Logo'
 import SideBarItem from './SideBarItem'
 import { useDispatch, useSelector } from 'react-redux'
-import { toggleSideBar } from '@/actions/sideBarActions'
+import { showSideBar, hideSideBar, toggleLoading } from '@/actions/appActions'
+import { updateReports } from '@/actions/reportsActions'
 import { log, newOutput } from '@/actions/outputActions'
 import SideBarButton from './SideBarButton'
 import { useLocation } from 'wouter'
-import axios from 'axios'
 
 const pages = [
   { to: 'editor', img: '', label: 'Editor' },
@@ -15,26 +16,35 @@ const pages = [
   { to: 'docs', img: '', label: 'Documentación' }
 ]
 
-function SideBar() {
+function app() {
   const [activePage] = useLocation()
-  const [show, content] = useSelector((state) => [
-    state.sideBar.show,
+  const [{ show, loading }, content] = useSelector((state) => [
+    state.app,
     state.editorContent
   ])
   const dispatch = useDispatch()
 
   const handleToggle = () => {
-    dispatch(toggleSideBar())
+    dispatch(show ? hideSideBar() : showSideBar())
+  }
+
+  const handleHide = () => {
+    dispatch(hideSideBar())
   }
 
   const handleRun = () => {
-    // dispatch(log('quepex'))
+    if (loading) return
+    dispatch(toggleLoading())
+
     axios
       .post('/api', { text: content })
-      .then((res) => {
-        console.log(res)
+      .then(({ data }) => {
+        console.log(data)
+        dispatch(updateReports(data))
       })
       .catch((error) => console.log(error))
+
+    dispatch(toggleLoading())
   }
 
   return (
@@ -51,6 +61,7 @@ function SideBar() {
             />
           ))}
         </div>
+        <div className={styles.separator} />
         <div className={styles.buttons}>
           <SideBarButton
             label={
@@ -59,17 +70,22 @@ function SideBar() {
             onClick={handleToggle}
           />
           {activePage.includes('editor') && (
-            <SideBarButton label={'R'} onClick={handleRun} highlight />
+            <SideBarButton label={'run'} onClick={handleRun} highlight />
           )}
         </div>
       </div>
-      <div
-        className={styles.outside}
-        onClick={handleToggle}
-        style={{ display: show ? 'block' : 'none' }}
-      />
+      {loading && <Loader />}
+      {(show || loading) && <div className={styles.outside} onClick={handleHide} />}
     </div>
   )
 }
 
-export default SideBar
+function Loader() {
+  return (
+    <div className={styles.loader}>
+      <div className={styles.bar} />
+    </div>
+  )
+}
+
+export default app

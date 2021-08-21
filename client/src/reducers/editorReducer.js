@@ -1,6 +1,6 @@
 const editorReducer = (state = '', action) => {
   switch (action.type) {
-    case '@editor/update': {
+    case '@editor/updateContent': {
       const newEditorContent = action.payload
       save(newEditorContent)
       return newEditorContent

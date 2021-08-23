@@ -1,5 +1,4 @@
 .base {
-  font-family: 'Source Code Pro', monospace;
   height: 100vh;
 }
 
@@ -14,6 +13,7 @@
 }
 
 .console {
+  font-family: 'Source Code Pro', monospace;
   background: rgb(40 42 54);
   color: rgb(220, 230, 230);
 

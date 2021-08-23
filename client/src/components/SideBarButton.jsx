@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from '@/styles/SideBarButton.module.css'
 
-function SideBarButton({ label, onClick, highlight = false }) {
+function SideBarButton({ onClick, img, highlight }) {
   return (
     <button
       className={styles.base}
@@ -10,11 +10,11 @@ function SideBarButton({ label, onClick, highlight = false }) {
         highlight
           ? {
               color: 'white',
-              background: 'rgb(110, 210, 110)'
+              background: 'rgb(100, 190, 100)'
             }
           : {}
       }>
-      {label}
+      <img src={`https://img.icons8.com/${img}`} />
     </button>
   )
 }

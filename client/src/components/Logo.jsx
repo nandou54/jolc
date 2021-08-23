@@ -1,17 +1,24 @@
 import React from 'react'
 import styles from '@/styles/Logo.module.css'
 import { Link } from 'wouter'
-import { useDispatch } from 'react-redux'
-import { hideSideBar } from '../actions/appActions'
+import { useDispatch, useSelector } from 'react-redux'
+import { toggleSideBar } from '../actions/appActions'
 
 function Logo() {
+  const { show } = useSelector((state) => state.app)
   const dispatch = useDispatch()
   const handleClick = () => {
-    dispatch(hideSideBar())
+    dispatch(toggleSideBar(false))
   }
+
   return (
-    <Link className={styles.base} to='/client' onClick={handleClick}>
-      JOLC
+    <Link
+      to='/client/'
+      style={{ opacity: show ? '100%' : '0%' }}
+      className={styles.base}
+      onClick={handleClick}>
+      Jolc
+      <img src='https://img.icons8.com/color-glass/48/000000/code.png' />
     </Link>
   )
 }

@@ -1,28 +1,28 @@
 .base {
-  background: transparent;
-  color: rgb(120, 250, 120);
+  background: rgba(100, 100, 150, 0.1);
 
-  width: 100%;
-  height: 100px;
-  height: 34px;
-  padding: 20px 0;
+  width: calc(100% + 3px);
+  margin-right: -3px;
+  height: 50px;
+  margin-bottom: 10px;
 
-  border: 2px rgb(40, 42, 61) solid;
-  border-left: none;
+  border: none;
+  border-right: 3px transparent solid;
 
   display: flex;
   align-items: center;
   justify-content: center;
-
-  font-size: 14px;
 }
 
 .base:hover {
   cursor: pointer;
-  border-right: 2px rgb(101, 206, 101) solid;
-  width: 100%;
+  border-right: 3px rgb(9, 158, 204) solid;
 }
 
 .base:active {
-  border-right: 2px rgb(147, 216, 147) solid;
+  border-right: 3px rgb(158, 170, 158) solid;
+}
+
+.base img {
+  height: 60%;
 }

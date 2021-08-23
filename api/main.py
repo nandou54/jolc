@@ -13,26 +13,16 @@ class inputData(BaseModel):
 
 app = FastAPI()
 
-# origins = ["http://127.0.0.1:8000"]
-
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=origins,
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
-
 mime_types = {
+  'txt':'text/plain',
   'js':'text/javascript',
   'css':'text/css',
   'jpg':'image/jpeg',
   'png':'image/png',
-  'svg':'image/svg+xml',
-  'txt':'text/plain'
+  'svg':'image/svg+xml'
 }
 
-templates = Jinja2Templates(directory="dist")
+templates = Jinja2Templates(directory="dist")   
 
 @app.post("/api/")
 def analyze_input(input: inputData):

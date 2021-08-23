@@ -1,11 +1,21 @@
 .base {
-  margin: 43px 0 60px;
+  grid-area: logo;
+  font-family: 'Averia Serif Libre', cursive;
 
-  font-family: 'Righteous', cursive;
-  font-size: 50px;
-  text-align: center;
+  font-size: 70px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: opacity 0.3s;
 }
 
 .base:hover {
-  color: rgb(200, 255, 210);
+  color: rgb(191, 165, 238);
+}
+
+.base img {
+  height: 60px;
+  margin-left: 10px;
 }

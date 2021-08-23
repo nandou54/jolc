@@ -13,9 +13,6 @@ def interpret(input):
 
   return res
 
-INPUT = '''
-x = 9;
-'''
 
 def exInstrucciones(instrucciones, env):
   for instruccion in instrucciones:
@@ -76,6 +73,3 @@ ejecutables = {
   'continue':exContinue,
   'return':exReturn
 }
-
-# result = interpret(INPUT)
-# print(result['ast'])

@@ -4,17 +4,11 @@ import styles from '@/styles/SideBar.module.css'
 import Logo from './Logo'
 import SideBarItem from './SideBarItem'
 import { useDispatch, useSelector } from 'react-redux'
-import { showSideBar, hideSideBar, toggleLoading } from '@/actions/appActions'
+import { toggleLoading, toggleSideBar } from '@/actions/appActions'
 import { updateReports } from '@/actions/reportsActions'
 import { log, newOutput } from '@/actions/outputActions'
 import SideBarButton from './SideBarButton'
 import { useLocation } from 'wouter'
-
-const pages = [
-  { to: 'editor', img: '', label: 'Editor' },
-  { to: 'reports', img: '', label: 'Reportes' },
-  { to: 'docs', img: '', label: 'Documentación' }
-]
 
 function app() {
   const [activePage] = useLocation()
@@ -24,17 +18,16 @@ function app() {
   ])
   const dispatch = useDispatch()
 
-  const handleToggle = () => {
-    dispatch(show ? hideSideBar() : showSideBar())
+  const handleToggleSideBar = () => {
+    dispatch(toggleSideBar(!show))
   }
-
-  const handleHide = () => {
-    dispatch(hideSideBar())
+  const handleHideSideBar = () => {
+    dispatch(toggleSideBar(false))
   }
 
   const handleRun = () => {
     if (loading) return
-    dispatch(toggleLoading())
+    dispatch(toggleLoading(true))
 
     axios
       .post('/api', { text: content })
@@ -44,38 +37,59 @@ function app() {
       })
       .catch((error) => console.log(error))
 
-    dispatch(toggleLoading())
+    dispatch(toggleLoading(false))
   }
+
+  const items = [
+    {
+      to: '/client/editor',
+      label: 'Editor',
+      img: 'pastel-glyph/64/seo-text--v1.png',
+      active: activePage.includes('editor')
+    },
+    {
+      to: '/client/reports',
+      label: 'Reportes',
+      img: 'pastel-glyph/64/report-file--v4.png',
+      active: activePage.includes('reports')
+    }
+  ]
+
+  const buttons = [
+    {
+      onClick: handleToggleSideBar,
+      img: 'ios-filled/50/FFFFFF/menu-2.png',
+      highlight: false
+    },
+    {
+      onClick: handleRun,
+      img: 'color-glass/48/000000/play.png',
+      highlight: true,
+      condition: activePage.includes('editor')
+    }
+  ]
 
   return (
     <div className={styles.base}>
-      <div className={styles.sidebar} style={{ marginLeft: show ? 0 : -200 }}>
-        <div className={styles.pages}>
-          <Logo />
-          {pages.map(({ to, label }) => (
-            <SideBarItem
-              key={to}
-              to={`/client/${to}`}
-              label={label}
-              active={activePage.includes(to)}
-            />
+      <div className={styles.sidebar} style={{ marginLeft: show ? 0 : -190 }}>
+        <Logo />
+        <div className={styles.items}>
+          {items.map((item, i) => (
+            <SideBarItem key={i} {...item} />
           ))}
         </div>
         <div className={styles.separator} />
         <div className={styles.buttons}>
-          <SideBarButton
-            label={
-              <img src='https://img.icons8.com/material-outlined/24/000000/menu--v4.png' />
-            }
-            onClick={handleToggle}
-          />
-          {activePage.includes('editor') && (
-            <SideBarButton label={'run'} onClick={handleRun} highlight />
+          {buttons.map(
+            ({ condition = true, ...button }, i) =>
+              condition && <SideBarButton key={i} {...button} />
           )}
         </div>
       </div>
       {loading && <Loader />}
-      {(show || loading) && <div className={styles.outside} onClick={handleHide} />}
+      {(show || loading) && (
+        <div className={styles.outside} onClick={() => handleHideSideBar(false)} />
+      )}
     </div>
   )
 }

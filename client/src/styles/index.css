@@ -1,37 +1,46 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato&family=Poppins&family=Righteous&family=Source+Code+Pro&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@500&family=Oswald&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@700&display=swap'); /*logo*/
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&display=swap'); /*title*/
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap'); /*regular*/
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap'); /*code*/
 
 body {
-  font-family: 'Barlow', sans-serif;
+  font-family: 'Poppins', sans-serif;
   margin: 0;
+  color: rgb(216, 207, 250);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+p,
+a {
+  font-size: 14px;
+  font-weight: 500;
+}
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Kanit', serif;
+  font-weight: 500;
+  font-size: 1.4rem;
+  margin: 0;
+  color: rgb(162, 178, 223);
 }
 
-a {
-  color: rgb(61, 138, 201);
-}
-
+a:link,
 a:visited {
-  color: rgb(30, 163, 162);
+  color: rgb(84, 119, 214);
+  text-decoration: 2.5px underline rgb(35, 52, 180);
+}
+a:hover {
+  color: rgb(92, 146, 216);
+  text-decoration: 3px underline rgb(35, 52, 180);
 }
 
 li {
   margin: 10px 0;
-}
-
-body::-webkit-scrollbar {
-  width: 0;
 }
 
 ::-webkit-scrollbar {

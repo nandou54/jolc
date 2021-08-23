@@ -6,9 +6,9 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 import appReducer from '@/reducers/appReducer'
 
 const initialState = {
-  app: { show: false },
+  app: { show: false, loading: false },
   editorContent: localStorage.getItem('editorContent') || '/* get started */',
-  reports: localStorage.getItem('reports') || {},
+  reports: localStorage.getItem('reports') || { ast: [], errors: [], symbols: [] },
   output: []
 }
 

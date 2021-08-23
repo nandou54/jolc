@@ -1,14 +1,11 @@
 import React from 'react'
 import styles from '@/styles/EditorArea.module.css'
 
-import AceEditor from 'react-ace'
-
 import { useSelector, useDispatch } from 'react-redux'
-
-import 'ace-builds/src-noconflict/theme-dracula'
-import 'ace-builds/src-noconflict/ext-language_tools'
-import 'ace-builds/src-noconflict/ext-beautify'
 import { updateEditorContent } from '@/actions/editorActions'
+
+import AceEditor from 'react-ace'
+import 'ace-builds/src-noconflict/theme-dracula'
 
 function EditorArea() {
   const editorContent = useSelector((state) => state.editorContent)
@@ -25,15 +22,13 @@ function EditorArea() {
         className={styles.editor}
         theme='dracula'
         onChange={handleChange}
-        fontSize={20}
+        fontSize={16}
         showPrintMargin={true}
         highlightActiveLine={true}
         value={editorContent}
         setOptions={{
           showLineNumbers: true,
-          tabSize: 2,
-          cursorStyle: 'wide',
-          useSoftTabs: true
+          tabSize: 2
         }}
         width='100%'
         height='calc(100% - 35px)'

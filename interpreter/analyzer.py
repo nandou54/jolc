@@ -203,7 +203,8 @@ def p_INS(p):
     '''
     if len(p)==4:
         p[0] = p[1]
-        p[0].insert(p[2], -1)
+        print(p[2])
+        p[0].insert(-1, p[2])
     else: p[0] = [p[1]]
     print(p)
 
@@ -294,7 +295,7 @@ def p_PAR(p):
     '''
     if len(p)==4:
         p[0] = p[1]
-        p[0].insert(p[3], -1)
+        p[0].insert(-1, p[3])
     else: p[0] = [p[1]]
 
 def p_P(p):
@@ -323,7 +324,7 @@ def p_ATR(p):
     '''
     if len(p)==4:
         p[0] = p[1]
-        p[0].insert(p[2], -1)
+        p[0].insert(-1, p[2])
     else: p[0] = [p[1]]
 
 def p_A(p):
@@ -345,7 +346,7 @@ def p_EXP(p):
     '''
     if len(p)==4:
         p[0] = p[1]
-        p[0].insert(p[2], -1)
+        p[0].insert(-1, p[2])
     else: p[0] = [p[1]]
 
 def p_E(p):
@@ -433,7 +434,7 @@ def p_ID(p):
     '''
     if len(p)==4:
         p[0] = p[1]
-        p[0].insert(p[3], -1)
+        p[0].insert(-1, p[3])
     else: p[0] = [p[1]]
 
 def p_IF(p):

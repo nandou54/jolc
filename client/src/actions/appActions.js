@@ -1,13 +1,10 @@
-const showSideBar = () => ({
-  type: '@app/show'
+const toggleSideBar = (on) => ({
+  type: '@app/toggleSideBar',
+  payload: on
+})
+const toggleLoading = (on) => ({
+  type: '@app/toggleLoading',
+  payload: on
 })
 
-const hideSideBar = () => ({
-  type: '@app/hide'
-})
-
-const toggleLoading = () => ({
-  type: '@app/toggleLoading'
-})
-
-export { showSideBar, hideSideBar, toggleLoading }
+export { toggleSideBar, toggleLoading }

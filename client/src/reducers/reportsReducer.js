@@ -1,7 +1,7 @@
 const defaultState = {
   ast: [],
-  errores: [],
-  simbolos: []
+  errors: [],
+  symbols: []
 }
 
 const reportsReducer = (state = defaultState, action) => {
@@ -16,6 +16,6 @@ const reportsReducer = (state = defaultState, action) => {
   }
 }
 
-const save = (reports) => localStorage.setItem('reports', reports)
+const save = (reports) => localStorage.setItem('reports', JSON.stringify(reports))
 
 export default reportsReducer

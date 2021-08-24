@@ -1,5 +1,6 @@
 .base {
-  background: rgb(21, 21, 32);
+  /* background: rgb(21, 21, 32); */
+  background: linear-gradient(rgb(28, 28, 45), rgb(20, 20, 25));
   min-height: 100vh;
   margin-left: 63px;
 }

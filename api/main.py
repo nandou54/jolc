@@ -9,7 +9,7 @@ from starlette.exceptions import HTTPException
 from interpreter.main import interpret
 
 class inputData(BaseModel):
-  text: str
+  content: str
 
 app = FastAPI()
 
@@ -26,11 +26,19 @@ templates = Jinja2Templates(directory="dist")
 
 @app.post("/api/")
 def analyze_input(input: inputData):
-  result = interpret(input.text)
+  result = interpret(input.content)
   return result
 
-@app.get("/client")
+@app.get("/client/")
 async def serve_app(request: Request):
+  return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/client/editor")
+async def serve_editor(request: Request):
+  return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/client/reports")
+async def serve_reports(request: Request):
   return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/client/static/{filename}")
@@ -53,4 +61,4 @@ async def serve_file(request: Request, filename):
 
 @app.exception_handler(HTTPException)
 async def custom_http_exception_handler(request, exc):
-    return RedirectResponse("/client")
+    return RedirectResponse("/client/")

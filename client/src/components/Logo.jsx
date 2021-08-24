@@ -17,8 +17,8 @@ function Logo() {
       style={{ opacity: show ? '100%' : '0%' }}
       className={styles.base}
       onClick={handleClick}>
-      Jolc
       <img src='https://img.icons8.com/color-glass/48/000000/code.png' />
+      Jolc
     </Link>
   )
 }

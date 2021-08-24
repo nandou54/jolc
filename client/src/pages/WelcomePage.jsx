@@ -21,16 +21,6 @@ function WelcomePage() {
       </div>
       <div className={styles.group}>
         <h3>Autor</h3>
-        <h3>Autor</h3>
-        <h3>Autor</h3>
-        <h3>Autor</h3>
-        <h3>Autor</h3>
-        <h3>Autor</h3>
-        <h3>Autor</h3>
-        <h3>Autor</h3>
-        <h3>Autor</h3>
-        <h3>Autor</h3>
-        <h3>Autor</h3>
         <p>Nombre: Pablo Cabrera</p>
         <p>Carné: 201901698</p>
         <li>

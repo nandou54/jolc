@@ -3,6 +3,14 @@
   height: calc(100% - 40px);
 }
 
+.small {
+  padding: 10px 0;
+  font-size: 12px;
+
+  display: flex;
+  justify-content: flex-end;
+}
+
 .reports {
   margin-top: 50px;
   display: flex;

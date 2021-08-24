@@ -4,9 +4,7 @@ import { useSelector } from 'react-redux'
 import { Link } from 'wouter'
 
 function ReportsPage() {
-  const reports = useSelector((state) => state.reports)
-  const { ast, errors, symbols } = reports
-
+  const { ast, errors, symbols } = useSelector((state) => state.reports)
   const existsReports = ast.length || errors.length || symbols.length
 
   const buttons = [
@@ -29,6 +27,7 @@ function ReportsPage() {
 
   return (
     <div className={styles.base}>
+      <div className={styles.small}>Agosto - Septiembre de 2021</div>
       <h2>Reportes de la aplicación</h2>
       <p>JOLC ofrece una serie de reportes</p>
       <div className={styles.reports}>

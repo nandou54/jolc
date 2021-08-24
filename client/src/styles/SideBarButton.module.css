@@ -8,6 +8,8 @@
 
   border: none;
   border-right: 3px transparent solid;
+  border-top-left-radius: 23px;
+  border-bottom-left-radius: 23px;
 
   display: flex;
   align-items: center;
@@ -24,5 +26,5 @@
 }
 
 .base img {
-  height: 60%;
+  height: 65%;
 }

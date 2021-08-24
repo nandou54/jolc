@@ -37,8 +37,12 @@ def Break():
 def Continue():
   return {'i':'continue'}
 
-def Return(expresion):
-  return {'i':'return', 'expresion':expresion}
+# def Return(expresion):
+#   return {'i':'return', 'expresion':expresion}
+
+class Return():
+  def __init__(self, expresion):
+      self.expresion = expresion
 
 operaciones = {
   '+':'suma',

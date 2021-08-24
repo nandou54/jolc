@@ -9,8 +9,7 @@ function SideBarButton({ onClick, img, highlight }) {
       style={
         highlight
           ? {
-              color: 'white',
-              background: 'rgb(100, 190, 100)'
+              background: 'rgb(119, 203, 119)'
             }
           : {}
       }>

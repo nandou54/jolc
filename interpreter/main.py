@@ -1,61 +1,65 @@
 from interpreter.analyzer import parse
 from interpreter.core import *
 
-output:list = []
-errores:list = []
-simbolos:list = []
-
-entorno_global = Entorno()
-
 
 def interpret(input):
+  output.clear()
+  errors.clear()
+  symbols.clear()
+
   res = parse(input)
 
   return res
 
 
-def exInstrucciones(instrucciones, env):
+def exInstrucciones(instrucciones, env:Environment):
   for instruccion in instrucciones:
     if instruccion['i'] in ejecutables.keys():
       res = ejecutables[instruccion['i']](instruccion, env)
 
-def exExpresion(_expresion, env):
+def exExpresion(ins, env:Environment):
   pass
 
-def exAsignacion(_asignacion, env):
+def exAsignacion(ins, env:Environment):
+  if env.getLocalSymbol(ins['id']): return print('La variable %s ya ha sido declarada', )
+
+  value = None
+
+  if ins['expresion'] != None:
+    pass
+
+
+def exFuncion(ins, env:Environment):
   pass
 
-def exFuncion(_funcion, env):
+def exStruct(ins, env:Environment):
   pass
 
-def exStruct(_struct, env):
+def exLlamada(ins, env:Environment):
   pass
 
-def exLlamada(_llamada, env):
+def exAcceso(ins, env:Environment):
   pass
 
-def exAcceso(_acceso, env):
+def exIf(ins, env:Environment):
   pass
 
-def exIf(_if, env):
+def exElse(ins, env:Environment):
   pass
 
-def exElse(_else, env):
+def exWhile(ins, env:Environment):
   pass
 
-def exWhile(_while, env):
+def exFor(ins, env:Environment):
   pass
 
-def exFor(_for, env):
+def exBreak(env:Environment):
   pass
 
-def exBreak(env):
+def exContinue(env:Environment):
   pass
 
-def exContinue(env):
-  pass
-
-def exReturn(_return, env):
+def exReturn(_return, env:Environment):
   pass
 
 

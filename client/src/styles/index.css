@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@700&display=swap'); /*logo*/
-@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&display=swap'); /*title*/
+/* @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&display=swap'); title */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap'); /*regular*/
 @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap'); /*code*/
 
@@ -13,7 +13,7 @@ body {
 
 p,
 a {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
 }
 h1,
@@ -22,8 +22,8 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Kanit', serif;
-  font-weight: 500;
+  font-family: 'Poppins', serif;
+  font-weight: 600;
   font-size: 1.4rem;
   margin: 0;
   color: rgb(162, 178, 223);
@@ -45,6 +45,10 @@ li {
 
 ::-webkit-scrollbar {
   width: 10px;
+}
+
+body::-webkit-scrollbar {
+  width: 0;
 }
 
 ::-webkit-scrollbar-track {

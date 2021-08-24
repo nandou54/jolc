@@ -7,7 +7,7 @@
 
 .sidebar {
   z-index: 10;
-  background: rgb(26, 34, 53);
+  background: linear-gradient(rgb(27, 35, 55), rgb(20, 26, 40));
   color: white;
   width: 250px;
   height: 100%;
@@ -15,7 +15,7 @@
 
   display: grid;
   grid-template-columns: 4fr 2px 1fr;
-  grid-template-rows: 150px 1fr;
+  grid-template-rows: 140px 1fr;
   grid-template-areas:
     'logo logo logo'
     'items separator buttons';

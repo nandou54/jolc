@@ -12,10 +12,7 @@ import { useLocation } from 'wouter'
 
 function app() {
   const [activePage] = useLocation()
-  const [{ show, loading }, content] = useSelector((state) => [
-    state.app,
-    state.editorContent
-  ])
+  const [{ show, loading }, content] = useSelector((state) => [state.app, state.editor])
   const dispatch = useDispatch()
 
   const handleToggleSideBar = () => {
@@ -30,10 +27,11 @@ function app() {
     dispatch(toggleLoading(true))
 
     axios
-      .post('/api', { text: content })
+      .post('/api', { content })
       .then(({ data }) => {
-        console.log(data)
         dispatch(updateReports(data))
+        dispatch(newOutput([JSON.stringify(data)]))
+        console.log(data)
       })
       .catch((error) => console.log(error))
 
@@ -63,7 +61,7 @@ function app() {
     },
     {
       onClick: handleRun,
-      img: 'color-glass/48/000000/play.png',
+      img: 'material-outlined/24/FFFFFF/play--v1.png',
       highlight: true,
       condition: activePage.includes('editor')
     }

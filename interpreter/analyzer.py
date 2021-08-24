@@ -524,13 +524,9 @@ from interpreter.ply.yacc import yacc
 parser = yacc()
 
 # TODO: array de errores (linea, columna, tipo, descripcion)
-errores:list = [] 
+errors:list = [] 
 
 def parse(input):
     ast = parser.parse(input)
-    return {'ast':ast, 'simbolos':[], 'errores':errores, 'output':[]}
-
-
-# f = open("api\input.txt", "r")
-# input = f.read()
-# result = parser.parse(input)
+    if ast == None: ast = []
+    return {'ast':ast, 'symbols':[], 'errors':errors, 'output':[]}

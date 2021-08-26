@@ -1,50 +1,55 @@
-def Asignacion(scope, id, expresion, tipo):
-  return {'i':'asignacion', 'scope':scope, 'id':id, 'expresion':expresion, 'tipo':tipo}
+def Assignment(ln, col, scope, id, expression, type):
+  return {"ln":ln, "col":col, 'i_type':'assignment', 'scope':scope, 'id':id, 'expression':expression, 'type':type}
 
-def Funcion(id, parametros):
-  return {'i':'funcion', 'id':id, 'parametros':parametros}
+def Assignment_Struct(ln, col, id, expression):
+  return {"ln":ln, "col":col, 'i_type':'assignment_struct', 'id':id, 'expression':expression}
 
-def Struct(mutable, id, atributos):
-  return {'i':'struct', 'mutable':mutable, 'id':id, 'atributos':atributos}
+def Assignment_Array(ln, col, id, index, expression):
+  return {"ln":ln, "col":col, 'i_type':'assignment_array', 'id':id, 'index':index, 'expression':expression}
 
-def Atributo(id, tipo):
-  return {'id':id, 'tipo':tipo}
+def Function(ln, col, id, parameters, instructions):
+  return {"ln":ln, "col":col, 'i_type':'function', 'id':id, 'parameters':parameters, 'instructions':instructions}
 
-def Expresion(operable, unaria, izq, der, tipo):
-  return {'i':'expresion', 'operable':operable, 'unaria':unaria, 'izq':izq, 'der':der, 'tipo':tipo}
+def Struct(ln, col, mutable, id, attributes):
+  return {"ln":ln, "col":col, 'i_type':'struct', 'mutable':mutable, 'id':id, 'attributes':attributes}
 
-def Llamada(id, expresiones):
-  return {'i':'llamada', 'id':id, 'expresiones':expresiones}
+def Attribute(ln, col, id, type):
+  return {"ln":ln, "col":col, 'id':id, 'type':type}
 
-def Acceso_arreglo(id, expresion):
-  return {'i':'acceso', 'id':id, 'expresion':expresion}
+def Expression(ln, col, operable, unary, l, r, type):
+  return {"ln":ln, "col":col, 'i_type':'expression', 'operable':operable, 'unary':unary, 'type':type, 'l':l, 'r':r}
 
-def If(expresion, instrucciones, elseif):
-  return {'i':'if', 'expresion':expresion, 'instrucciones':instrucciones, 'elseif':elseif}
+def Call(ln, col, id, expressions):
+  return {"ln":ln, "col":col, 'i_type':'call', 'id':id, 'expressions':expressions}
 
-def Else(instrucciones):
-  return {'i':'else', 'instrucciones':instrucciones}
+def Access(ln, col, id, expression):
+  return {"ln":ln, "col":col, 'i_type':'access', 'id':id, 'expression':expression}
 
-def While(expresion, instrucciones):
-  return {'i':'while', 'expresion':expresion, 'instrucciones':instrucciones}
+def If(ln, col, expression, instructions, elseif):
+  return {"ln":ln, "col":col, 'i_type':'if', 'expression':expression, 'instructions':instructions, 'elseif':elseif}
 
-def For(id, expresion, instrucciones):
-  return {'i':'for', 'id':id, 'expresion':expresion, 'instrucciones':instrucciones}
+def Else(ln, col, instructions):
+  return {"ln":ln, "col":col, 'i_type':'else', 'instructions':instructions}
 
-def Break():
-  return {'i':'break'}
+def While(ln, col, expression, instructions):
+  return {"ln":ln, "col":col, 'i_type':'while', 'expression':expression, 'instructions':instructions}
 
-def Continue():
-  return {'i':'continue'}
+def For(ln, col, id, expression, instructions):
+  return {"ln":ln, "col":col, 'i_type':'for', 'id':id, 'expression':expression, 'instructions':instructions}
 
-# def Return(expresion):
-#   return {'i':'return', 'expresion':expresion}
+def Break(ln, col):
+  return {"ln":ln, "col":col, 'i_type':'break'}
 
-class Return():
-  def __init__(self, expresion):
-      self.expresion = expresion
+def Continue(ln, col):
+  return {"ln":ln, "col":col, 'i_type':'continue'}
 
-operaciones = {
+def Return(ln, col, expression):
+  return {"ln":ln, "col":col, 'i_type':'return', 'expression':expression}
+
+def Error(ln, col, type, description):
+    return {"ln":ln, "col":col, "type":type, "description":description}
+
+operations = {
   '+':'suma',
   '-':'resta',
   '*':'multiplicacion',

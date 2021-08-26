@@ -27,7 +27,7 @@ function app() {
     dispatch(toggleLoading(true))
 
     axios
-      .post('/api', { content })
+      .post('/api/', { content })
       .then(({ data }) => {
         dispatch(updateReports(data))
         dispatch(newOutput([JSON.stringify(data)]))

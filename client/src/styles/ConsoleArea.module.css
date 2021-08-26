@@ -25,6 +25,8 @@
 }
 
 .console li {
+  max-width: 100%;
+  word-wrap: break-word;
   list-style: '‣ ';
 }
 

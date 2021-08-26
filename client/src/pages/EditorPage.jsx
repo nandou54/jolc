@@ -8,7 +8,7 @@ import ConsoleArea from '@/components/ConsoleArea'
 function EditorPage() {
   return (
     <Split
-      minSize={300}
+      minSize={150}
       render={({ getGridProps, getGutterProps }) => (
         <div className={styles.base} {...getGridProps()}>
           <EditorArea />

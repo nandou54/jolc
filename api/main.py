@@ -22,7 +22,7 @@ mime_types = {
   'svg':'image/svg+xml'
 }
 
-templates = Jinja2Templates(directory="dist")   
+templates = Jinja2Templates(directory="dist")
 
 @app.post("/api/")
 def analyze_input(input: inputData):

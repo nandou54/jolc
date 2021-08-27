@@ -7,14 +7,14 @@
 
 .sidebar {
   z-index: 10;
-  background: linear-gradient(rgb(27, 35, 55), rgb(20, 26, 40));
+  background: linear-gradient(rgb(35, 40, 60), rgb(20, 20, 40));
   color: white;
   width: 250px;
   height: 100%;
-  border-right: 3px rgba(60, 60, 100) solid;
+  border-right: 3px rgb(25, 25, 40) solid;
 
   display: grid;
-  grid-template-columns: 4fr 2px 1fr;
+  grid-template-columns: 190px 2px 58px;
   grid-template-rows: 140px 1fr;
   grid-template-areas:
     'logo logo logo'
@@ -34,11 +34,11 @@
 .separator {
   grid-area: separator;
   background: linear-gradient(
-    rgba(20, 20, 40, 0),
-    rgba(20, 20, 40, 0.3),
-    rgba(20, 20, 40, 0.5),
-    rgba(20, 20, 40, 0.3),
-    rgba(20, 20, 40, 0)
+    rgba(15, 15, 30, 0),
+    rgba(15, 15, 30, 0.3),
+    rgba(15, 15, 30, 0.6),
+    rgba(15, 15, 30, 0.3),
+    rgba(15, 15, 30, 0)
   );
   margin: 5px 0;
 }

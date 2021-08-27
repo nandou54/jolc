@@ -1,3 +1,5 @@
+from datetime import datetime
+
 def Assignment(ln, col, scope, id, expression, type):
   return {"ln":ln, "col":col, 'i_type':'assignment', 'scope':scope, 'id':id, 'expression':expression, 'type':type}
 
@@ -47,7 +49,8 @@ def Return(ln, col, expression):
   return {"ln":ln, "col":col, 'i_type':'return', 'expression':expression}
 
 def Error(ln, col, type, description):
-    return {"ln":ln, "col":col, "type":type, "description":description}
+  time = datetime.today().strftime('%d/%m/%Y %H:%M:%S.%f')
+  return {"ln":ln, "col":col, "type":type, "description":description, "time":time}
 
 operations = {
   '+':'suma',

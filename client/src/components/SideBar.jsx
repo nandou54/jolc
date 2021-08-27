@@ -10,7 +10,7 @@ import { log, newOutput } from '@/actions/outputActions'
 import SideBarButton from './SideBarButton'
 import { useLocation } from 'wouter'
 
-function app() {
+function SideBar() {
   const [activePage] = useLocation()
   const [{ show, loading }, content] = useSelector((state) => [state.app, state.editor])
   const dispatch = useDispatch()
@@ -25,7 +25,6 @@ function app() {
   const handleRun = () => {
     if (loading) return
     dispatch(toggleLoading(true))
-
     axios
       .post('/api/', { content })
       .then(({ data }) => {
@@ -69,7 +68,7 @@ function app() {
 
   return (
     <div className={styles.base}>
-      <div className={styles.sidebar} style={{ marginLeft: show ? 0 : -190 }}>
+      <div className={styles.sidebar} style={{ marginLeft: show ? 0 : -193 }}>
         <Logo />
         <div className={styles.items}>
           {items.map((item, i) => (
@@ -100,4 +99,4 @@ function Loader() {
   )
 }
 
-export default app
+export default SideBar

@@ -3,8 +3,7 @@
 }
 
 .title {
-  background: rgb(25, 30, 45);
-  color: white;
+  background: rgb(25, 25, 40);
   height: 35px;
 
   display: flex;
@@ -17,17 +16,17 @@
   background: rgb(40 42 54);
   color: rgb(220, 230, 230);
 
-  width: calc(100% - 40px);
   height: calc(100% - 55px);
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 10px 20px;
+  padding-bottom: 20px;
+  padding-right: 10px;
 }
 
 .console li {
-  max-width: 100%;
+  margin: 2px 0;
   word-wrap: break-word;
-  list-style: '‣ ';
+  list-style-type: '$ ';
 }
 
 @media only screen and (max-width: 768px) {

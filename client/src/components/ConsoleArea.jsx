@@ -9,9 +9,11 @@ function ConsoleArea() {
     <div className={styles.base}>
       <div className={`${styles.title} unselectable`}>console</div>
       <div className={styles.console}>
-        {output.map((line, i) => (
-          <li key={i}>{line}</li>
-        ))}
+        <ul>
+          {output.map((line, i) => (
+            <li key={i}>{line}</li>
+          ))}
+        </ul>
       </div>
     </div>
   )

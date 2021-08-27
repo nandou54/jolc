@@ -1,13 +1,13 @@
 .base {
-  background: rgba(55, 55, 70, 0.5);
+  background: rgb(40, 40, 65);
 
-  width: calc(100% - 13px + 3px);
+  width: calc(100% + 3px - 8px);
   margin-right: -3px;
   height: 50px;
   margin-bottom: 10px;
 
   border: none;
-  border-right: 3px transparent solid;
+  border-right: 3px rgb(40, 40, 65) solid;
   border-top-left-radius: 23px;
   border-bottom-left-radius: 23px;
 
@@ -18,13 +18,16 @@
 
 .base:hover {
   cursor: pointer;
-  border-right: 3px rgb(9, 158, 204) solid;
 }
 
 .base:active {
-  border-right: 3px rgb(158, 170, 158) solid;
+  width: calc(100% + 3px - 13px);
+  height: 46px;
+  margin-top: 2px;
+  margin-bottom: 12px;
 }
 
 .base img {
   height: 60%;
+  margin-left: 5px;
 }

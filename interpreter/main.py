@@ -1,26 +1,50 @@
-from interpreter.analyzer import parse
-from interpreter.core import *
+from .core import *
+from .analyzer import parse
+from .symbols import SemanticError
 
 
 def interpret(input):
-  output.clear()
+  global errors, output, symbols
+  global functions, loops, envs, globalEnv
+
   errors.clear()
+  output.clear()
   symbols.clear()
 
+  functions.clear()
+  loops.clear()
+  envs.clear()
+
+  globalEnv = Environment()
+  envs.append(globalEnv)
+
   res = parse(input)
+  INS = res['ast'].copy()
+  errors = res['errors']
+
+  for instruction in INS:
+    if instruction['i_type']=='function': exFunction(instruction, globalEnv)
+
+  INS = list(filter(lambda instruction: instruction['i_type'!='function']), INS)
+
+  exInstructions(INS, globalEnv)
+
+  res['errors'] = errors
+  res['output'] = output
+  res['symbols'] = symbols
 
   return res
 
 
-def exInstrucciones(instrucciones, env:Environment):
+def exInstructions(instrucciones, env:Environment):
   for instruccion in instrucciones:
-    if instruccion['i'] in ejecutables.keys():
-      res = ejecutables[instruccion['i']](instruccion, env)
+    if instruccion['i'] in executables.keys():
+      res = executables[instruccion['i']](instruccion, env)
 
-def exExpresion(ins, env:Environment):
+def exExpression(ins, env:Environment):
   pass
 
-def exAsignacion(ins, env:Environment):
+def exAssignment(ins, env:Environment):
   if env.getLocalSymbol(ins['id']): return print('La variable %s ya ha sido declarada', )
 
   value = None
@@ -28,17 +52,17 @@ def exAsignacion(ins, env:Environment):
   if ins['expresion'] != None:
     pass
 
-
-def exFuncion(ins, env:Environment):
-  pass
+def exFunction(ins, env:Environment):
+  if ins['id'] in RESERVED_FUNCTIONS:
+    return SemanticError(ins, 'Semántico')
 
 def exStruct(ins, env:Environment):
   pass
 
-def exLlamada(ins, env:Environment):
+def exCall(ins, env:Environment):
   pass
 
-def exAcceso(ins, env:Environment):
+def exAccess(ins, env:Environment):
   pass
 
 def exIf(ins, env:Environment):
@@ -62,13 +86,12 @@ def exContinue(env:Environment):
 def exReturn(_return, env:Environment):
   pass
 
-
-ejecutables = {
-  'asignacion':exAsignacion,
-  'funcion':exFuncion,
+executables = {
+  'asignacion':exAssignment,
+  'funcion':exFunction,
   'struct':exStruct,
-  'llamada':exLlamada,
-  'acceso':exAcceso,
+  'llamada':exCall,
+  'acceso':exAccess,
   'if':exIf,
   'else':exElse,
   'while':exWhile, 

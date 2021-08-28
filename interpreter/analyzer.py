@@ -1,4 +1,7 @@
-from interpreter.symbols import *
+from interpreter.ply.yacc import yacc
+from interpreter.ply.lex import lex
+
+from .symbols import *
 
 INPUT:str
 errors:list
@@ -167,12 +170,11 @@ def t_newline(t):
   t.lexer.lineno+=len(t.value)
 
 def t_error(t):
-  error = Error(t.lineno, getColumn(t), "Léxico", "No se pudo reconocer el lexema '%s'" % t.value)
+  error = LexicalError(t.lineno, getColumn(t), "No se pudo reconocer el lexema '%s'" % t.value)
   errors.append(error)
   t.lexer.skip(1)
 
 # Analizador léxico
-from interpreter.ply.lex import lex
 lexer = lex()
 
 # Precedencia de menos a más
@@ -560,11 +562,11 @@ def p_error(p):
   if p:
     if type(p.value) is dict: msg = "Sintáxis no válida en {}".format(p.type)
     else: msg = "Sintaxis no válida cerca de '{}' ({})" .format(p.value, p.type)
-    error = Error(p.lineno, getColumn(p), "Sintáctico", msg)
+    error = SyntacticError(p.lineno, getColumn(p), msg)
   else:
-    error = Error(0, 0, "Sintáctico", "Ninguna instrucción válida")
+    error = SyntacticError(0, 0, "Ninguna instrucción válida")
 
   errors.append(error)
 
-from interpreter.ply.yacc import yacc
+# Analizador sintáctico
 parser = yacc()

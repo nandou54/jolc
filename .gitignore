@@ -1,6 +1,17 @@
+# general
 *.pdf
 .vscode
 node_modules
+
+# api
+parser.out
+parsetab.py
 __pycache__
 .mypy_cache
+test.py
+
+# client
+.DS_Store
 dist
+dist-ssr
+*.local

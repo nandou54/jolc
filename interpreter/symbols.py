@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime as _datetime
 
 def Assignment(ln, col, scope, id, expression, type):
   return {"ln":ln, "col":col, 'i_type':'assignment', 'scope':scope, 'id':id, 'expression':expression, 'type':type}
@@ -48,8 +48,17 @@ def Continue(ln, col):
 def Return(ln, col, expression):
   return {"ln":ln, "col":col, 'i_type':'return', 'expression':expression}
 
-def Error(ln, col, type, description):
-  time = datetime.today().strftime('%d/%m/%Y %H:%M:%S.%f')
+def LexicalError(ln, col, description):
+  return _Error(ln, col, 'Léxico', description)
+
+def SyntacticError(ln, col, description):
+  return _Error(ln, col, 'Sintáctico', description)
+
+def SemanticError(ins, description):
+  return _Error(ins['ln'], ins['col'], 'Semántico', description)
+
+def _Error(ln, col, type, description):
+  time = _datetime.today().strftime('%d/%m/%Y %H:%M:%S.%f')
   return {"ln":ln, "col":col, "type":type, "description":description, "time":time}
 
 operations = {

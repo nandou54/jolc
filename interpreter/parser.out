@@ -4,8 +4,8 @@ Grammar
 
 Rule 0     S' -> INS
 Rule 1     INS -> INS I puntoycoma
-Rule 2     INS -> INS error puntoycoma
-Rule 3     INS -> I puntoycoma
+Rule 2     INS -> I puntoycoma
+Rule 3     INS -> INS error puntoycoma
 Rule 4     INS -> error puntoycoma
 Rule 5     I -> ASIGNACION
 Rule 6     I -> ASIGNACION_STRUCT
@@ -124,7 +124,7 @@ dospuntos            : 92
 else                 : 89
 elseif               : 86 87 88
 end                  : 17 40 41
-error                : 2 4
+error                : 3 4
 float64              : 71
 for                  : 91
 function             : 35 36
@@ -176,11 +176,11 @@ ELSEIF               : 85 87
 EXP                  : 46 76 78
 FOR                  : 13
 FUNCION              : 8
-I                    : 1 3
+I                    : 1 2
 ID                   : 31 69 81
 IF                   : 11
 IND                  : 32 33
-INS                  : 1 2 17 18 0
+INS                  : 1 3 17 18 0
 LLAMADA              : 10 65
 P                    : 37 38
 PAR                  : 35 37
@@ -197,8 +197,8 @@ state 0
 
     (0) S' -> . INS
     (1) INS -> . INS I puntoycoma
-    (2) INS -> . INS error puntoycoma
-    (3) INS -> . I puntoycoma
+    (2) INS -> . I puntoycoma
+    (3) INS -> . INS error puntoycoma
     (4) INS -> . error puntoycoma
     (5) I -> . ASIGNACION
     (6) I -> . ASIGNACION_STRUCT
@@ -272,7 +272,7 @@ state 1
 
     (0) S' -> INS .
     (1) INS -> INS . I puntoycoma
-    (2) INS -> INS . error puntoycoma
+    (3) INS -> INS . error puntoycoma
     (5) I -> . ASIGNACION
     (6) I -> . ASIGNACION_STRUCT
     (7) I -> . ASIGNACION_ARRAY
@@ -342,7 +342,7 @@ state 1
 
 state 2
 
-    (3) INS -> I . puntoycoma
+    (2) INS -> I . puntoycoma
 
     puntoycoma      shift and go to state 32
 
@@ -722,32 +722,32 @@ state 30
 
 state 31
 
-    (2) INS -> INS error . puntoycoma
+    (3) INS -> INS error . puntoycoma
 
     puntoycoma      shift and go to state 65
 
 
 state 32
 
-    (3) INS -> I puntoycoma .
+    (2) INS -> I puntoycoma .
 
-    error           reduce using rule 3 (INS -> I puntoycoma .)
-    id              reduce using rule 3 (INS -> I puntoycoma .)
-    function        reduce using rule 3 (INS -> I puntoycoma .)
-    struct          reduce using rule 3 (INS -> I puntoycoma .)
-    mutable         reduce using rule 3 (INS -> I puntoycoma .)
-    if              reduce using rule 3 (INS -> I puntoycoma .)
-    while           reduce using rule 3 (INS -> I puntoycoma .)
-    for             reduce using rule 3 (INS -> I puntoycoma .)
-    break           reduce using rule 3 (INS -> I puntoycoma .)
-    continue        reduce using rule 3 (INS -> I puntoycoma .)
-    return          reduce using rule 3 (INS -> I puntoycoma .)
-    local           reduce using rule 3 (INS -> I puntoycoma .)
-    global          reduce using rule 3 (INS -> I puntoycoma .)
-    $end            reduce using rule 3 (INS -> I puntoycoma .)
-    end             reduce using rule 3 (INS -> I puntoycoma .)
-    else            reduce using rule 3 (INS -> I puntoycoma .)
-    elseif          reduce using rule 3 (INS -> I puntoycoma .)
+    error           reduce using rule 2 (INS -> I puntoycoma .)
+    id              reduce using rule 2 (INS -> I puntoycoma .)
+    function        reduce using rule 2 (INS -> I puntoycoma .)
+    struct          reduce using rule 2 (INS -> I puntoycoma .)
+    mutable         reduce using rule 2 (INS -> I puntoycoma .)
+    if              reduce using rule 2 (INS -> I puntoycoma .)
+    while           reduce using rule 2 (INS -> I puntoycoma .)
+    for             reduce using rule 2 (INS -> I puntoycoma .)
+    break           reduce using rule 2 (INS -> I puntoycoma .)
+    continue        reduce using rule 2 (INS -> I puntoycoma .)
+    return          reduce using rule 2 (INS -> I puntoycoma .)
+    local           reduce using rule 2 (INS -> I puntoycoma .)
+    global          reduce using rule 2 (INS -> I puntoycoma .)
+    $end            reduce using rule 2 (INS -> I puntoycoma .)
+    end             reduce using rule 2 (INS -> I puntoycoma .)
+    else            reduce using rule 2 (INS -> I puntoycoma .)
+    elseif          reduce using rule 2 (INS -> I puntoycoma .)
 
 
 state 33
@@ -1093,8 +1093,8 @@ state 44
     (17) BLOQUE -> . INS end
     (18) BLOQUE_ABIERTO -> . INS
     (1) INS -> . INS I puntoycoma
-    (2) INS -> . INS error puntoycoma
-    (3) INS -> . I puntoycoma
+    (2) INS -> . I puntoycoma
+    (3) INS -> . INS error puntoycoma
     (4) INS -> . error puntoycoma
     (5) I -> . ASIGNACION
     (6) I -> . ASIGNACION_STRUCT
@@ -1918,8 +1918,8 @@ state 61
     (92) RANGO -> E . dospuntos E
     (17) BLOQUE -> . INS end
     (1) INS -> . INS I puntoycoma
-    (2) INS -> . INS error puntoycoma
-    (3) INS -> . I puntoycoma
+    (2) INS -> . I puntoycoma
+    (3) INS -> . INS error puntoycoma
     (4) INS -> . error puntoycoma
     (5) I -> . ASIGNACION
     (6) I -> . ASIGNACION_STRUCT
@@ -2074,25 +2074,25 @@ state 64
 
 state 65
 
-    (2) INS -> INS error puntoycoma .
+    (3) INS -> INS error puntoycoma .
 
-    error           reduce using rule 2 (INS -> INS error puntoycoma .)
-    id              reduce using rule 2 (INS -> INS error puntoycoma .)
-    function        reduce using rule 2 (INS -> INS error puntoycoma .)
-    struct          reduce using rule 2 (INS -> INS error puntoycoma .)
-    mutable         reduce using rule 2 (INS -> INS error puntoycoma .)
-    if              reduce using rule 2 (INS -> INS error puntoycoma .)
-    while           reduce using rule 2 (INS -> INS error puntoycoma .)
-    for             reduce using rule 2 (INS -> INS error puntoycoma .)
-    break           reduce using rule 2 (INS -> INS error puntoycoma .)
-    continue        reduce using rule 2 (INS -> INS error puntoycoma .)
-    return          reduce using rule 2 (INS -> INS error puntoycoma .)
-    local           reduce using rule 2 (INS -> INS error puntoycoma .)
-    global          reduce using rule 2 (INS -> INS error puntoycoma .)
-    $end            reduce using rule 2 (INS -> INS error puntoycoma .)
-    end             reduce using rule 2 (INS -> INS error puntoycoma .)
-    else            reduce using rule 2 (INS -> INS error puntoycoma .)
-    elseif          reduce using rule 2 (INS -> INS error puntoycoma .)
+    error           reduce using rule 3 (INS -> INS error puntoycoma .)
+    id              reduce using rule 3 (INS -> INS error puntoycoma .)
+    function        reduce using rule 3 (INS -> INS error puntoycoma .)
+    struct          reduce using rule 3 (INS -> INS error puntoycoma .)
+    mutable         reduce using rule 3 (INS -> INS error puntoycoma .)
+    if              reduce using rule 3 (INS -> INS error puntoycoma .)
+    while           reduce using rule 3 (INS -> INS error puntoycoma .)
+    for             reduce using rule 3 (INS -> INS error puntoycoma .)
+    break           reduce using rule 3 (INS -> INS error puntoycoma .)
+    continue        reduce using rule 3 (INS -> INS error puntoycoma .)
+    return          reduce using rule 3 (INS -> INS error puntoycoma .)
+    local           reduce using rule 3 (INS -> INS error puntoycoma .)
+    global          reduce using rule 3 (INS -> INS error puntoycoma .)
+    $end            reduce using rule 3 (INS -> INS error puntoycoma .)
+    end             reduce using rule 3 (INS -> INS error puntoycoma .)
+    else            reduce using rule 3 (INS -> INS error puntoycoma .)
+    elseif          reduce using rule 3 (INS -> INS error puntoycoma .)
 
 
 state 66
@@ -3491,7 +3491,7 @@ state 99
     (17) BLOQUE -> INS . end
     (18) BLOQUE_ABIERTO -> INS .
     (1) INS -> INS . I puntoycoma
-    (2) INS -> INS . error puntoycoma
+    (3) INS -> INS . error puntoycoma
     (5) I -> . ASIGNACION
     (6) I -> . ASIGNACION_STRUCT
     (7) I -> . ASIGNACION_ARRAY
@@ -3857,7 +3857,7 @@ state 107
 
     (17) BLOQUE -> INS . end
     (1) INS -> INS . I puntoycoma
-    (2) INS -> INS . error puntoycoma
+    (3) INS -> INS . error puntoycoma
     (5) I -> . ASIGNACION
     (6) I -> . ASIGNACION_STRUCT
     (7) I -> . ASIGNACION_ARRAY
@@ -4211,8 +4211,8 @@ state 118
     (36) FUNCION -> function id parentesis_A parentesis_B . BLOQUE
     (17) BLOQUE -> . INS end
     (1) INS -> . INS I puntoycoma
-    (2) INS -> . INS error puntoycoma
-    (3) INS -> . I puntoycoma
+    (2) INS -> . I puntoycoma
+    (3) INS -> . INS error puntoycoma
     (4) INS -> . error puntoycoma
     (5) I -> . ASIGNACION
     (6) I -> . ASIGNACION_STRUCT
@@ -4362,8 +4362,8 @@ state 127
     (89) ELSE -> else . BLOQUE
     (17) BLOQUE -> . INS end
     (1) INS -> . INS I puntoycoma
-    (2) INS -> . INS error puntoycoma
-    (3) INS -> . I puntoycoma
+    (2) INS -> . I puntoycoma
+    (3) INS -> . INS error puntoycoma
     (4) INS -> . error puntoycoma
     (5) I -> . ASIGNACION
     (6) I -> . ASIGNACION_STRUCT
@@ -5702,8 +5702,8 @@ state 148
     (92) RANGO -> E . dospuntos E
     (17) BLOQUE -> . INS end
     (1) INS -> . INS I puntoycoma
-    (2) INS -> . INS error puntoycoma
-    (3) INS -> . I puntoycoma
+    (2) INS -> . I puntoycoma
+    (3) INS -> . INS error puntoycoma
     (4) INS -> . error puntoycoma
     (5) I -> . ASIGNACION
     (6) I -> . ASIGNACION_STRUCT
@@ -5883,8 +5883,8 @@ state 157
     (35) FUNCION -> function id parentesis_A PAR parentesis_B . BLOQUE
     (17) BLOQUE -> . INS end
     (1) INS -> . INS I puntoycoma
-    (2) INS -> . INS error puntoycoma
-    (3) INS -> . I puntoycoma
+    (2) INS -> . I puntoycoma
+    (3) INS -> . INS error puntoycoma
     (4) INS -> . error puntoycoma
     (5) I -> . ASIGNACION
     (6) I -> . ASIGNACION_STRUCT
@@ -6015,8 +6015,8 @@ state 163
     (17) BLOQUE -> . INS end
     (18) BLOQUE_ABIERTO -> . INS
     (1) INS -> . INS I puntoycoma
-    (2) INS -> . INS error puntoycoma
-    (3) INS -> . I puntoycoma
+    (2) INS -> . I puntoycoma
+    (3) INS -> . INS error puntoycoma
     (4) INS -> . error puntoycoma
     (5) I -> . ASIGNACION
     (6) I -> . ASIGNACION_STRUCT

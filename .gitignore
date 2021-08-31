@@ -2,13 +2,16 @@
 *.pdf
 .vscode
 node_modules
+legacy.*
 
 # api
-parser.out
-parsetab.py
 __pycache__
 .mypy_cache
 test.py
+
+# interpreter
+interpreter/parser.out
+parsetab.py
 
 # client
 .DS_Store

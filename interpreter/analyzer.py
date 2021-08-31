@@ -2,14 +2,21 @@ from interpreter.ply.yacc import yacc
 from interpreter.ply.lex import lex
 
 from .symbols import *
+from .symbols import _Error
 
 INPUT:str
 errors:list
 
+def LexicalError(ln, col, description):
+  return _Error(ln, col, 'Léxico', description)
+
+def SyntacticError(ln, col, description):
+  return _Error(ln, col, 'Sintáctico', description)
+
 def getColumn(t):
   global INPUT
-  line_start = INPUT.rfind('\n', 0, t.lexpos) + 1
-  return (t.lexpos - line_start) + 1
+  line_start = INPUT.rfind('\n', 0, t.lexpos)+1
+  return (t.lexpos-line_start)+1
 
 def parse(input):
   global INPUT
@@ -20,7 +27,7 @@ def parse(input):
 
   ast = parser.parse(input)
   if ast == None: ast = []
-  return {'ast':ast, 'symbols':[], 'errors':errors, 'output':[]}
+  return {'ast':ast, 'errors':errors, 'output':'', 'symbols':[]}
 
 reserved = [
   'Nothing',
@@ -111,58 +118,57 @@ t_tipo           = r'::'
 t_dospuntos      = r':'
 t_puntoycoma     = r';'
 
-# def t_nothing(t):
-#   r'Nothing'
-#   valor, tipo = None, 'nothing'
-#   t.value = Expresion(False, False, valor, None, tipo)
-#   return t
-
 def t_float64(t):
   r'\d+\.\d+'
-  value, type = 0, 'float64'
+  value, valueType = 0, 'float64'
 
   try:
     value = float(t.value)
   except ValueError:
     print("Float64 value too big: %d", t.value)
 
-  t.value = Expression(t.lineno, getColumn(t), False, False, value, None, type)
+  t.value = Value(t.lineno, getColumn(t), value, valueType)
   return t
 
 def t_int64(t):
   r'\d+'
-  value, type = 0, 'int64'
+  value, valueType = 0, 'int64'
 
   try:
     value = int(t.value)
   except ValueError:
     print("Int64 value too big: %d", t.value)
 
-  t.value = Expression(t.lineno, getColumn(t), False, False, value, None, type)
+  t.value = Value(t.lineno, getColumn(t), value, valueType)
   return t
 
 def t_bool(t):
   r'(true)|(false)'
-  value, type = t.value=='true', 'bool'
-  t.value = Expression(t.lineno, getColumn(t), False, False, value, None, type)
+  value, valueType = t.value=='true', 'bool'
+  t.value = Value(t.lineno, getColumn(t), value, valueType)
   return t
 
 def t_char(t):
   r"'[^'\n]'"
-  value, type = t.value[1], 'char'
-  t.value = Expression(t.lineno, getColumn(t), False, False, value, None, type)
+  value, valueType = t.value[1], 'char'
+  t.value = Value(t.lineno, getColumn(t), value, valueType)
   return t
 
 def t_string(t):
   r'"[^"\n]*"'
-  value, type = t.value[1:-1], 'string'
-  t.value = Expression(t.lineno, getColumn(t), False, False, value, None, type)
+  value, valueType = t.value[1:-1], 'string'
+  t.value = Value(t.lineno, getColumn(t), value, valueType)
+  return t
+
+def t_Nothing(t):
+  r'Nothing'
+  t.value = Value(t.lineno, getColumn(t), None, 'Nothing')
   return t
 
 def t_id(t):
   r'[a-zA-Z_][a-zA-Z_0-9]*'
   if t.value in reserved: t.type = t.value
-  else: t.value = Expression(t.lineno, getColumn(t), False, False, t.value, None, 'id')
+  else: t.value = Value(t.lineno, getColumn(t), t.value, 'id')
   return t
 
 def t_newline(t):
@@ -197,20 +203,23 @@ precedence = (
 def p_INS(p):
   '''
   INS : INS I puntoycoma
-      | INS error puntoycoma
       | I puntoycoma
-      | error puntoycoma
   '''
-  print(p)
   if len(p)==4:
     p[0] = p[1]
-    if type(p[2]) is dict:
-      p[0].append(p[2])
+    p[0].append(p[2])
   else:
-    if type(p[1]) is dict:
-      p[0] = [p[1]]
-    else:
-      p[0] = []
+    p[0] = [p[1]]
+
+def p_INS_error(p):
+  '''
+  INS : INS error puntoycoma
+      | error puntoycoma
+  '''
+  if len(p)==4:
+    p[0] = p[1]
+  else:
+    p[0] = []
 
 def p_I(p):
   '''
@@ -253,7 +262,7 @@ def p_TIPO(p):
 
 def p_SCOPE(p):
   '''
-  SCOPE  : local
+  SCOPE : local
         | global
   '''
   p[0] = p[1]
@@ -264,20 +273,20 @@ def p_ASIGNACION(p):
               | SCOPE id igual ASIGNACION_VALOR
               | SCOPE id
   '''
-  scope, id, expression, value_type = None, None, None, None
+  id, expression, scope, type = None, None, None, None
 
   if len(p)==4:
     id = p[1]
     expression = p[3]['expression']
-    value_type = p[3]['type']
+    type = p[3]['type']
   else:
     scope = p[1]
     id = p[2]
     if len(p)==5:
       expression = p[4]['expression']
-      value_type = p[4]['type']
+      type = p[4]['type']
 
-  p[0] = Assignment(p.lexer.lineno, getColumn(p.lexer), scope, id, expression, value_type)
+  p[0] = Assignment(p.lexer.lineno, getColumn(p.lexer), id, expression, scope, type)
 
 def p_ASIGNACION_VALOR(p):
   '''
@@ -296,14 +305,14 @@ def p_ASIGNACION_STRUCT(p):
   ASIGNACION_STRUCT : ID igual E
   '''
   id, expression = p[1], p[3]
-  p[0] = Assignment_Struct(p.lexer.lineno, getColumn(p.lexer), id, expression)
+  p[0] = StructAssignment(p.lexer.lineno, getColumn(p.lexer), id, expression)
 
 def p_ASIGNACION_ARRAY(p):
   '''
   ASIGNACION_ARRAY : id IND igual E
   '''
   id, index, expression = p[1], p[2], p[4]
-  p[0] = Assignment_Array(p.lexer.lineno, getColumn(p.lexer), id, index, expression)
+  p[0] = ArrayAssignment(p.lexer.lineno, getColumn(p.lexer), id, index, expression)
 
 def p_IND(p):
   '''
@@ -423,24 +432,25 @@ def p_E(p):
   '''
   if len(p)==2:
     p[0] = p[1]
+    if type(p[0]) is list: p[0] = Value(0, 0, p[0], 'id')
     return
 
   if p[1]=='(':
     p[0] = p[2]
     return
 
-  operable, unary, l, r, type = True, False, None, None, None
+  unary, l, r, expressionType = False, None, None, None
 
   if len(p)==4:
     l = p[1]
     r = p[3]
-    type = operations[p[2]]
+    expressionType = operations[p[2]]
   else:
     unary = True
     l = p[2]
-    type = operations[p[1]]
+    expressionType = 'negacion' if p[1]=='-' else 'not'
 
-  p[0] = Expression(p.lexer.lineno, getColumn(p.lexer), operable, unary, l, r, type)
+  p[0] = Expression(p.lexer.lineno, getColumn(p.lexer), unary, expressionType, l, r)
 
 def p_ARREGLO(p):
   '''
@@ -449,7 +459,7 @@ def p_ARREGLO(p):
   '''
   value = []
   if len(p)==4: value = p[2]
-  p[0] = Expression(p.lexer.lineno, getColumn(p.lexer), False, False, value, None, 'array')
+  p[0] = Value(p.lexer.lineno, getColumn(p.lexer), value, 'array')
 
 def p_LLAMADA(p):
   '''
@@ -532,7 +542,7 @@ def p_RANGO(p):
   RANGO : E dospuntos E
   '''
   izq, der = p[1], p[3]
-  p[0] = Expression(p.lexer.lineno, getColumn(p.lexer), False, False, izq, der, 'rango')
+  p[0] = Expression(p.lexer.lineno, getColumn(p.lexer), False, 'rango', izq, der)
 
 def p_BREAK(p):
   '''

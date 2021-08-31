@@ -1,16 +1,6 @@
-import json
-from interpreter.analyzer import lexer, parse
+arr = [1, 2, 3]
 
-INPUT = '''
-x = accesoo[5];
-'''
+for el in arr:
+  el = 0
 
-# lexer.input(INPUT)
-# for tok in lexer:
-#     print(tok)
-
-res = parse(INPUT)
-prettyAST = json.dumps(res["ast"], indent=2)
-prettyErrors = json.dumps(res["errors"], indent=2)
-print(prettyAST)
-print(prettyErrors)
+arr

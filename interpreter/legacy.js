@@ -705,6 +705,60 @@ const interpret = (INS) => {
   return { printed: getPrinted(), interpreted_errors: getErrors(), symbols: getSymbols() }
 }
 
+const $Instructions = (INS, env) => {
+  for (let Instruction of INS) {
+    if (['Funcion', 'Metodo'].includes(Instruction.Tipo))
+      return Error(
+        Instruction.Linea,
+        Instruction.Columna,
+        'Solo se pueden declarar funciones o métodos en el entorno global'
+      )
+    if (Instruction.Tipo === 'Exec')
+      return Error(
+        Instruction.Linea,
+        Instruction.Columna,
+        `Sentencia 'exec' en un entorno no global`
+      )
+
+    if (Execute[Instruction.Tipo]) {
+      let result = Execute[Instruction.Tipo](Instruction, env)
+      if (!result) continue
+      Instruction = result
+    }
+
+    if (Instruction.Tipo === 'Return') {
+      if (!functions.length)
+        return Error(
+          Instruction.Linea,
+          Instruction.Columna,
+          'Instruccion return fuera de una función'
+        )
+      let Expresion = Instruction.Expresion ? $Evaluar(Instruction.Expresion, env) : null
+      return { ...Instruction, Expresion }
+    } else if (Instruction.Tipo === 'Break') {
+      if (!cycles.length) {
+        Error(
+          Instruction.Linea,
+          Instruction.Columna,
+          'Instruccion break fuera de una función'
+        )
+        continue
+      }
+      return Instruction
+    } else if (Instruction.Tipo === 'Continue') {
+      if (!cycles.length) {
+        Error(
+          Instruction.Linea,
+          Instruction.Columna,
+          'Instruccion continue fuera de una función'
+        )
+        continue
+      }
+      return Instruction
+    }
+  }
+}
+
 const $Evaluar = (Operacion, env) => {
   if (
     ['int', 'double', 'char', 'string', 'boolean', 'vector', 'list'].includes(
@@ -742,25 +796,6 @@ const $Evaluar = (Operacion, env) => {
       `No se pudo realizar la operacion '${Operacion.Tipo}'`
     )
 
-  if (Operacion.Tipo === 'ternaria') {
-    if (!rigth_expression)
-      return Error(
-        Operacion.Linea,
-        Operacion.Columna,
-        `No se pudo realizar la operacion 'condicional'`
-      )
-
-    let condition = $Evaluar(Operacion.Condicion, env)
-    if (!condition || condition.Tipo !== 'boolean')
-      return Error(
-        Operacion.Linea,
-        Operacion.Columna,
-        'No se pudo realizar la operación ternaria'
-      )
-    return condition.Valor ? left_expression : rigth_expression
-  }
-
-  let return_type
   if (operation_results[Operacion.Tipo]) {
     if (!rigth_expression)
       return Error(
@@ -818,26 +853,6 @@ const $Declaracion = ({ Linea, Columna, Tipo_variable, ID, Expresion }, env) => 
   } else value = s.Simbolo(Linea, Columna, Tipo_variable, default_values[Tipo_variable])
 
   Declare(env, ID, value)
-}
-
-const $Asignacion = ({ Linea, Columna, ID, Expresion }, env) => {
-  let id = getDeclaredGlobal(env, ID)
-  if (!id) return Error(Linea, Columna, `No se ha declarado la variable '${ID}'`)
-
-  let value = $Evaluar(Expresion, env)
-  if (!value) return Error(Linea, Columna, `No se pudo realizar la asignacion`)
-  if (id.Tipo !== value.Tipo)
-    if (id.Tipo === 'double' && value.Tipo === 'int') value.Tipo = 'double'
-    else if (id.Tipo === 'int' && value.Tipo === 'double' && value.Valor % 1 === 0)
-      value.Tipo = 'int'
-    else
-      return Error(
-        Linea,
-        Columna,
-        `No se puede asignar un valor ${value.Tipo} a '${ID}' (${id.Tipo})`
-      )
-
-  id.Valor = value.Valor
 }
 
 const $Funcion = (
@@ -931,132 +946,6 @@ const $Llamada = ({ Linea, Columna, ID, Parametros }, env) => {
   return return_value
 }
 
-const $Incremento = ({ Linea, Columna, ID }, env) => {
-  let id = getDeclaredGlobal(env, ID)
-  if (!id) return Error(Linea, Columna, `No se encontró la variable '${ID}'`)
-  if (!['int', 'double'].includes(id.Tipo))
-    return Error(
-      Linea,
-      Columna,
-      `No se puede incrementar la variable no numérica '${ID}'`
-    )
-
-  id.Valor += 1
-}
-
-const $Decremento = ({ Linea, Columna, ID }, env) => {
-  let id = getDeclaredGlobal(env, ID)
-  if (!id) return Error(Linea, Columna, `No se encontró la variable '${ID}'`)
-  if (!['int', 'double'].includes(id.Tipo))
-    return Error(
-      Linea,
-      Columna,
-      `No se puede decrementar la variable no numérica '${ID}'`
-    )
-
-  id.Valor -= 1
-}
-
-const $DeclararVector = (
-  { Linea, Columna, Tipo_valores, ID, Tipo_i, Tamaño, Valores },
-  env
-) => {
-  if (getDeclaredGlobal(env, ID))
-    return Error(Linea, Columna, `La variable '${ID}' ya ha sido declarada`)
-
-  let size,
-    values = []
-  if (Tipo_i) {
-    if (Tipo_valores !== Tipo_i)
-      return Error(Linea, Columna, `Los tipos del vector '${ID}' no coinciden`)
-    size = $Evaluar(Tamaño, env)
-    if (!size) return Error(Linea, Columna, `No se pudo declarar el vector '${ID}'`)
-    if (size.Tipo !== 'int')
-      return Error(
-        Linea,
-        Columna,
-        `El tamaño del vector '${ID}' debe ser un número entero`
-      )
-    if (size.Valor < 1)
-      return Error(
-        Linea,
-        Columna,
-        `El tamaño del vector '${ID}' debe ser un entero mayor a 0`
-      )
-
-    values = Array(size.Valor).fill(
-      s.Simbolo(Linea, Columna, Tipo_valores, default_values[Tipo_valores])
-    )
-  } else {
-    for (let value of Valores) {
-      let temp_value = $Evaluar(value, env)
-      if (!temp_value)
-        return Error(Linea, Columna, `No se pudo declarar el vector '${ID}'`)
-      if (temp_value.Tipo !== Tipo_valores)
-        return Error(
-          Linea,
-          Columna,
-          `El tipo del vector '${ID}' (${Tipo_valores}) no coincide con un valor asignado (${temp_value.Tipo})`
-        )
-
-      values.push(temp_value)
-    }
-  }
-
-  Declare(env, ID, s.Vector(Linea, Columna, Tipo_valores, ID, Tipo_valores, size, values))
-}
-
-const $DeclararLista = ({ Linea, Columna, Tipo_valores, ID, Tipo_i, Valores }, env) => {
-  if (getDeclaredGlobal(env, ID))
-    return Error(Linea, Columna, `La variable '${ID}' ya ha sido declarada`)
-
-  let values = []
-  if (Tipo_i) {
-    if (Tipo_valores !== Tipo_i)
-      return Error(Linea, Columna, `Los tipos de la lista '${ID}' no coinciden`)
-  } else {
-    let temp_list = $Evaluar(Valores, env)
-
-    if (!temp_list) return Error(Linea, Columna, `No se pudo declarar la lista '${ID}'`)
-    if (temp_list.Tipo !== 'list')
-      return Error(Linea, Columna, `Se debe asignar una lista a '${ID}'`)
-    if (temp_list.Tipo_valores !== Tipo_valores)
-      return Error(
-        Linea,
-        Columna,
-        `Se debe asignar una lista del mismo tipo al declarado (${Tipo_valores})`
-      )
-
-    values = temp_list.Valores
-  }
-
-  Declare(env, ID, s.Lista(Linea, Columna, Tipo_valores, ID, Tipo_valores, values))
-}
-
-const $AccesoVector = ({ Linea, Columna, ID, Index }, env) => {
-  let vector = getDeclaredGlobal(env, ID)
-  if (!vector) return Error(Linea, Columna, `No se ha declarado el vector '${ID}'`)
-
-  let index = $Evaluar(Index, env)
-  if (!index) return Error(Linea, Columna, `No se pudo acceder al vector '${ID}'`)
-  if (index.Tipo !== 'int')
-    return Error(Linea, Columna, `Se esperaba un valor entero como índice en '${ID}'`)
-  if (index.Valor >= vector.Valores.length)
-    return Error(
-      Linea,
-      Columna,
-      `El índice proporcionado para '${ID}' sobrepasó el tamaño del vector (${vector.Valores.length})`
-    )
-  if (index.Valor < 0)
-    return Error(
-      Linea,
-      Columna,
-      `El índice proporcionado para '${ID}' debe ser mayor o igual a 0`
-    )
-
-  return vector.Valores[index.Valor]
-}
-
 const $AccesoLista = ({ Linea, Columna, ID, Index }, env) => {
   let list = getDeclaredGlobal(env, ID)
   if (!list) return Error(Linea, Columna, `No se ha declarado la lista '${ID}'`)
@@ -1079,39 +968,6 @@ const $AccesoLista = ({ Linea, Columna, ID, Index }, env) => {
     )
 
   return list.Valores[index.Valor]
-}
-
-const $ModificacionVector = ({ Linea, Columna, ID, Index, Expresion }, env) => {
-  let vector = getDeclaredGlobal(env, ID)
-  if (!vector) return Error(Linea, Columna, `No se ha declarado el vector '${ID}'`)
-
-  let index = $Evaluar(Index, env)
-  if (!index) return Error(Linea, Columna, `No se pudo modificar el vector '${ID}'`)
-  if (index.Tipo !== 'int')
-    return Error(Linea, Columna, `Se esperaba un valor entero como índice en  '${ID}'`)
-  if (index.Valor >= vector.Valores.length)
-    return Error(
-      Linea,
-      Columna,
-      `El índice proporcionado para '${ID}' sobrepasó el tamaño del vector (${vector.Valores.length})`
-    )
-  if (index.Valor < 0)
-    return Error(
-      Linea,
-      Columna,
-      `El índice proporcionado para '${ID}' debe ser mayor o igual a 0`
-    )
-
-  let value = $Evaluar(Expresion, env)
-  if (!value) return Error(Linea, Columna, `No se pudo modificar el vector '${ID}'`)
-  if (value.Tipo !== vector.Tipo_valores)
-    return Error(
-      Linea,
-      Columna,
-      `No se puede asignar un valor ${value.Tipo} al vector '${ID}' (${vector.Tipo_valores})`
-    )
-
-  vector.Valores[index.Valor] = value
 }
 
 const $ModificacionLista = ({ Linea, Columna, ID, Index, Expresion }, env) => {
@@ -1179,56 +1035,6 @@ const $If = (
   let new_env = Environment(env.ID + `#if(${Linea},${Columna})`, env)
   if (condition.Valor) return $Instructions(Instrucciones_true, new_env)
   else if (Instrucciones_false) return $Instructions(Instrucciones_false, new_env)
-}
-
-const $Switch = ({ Linea, Columna, Expresion, Cases, Default }, env) => {
-  let executed = false
-  let new_env = Environment(env.ID + `#switch(${Linea},${Columna})`, env)
-
-  cycles.push('switch')
-  for (let Case of Cases) {
-    let condition = $Evaluar(
-      s.Operacion(Linea, Columna, 'igualacion', Expresion, Case.Expresion),
-      env
-    )
-    if (!condition) {
-      cycles.pop()
-      return Error(Linea, Columna, `No se pudo ejecutar la sentencia switch`)
-    }
-
-    if (condition.Valor || executed) {
-      executed = true
-      let result = $Instructions(Case.Instrucciones, new_env)
-      if (result) {
-        cycles.pop()
-
-        if (result.Tipo === 'Continue')
-          return Error(
-            result.Linea,
-            result.Columna,
-            `No se puede ejecutar una sentencia 'continue' dentro de un switch`
-          )
-        return result.Tipo === 'Return' ? result : undefined
-      }
-    }
-  }
-
-  if (Default && !executed) {
-    let result = $Instructions(Default.Instrucciones, new_env)
-    if (result) {
-      cycles.pop()
-
-      if (result.Tipo === 'Continue')
-        return Error(
-          result.Linea,
-          result.Columna,
-          `No se puede ejecutar una sentencia 'continue' dentro de un switch`
-        )
-      return result.Tipo === 'Return' ? result : undefined
-    }
-  }
-
-  cycles.pop()
 }
 
 const $While = ({ Linea, Columna, Condicion, Instrucciones }, env) => {
@@ -1393,56 +1199,3 @@ const $For = (
     } else if (result.Tipo === 'Continue') continue
   }
 }
-
-const $DoWhile = ({ Linea, Columna, Condicion, Instrucciones }, env) => {
-  cycles.push('do-while')
-  let new_env = Environment(env.ID + `#do-while(${Linea},${Columna})`, env)
-
-  const INS = copyArray(Instrucciones)
-
-  for (let Instruccion of INS)
-    if (['Declaracion'].includes(Instruccion.Tipo)) {
-      $Declaracion(Instruccion, new_env)
-      Instruccion.Tipo = 'Asignacion'
-      if (!Instruccion.Expresion)
-        Instruccion.Expresion = s.Simbolo(
-          Instruccion.Linea,
-          Instruccion.Columna,
-          Instruccion.Tipo_variable,
-          default_values[Instruccion.Tipo_variable]
-        )
-    }
-
-  let first_iteration = s.Simbolo(Linea, Columna, 'boolean', true)
-
-  while (true) {
-    let condition = first_iteration || $Evaluar(Condicion, env)
-    if (!condition) {
-      cycles.pop()
-      return Error(Linea, Columna, `No se pudo ejecutar la sentencia do-while`)
-    }
-    if (condition.Tipo !== 'boolean') {
-      cycles.pop()
-      return Error(Linea, Columna, 'Se esperaba una condicion dentro del do-while')
-    }
-    if (!condition.Valor) {
-      cycles.pop()
-      return
-    }
-
-    let result = $Instructions(INS, new_env)
-    if (result) {
-      if (result.Tipo === 'Return') {
-        cycles.pop()
-        return result
-      } else if (result.Tipo === 'Break') {
-        cycles.pop()
-        return
-      } else if (result.Tipo === 'Continue') continue
-    }
-
-    first_iteration = null
-  }
-}
-
-export default interpret

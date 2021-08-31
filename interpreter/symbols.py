@@ -1,61 +1,133 @@
 from datetime import datetime as _datetime
+from typing import List, Type
 
-def Assignment(ln, col, scope, id, expression, type):
-  return {"ln":ln, "col":col, 'i_type':'assignment', 'scope':scope, 'id':id, 'expression':expression, 'type':type}
+class Assignment:
+  def __init__(self, ln, col, id, ex, scope, type):
+    self.ln = ln
+    self.col = col
+    self.id = id
+    self.ex:Expression = ex
+    self.scope = scope
+    self.type = type
 
-def Assignment_Struct(ln, col, id, expression):
-  return {"ln":ln, "col":col, 'i_type':'assignment_struct', 'id':id, 'expression':expression}
+class StructAssignment:
+  def __init__(self, ln, col, id, ex):
+    self.ln = ln
+    self.col = col
+    self.id = id
+    self.ex:Expression = ex
 
-def Assignment_Array(ln, col, id, index, expression):
-  return {"ln":ln, "col":col, 'i_type':'assignment_array', 'id':id, 'index':index, 'expression':expression}
+class ArrayAssignment:
+  def __init__(self, ln, col, id, index, ex):
+    self.ln = ln
+    self.col = col
+    self.id = id
+    self.index = index
+    self.ex:Expression = ex
 
-def Function(ln, col, id, parameters, instructions):
-  return {"ln":ln, "col":col, 'i_type':'function', 'id':id, 'parameters':parameters, 'instructions':instructions}
+class Function:
+  def __init__(self, ln, col, id, parameters, ins):
+    self.ln = ln
+    self.col = col
+    self.id = id
+    self.parameters = parameters
+    self.ins:T_SENTENCE = ins
 
-def Struct(ln, col, mutable, id, attributes):
-  return {"ln":ln, "col":col, 'i_type':'struct', 'mutable':mutable, 'id':id, 'attributes':attributes}
+class Struct:
+  def __init__(self, ln, col, id, mutable, attributes):
+    self.ln = ln
+    self.col = col
+    self.id = id
+    self.mutable = mutable
+    self.attributes:Type[List[Attribute]] = attributes
 
-def Attribute(ln, col, id, type):
-  return {"ln":ln, "col":col, 'id':id, 'type':type}
+class Attribute:
+  def __init__(self, ln, col, id, type):
+    self.ln = ln
+    self.col = col
+    self.id = id
+    self.type = type
 
-def Expression(ln, col, operable, unary, l, r, type):
-  return {"ln":ln, "col":col, 'i_type':'expression', 'operable':operable, 'unary':unary, 'type':type, 'l':l, 'r':r}
+class Expression:
+  def __init__(self, ln, col, unary, expressionType, left, right):
+    self.ln = ln
+    self.col = col
+    self.unary = unary
+    self.type = expressionType
+    self.left:Expression = left
+    self.right:Expression = right
 
-def Call(ln, col, id, expressions):
-  return {"ln":ln, "col":col, 'i_type':'call', 'id':id, 'expressions':expressions}
+class Value:
+  def __init__(self, ln, col, value, type):
+    self.ln = ln
+    self.col = col
+    self.value = value
+    self.type = type
 
-def Access(ln, col, id, expression):
-  return {"ln":ln, "col":col, 'i_type':'access', 'id':id, 'expression':expression}
+class Call:
+  def __init__(self, ln, col, id, expressions):
+    self.ln = ln
+    self.col = col
+    self.id = id
+    self.expressions = expressions
 
-def If(ln, col, expression, instructions, elseif):
-  return {"ln":ln, "col":col, 'i_type':'if', 'expression':expression, 'instructions':instructions, 'elseif':elseif}
+class Access:
+  def __init__(self, ln, col, id, ex):
+    self.ln = ln
+    self.col = col
+    self.id = id,
+    self.ex:Expression = ex
 
-def Else(ln, col, instructions):
-  return {"ln":ln, "col":col, 'i_type':'else', 'instructions':instructions}
+class If:
+  def __init__(self, ln, col, ex, ins, elseif):
+    self.ln = ln
+    self.col = col
+    self.ex:Expression = ex
+    self.ins:T_SENTENCE = ins
+    self.elseif = elseif
 
-def While(ln, col, expression, instructions):
-  return {"ln":ln, "col":col, 'i_type':'while', 'expression':expression, 'instructions':instructions}
+class Else:
+  def __init__(self, ln, col, ins):
+    self.ln = ln
+    self.col = col
+    self.ins:T_SENTENCE = ins
 
-def For(ln, col, id, expression, instructions):
-  return {"ln":ln, "col":col, 'i_type':'for', 'id':id, 'expression':expression, 'instructions':instructions}
+class While:
+  def __init__(self, ln, col, ex, ins):
+    self.ln = ln
+    self.col = col
+    self.ex:Expression = ex
+    self.ins:T_SENTENCE = ins
 
-def Break(ln, col):
-  return {"ln":ln, "col":col, 'i_type':'break'}
+class For:
+  def __init__(self, ln, col, id, ex, ins):
+    self.ln = ln
+    self.col = col
+    self.id = id
+    self.ex:Expression = ex
+    self.ins:T_SENTENCE = ins
 
-def Continue(ln, col):
-  return {"ln":ln, "col":col, 'i_type':'continue'}
+class Break:
+  def __init__(self, ln, col):
+    self.ln = ln
+    self.col = col
 
-def Return(ln, col, expression):
-  return {"ln":ln, "col":col, 'i_type':'return', 'expression':expression}
+class Continue:
+  def __init__(self, ln, col):
+    self.ln = ln
+    self.col = col
 
-def LexicalError(ln, col, description):
-  return _Error(ln, col, 'Léxico', description)
+class Return:
+  def __init__(self, ln, col, ex):
+    self.ln = ln
+    self.col = col
+    self.ex:Expression = ex
 
-def SyntacticError(ln, col, description):
-  return _Error(ln, col, 'Sintáctico', description)
+EXECUTABLE_SENTENCE = [Assignment, StructAssignment, ArrayAssignment, Function, Struct, Call, Access, If, While, For]
 
-def SemanticError(ins, description):
-  return _Error(ins['ln'], ins['col'], 'Semántico', description)
+SENTENCE = EXECUTABLE_SENTENCE + [Break, Continue, Return]
+
+T_SENTENCE = type(SENTENCE)
 
 def _Error(ln, col, type, description):
   time = _datetime.today().strftime('%d/%m/%Y %H:%M:%S.%f')
@@ -74,7 +146,6 @@ operations = {
   '>=':'mayor_igual',
   '==':'igualacion',
   '!=':'diferenciacion',
-  '!':'not',
   '&&':'and',
-  '||':'or',
+  '||':'or'
   }

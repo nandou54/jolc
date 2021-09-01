@@ -1,6 +1,6 @@
-arr = [1, 2, 3]
 
-for el in arr:
-  el = 0
+x = [1,2,6,8]
 
-arr
+
+res = ", ".join(x)
+res

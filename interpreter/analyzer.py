@@ -475,9 +475,9 @@ def p_LLAMADA(p):
 
 def p_ACCESO_ARREGLO(p):
   '''
-  ACCESO_ARREGLO : id corchete_A E corchete_B
+  ACCESO_ARREGLO : id IND
   '''
-  id, expression = p[1], p[3]
+  id, expression = p[1], p[2]
   p[0] = Access(p.lexer.lineno, getColumn(p.lexer), id, expression)
 
 def p_ID(p):

@@ -9,6 +9,7 @@ import { updateReports } from '@/actions/reportsActions'
 import { log, newOutput } from '@/actions/outputActions'
 import SideBarButton from './SideBarButton'
 import { useLocation } from 'wouter'
+import useKey from '@/hooks/useKey'
 
 function SideBar() {
   const [activePage] = useLocation()
@@ -28,14 +29,17 @@ function SideBar() {
     axios
       .post('/api/', { content })
       .then(({ data }) => {
-        dispatch(updateReports(data))
-        dispatch(newOutput([JSON.stringify(data)]))
         console.log(data)
+        const reports = { ast: data.ast, errors: data.errors, symbols: data.symbols }
+        dispatch(updateReports(reports))
+        dispatch(newOutput(data.output))
       })
       .catch((error) => console.log(error))
 
     dispatch(toggleLoading(false))
   }
+
+  useKey('Enter', handleRun, { ctrl: true }, activePage.includes('editor'))
 
   const items = [
     {

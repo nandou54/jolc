@@ -82,7 +82,7 @@ Rule 76    ARREGLO -> corchete_A EXP corchete_B
 Rule 77    ARREGLO -> corchete_A corchete_B
 Rule 78    LLAMADA -> id parentesis_A EXP parentesis_B
 Rule 79    LLAMADA -> id parentesis_A parentesis_B
-Rule 80    ACCESO_ARREGLO -> id corchete_A E corchete_B
+Rule 80    ACCESO_ARREGLO -> id IND
 Rule 81    ID -> ID punto id
 Rule 82    ID -> id
 Rule 83    IF -> if E BLOQUE
@@ -117,8 +117,8 @@ caret                : 52
 char                 : 73
 coma                 : 37 46
 continue             : 94
-corchete_A           : 33 34 76 77 80
-corchete_B           : 33 34 76 77 80
+corchete_A           : 33 34 76 77
+corchete_B           : 33 34 76 77
 diferenciacion       : 60
 dospuntos            : 92
 else                 : 89
@@ -170,7 +170,7 @@ BLOQUE               : 35 36 83 86 89 90 91
 BLOQUE_ABIERTO       : 84 85 87 88
 BREAK                : 14
 CONTINUE             : 15
-E                    : 29 30 31 32 33 34 46 47 48 48 49 49 50 50 51 51 52 52 53 53 54 55 55 56 56 57 57 58 58 59 59 60 60 61 61 62 62 63 64 80 83 84 85 86 87 88 90 91 92 92 95
+E                    : 29 30 31 32 33 34 46 47 48 48 49 49 50 50 51 51 52 52 53 53 54 55 55 56 56 57 57 58 58 59 59 60 60 61 61 62 62 63 64 83 84 85 86 87 88 90 91 92 92 95
 ELSE                 : 84 88
 ELSEIF               : 85 87
 EXP                  : 46 76 78
@@ -179,7 +179,7 @@ FUNCION              : 8
 I                    : 1 2
 ID                   : 31 69 81
 IF                   : 11
-IND                  : 32 33
+IND                  : 32 33 80
 INS                  : 1 3 17 18 0
 LLAMADA              : 10 65
 P                    : 37 38
@@ -532,7 +532,7 @@ state 22
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -591,7 +591,7 @@ state 23
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -672,7 +672,7 @@ state 27
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -808,7 +808,7 @@ state 34
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -880,7 +880,7 @@ state 36
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -941,7 +941,7 @@ state 37
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -1009,7 +1009,7 @@ state 39
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -1214,7 +1214,7 @@ state 45
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -1273,7 +1273,7 @@ state 46
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -1332,7 +1332,7 @@ state 47
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -1793,11 +1793,12 @@ state 59
 
     (78) LLAMADA -> id . parentesis_A EXP parentesis_B
     (79) LLAMADA -> id . parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> id . corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> id . IND
     (82) ID -> id .
+    (33) IND -> . IND corchete_A E corchete_B
+    (34) IND -> . corchete_A E corchete_B
 
     parentesis_A    shift and go to state 36
-    corchete_A      shift and go to state 103
     punto           reduce using rule 82 (ID -> id .)
     mas             reduce using rule 82 (ID -> id .)
     menos           reduce using rule 82 (ID -> id .)
@@ -1832,7 +1833,9 @@ state 59
     parentesis_B    reduce using rule 82 (ID -> id .)
     coma            reduce using rule 82 (ID -> id .)
     corchete_B      reduce using rule 82 (ID -> id .)
+    corchete_A      shift and go to state 37
 
+    IND                            shift and go to state 103
 
 state 60
 
@@ -1870,7 +1873,7 @@ state 60
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -2174,7 +2177,7 @@ state 68
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -2233,7 +2236,7 @@ state 69
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -2418,7 +2421,7 @@ state 74
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -2634,7 +2637,7 @@ state 84
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -2693,7 +2696,7 @@ state 85
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -2752,7 +2755,7 @@ state 86
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -2811,7 +2814,7 @@ state 87
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -2870,7 +2873,7 @@ state 88
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -2929,7 +2932,7 @@ state 89
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -2988,7 +2991,7 @@ state 90
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -3047,7 +3050,7 @@ state 91
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -3106,7 +3109,7 @@ state 92
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -3165,7 +3168,7 @@ state 93
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -3224,7 +3227,7 @@ state 94
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -3283,7 +3286,7 @@ state 95
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -3342,7 +3345,7 @@ state 96
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -3401,7 +3404,7 @@ state 97
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -3460,7 +3463,7 @@ state 98
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -3741,69 +3744,51 @@ state 102
 
 state 103
 
-    (80) ACCESO_ARREGLO -> id corchete_A . E corchete_B
-    (48) E -> . E mas E
-    (49) E -> . E menos E
-    (50) E -> . E asterisco E
-    (51) E -> . E barra E
-    (52) E -> . E caret E
-    (53) E -> . E modulo E
-    (54) E -> . menos E
-    (55) E -> . E mayor E
-    (56) E -> . E menor E
-    (57) E -> . E mayor_igual E
-    (58) E -> . E menor_igual E
-    (59) E -> . E igualacion E
-    (60) E -> . E diferenciacion E
-    (61) E -> . E or E
-    (62) E -> . E and E
-    (63) E -> . not E
-    (64) E -> . parentesis_A E parentesis_B
-    (65) E -> . LLAMADA
-    (66) E -> . ACCESO_ARREGLO
-    (67) E -> . RANGO
-    (68) E -> . ARREGLO
-    (69) E -> . ID
-    (70) E -> . int64
-    (71) E -> . float64
-    (72) E -> . bool
-    (73) E -> . char
-    (74) E -> . string
-    (75) E -> . Nothing
-    (78) LLAMADA -> . id parentesis_A EXP parentesis_B
-    (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
-    (92) RANGO -> . E dospuntos E
-    (76) ARREGLO -> . corchete_A EXP corchete_B
-    (77) ARREGLO -> . corchete_A corchete_B
-    (81) ID -> . ID punto id
-    (82) ID -> . id
+    (80) ACCESO_ARREGLO -> id IND .
+    (33) IND -> IND . corchete_A E corchete_B
 
-    menos           shift and go to state 45
-    not             shift and go to state 46
-    parentesis_A    shift and go to state 47
-    int64           shift and go to state 53
-    float64         shift and go to state 54
-    bool            shift and go to state 55
-    char            shift and go to state 56
-    string          shift and go to state 57
-    Nothing         shift and go to state 58
-    id              shift and go to state 59
-    corchete_A      shift and go to state 60
+    mas             reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    menos           reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    asterisco       reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    barra           reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    caret           reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    modulo          reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    mayor           reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    menor           reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    mayor_igual     reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    menor_igual     reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    igualacion      reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    diferenciacion  reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    or              reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    and             reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    dospuntos       reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    error           reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    id              reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    function        reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    struct          reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    mutable         reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    if              reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    while           reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    for             reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    break           reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    continue        reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    return          reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    local           reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    global          reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    puntoycoma      reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    tipo            reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    parentesis_B    reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    coma            reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    corchete_B      reduce using rule 80 (ACCESO_ARREGLO -> id IND .)
+    corchete_A      shift and go to state 69
 
-    E                              shift and go to state 146
-    LLAMADA                        shift and go to state 48
-    ACCESO_ARREGLO                 shift and go to state 49
-    RANGO                          shift and go to state 50
-    ARREGLO                        shift and go to state 51
-    ID                             shift and go to state 52
 
 state 104
 
     (76) ARREGLO -> corchete_A EXP . corchete_B
     (46) EXP -> EXP . coma E
 
-    corchete_B      shift and go to state 147
+    corchete_B      shift and go to state 146
     coma            shift and go to state 113
 
 
@@ -3959,7 +3944,7 @@ state 108
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -3978,7 +3963,7 @@ state 108
     id              shift and go to state 59
     corchete_A      shift and go to state 60
 
-    E                              shift and go to state 148
+    E                              shift and go to state 147
     LLAMADA                        shift and go to state 48
     ACCESO_ARREGLO                 shift and go to state 49
     RANGO                          shift and go to state 50
@@ -3994,13 +3979,13 @@ state 109
     (22) TIPO -> . Char
     (23) TIPO -> . String
 
-    Int64           shift and go to state 150
-    Float64         shift and go to state 151
-    Bool            shift and go to state 152
-    Char            shift and go to state 153
-    String          shift and go to state 154
+    Int64           shift and go to state 149
+    Float64         shift and go to state 150
+    Bool            shift and go to state 151
+    Char            shift and go to state 152
+    String          shift and go to state 153
 
-    TIPO                           shift and go to state 149
+    TIPO                           shift and go to state 148
 
 state 110
 
@@ -4058,7 +4043,7 @@ state 111
     (62) E -> E . and E
     (92) RANGO -> E . dospuntos E
 
-    corchete_B      shift and go to state 155
+    corchete_B      shift and go to state 154
     mas             shift and go to state 84
     menos           shift and go to state 85
     asterisco       shift and go to state 86
@@ -4148,7 +4133,7 @@ state 113
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -4167,7 +4152,7 @@ state 113
     id              shift and go to state 59
     corchete_A      shift and go to state 60
 
-    E                              shift and go to state 156
+    E                              shift and go to state 155
     LLAMADA                        shift and go to state 48
     ACCESO_ARREGLO                 shift and go to state 49
     RANGO                          shift and go to state 50
@@ -4180,6 +4165,39 @@ state 114
 
     igual           reduce using rule 34 (IND -> corchete_A E corchete_B .)
     corchete_A      reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    mas             reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    menos           reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    asterisco       reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    barra           reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    caret           reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    modulo          reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    mayor           reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    menor           reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    mayor_igual     reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    menor_igual     reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    igualacion      reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    diferenciacion  reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    or              reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    and             reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    dospuntos       reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    error           reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    id              reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    function        reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    struct          reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    mutable         reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    if              reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    while           reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    for             reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    break           reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    continue        reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    return          reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    local           reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    global          reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    puntoycoma      reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    tipo            reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    parentesis_B    reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    coma            reduce using rule 34 (IND -> corchete_A E corchete_B .)
+    corchete_B      reduce using rule 34 (IND -> corchete_A E corchete_B .)
 
 
 state 115
@@ -4202,8 +4220,8 @@ state 117
     (35) FUNCION -> function id parentesis_A PAR . parentesis_B BLOQUE
     (37) PAR -> PAR . coma P
 
-    parentesis_B    shift and go to state 157
-    coma            shift and go to state 158
+    parentesis_B    shift and go to state 156
+    coma            shift and go to state 157
 
 
 state 118
@@ -4265,7 +4283,7 @@ state 118
     local           shift and go to state 28
     global          shift and go to state 29
 
-    BLOQUE                         shift and go to state 159
+    BLOQUE                         shift and go to state 158
     INS                            shift and go to state 107
     I                              shift and go to state 2
     ASIGNACION                     shift and go to state 4
@@ -4300,13 +4318,13 @@ state 120
     (22) TIPO -> . Char
     (23) TIPO -> . String
 
-    Int64           shift and go to state 150
-    Float64         shift and go to state 151
-    Bool            shift and go to state 152
-    Char            shift and go to state 153
-    String          shift and go to state 154
+    Int64           shift and go to state 149
+    Float64         shift and go to state 150
+    Bool            shift and go to state 151
+    Char            shift and go to state 152
+    String          shift and go to state 153
 
-    TIPO                           shift and go to state 160
+    TIPO                           shift and go to state 159
 
 state 121
 
@@ -4338,7 +4356,7 @@ state 124
     (44) A -> . id tipo TIPO puntoycoma
     (45) A -> . id puntoycoma
 
-    end             shift and go to state 161
+    end             shift and go to state 160
     id              shift and go to state 78
 
     A                              shift and go to state 123
@@ -4416,7 +4434,7 @@ state 127
     local           shift and go to state 28
     global          shift and go to state 29
 
-    BLOQUE                         shift and go to state 162
+    BLOQUE                         shift and go to state 161
     INS                            shift and go to state 107
     I                              shift and go to state 2
     ASIGNACION                     shift and go to state 4
@@ -4469,7 +4487,7 @@ state 128
     (75) E -> . Nothing
     (78) LLAMADA -> . id parentesis_A EXP parentesis_B
     (79) LLAMADA -> . id parentesis_A parentesis_B
-    (80) ACCESO_ARREGLO -> . id corchete_A E corchete_B
+    (80) ACCESO_ARREGLO -> . id IND
     (92) RANGO -> . E dospuntos E
     (76) ARREGLO -> . corchete_A EXP corchete_B
     (77) ARREGLO -> . corchete_A corchete_B
@@ -4488,7 +4506,7 @@ state 128
     id              shift and go to state 59
     corchete_A      shift and go to state 60
 
-    E                              shift and go to state 163
+    E                              shift and go to state 162
     LLAMADA                        shift and go to state 48
     ACCESO_ARREGLO                 shift and go to state 49
     RANGO                          shift and go to state 50
@@ -5608,43 +5626,6 @@ state 145
 
 state 146
 
-    (80) ACCESO_ARREGLO -> id corchete_A E . corchete_B
-    (48) E -> E . mas E
-    (49) E -> E . menos E
-    (50) E -> E . asterisco E
-    (51) E -> E . barra E
-    (52) E -> E . caret E
-    (53) E -> E . modulo E
-    (55) E -> E . mayor E
-    (56) E -> E . menor E
-    (57) E -> E . mayor_igual E
-    (58) E -> E . menor_igual E
-    (59) E -> E . igualacion E
-    (60) E -> E . diferenciacion E
-    (61) E -> E . or E
-    (62) E -> E . and E
-    (92) RANGO -> E . dospuntos E
-
-    corchete_B      shift and go to state 164
-    mas             shift and go to state 84
-    menos           shift and go to state 85
-    asterisco       shift and go to state 86
-    barra           shift and go to state 87
-    caret           shift and go to state 88
-    modulo          shift and go to state 89
-    mayor           shift and go to state 90
-    menor           shift and go to state 91
-    mayor_igual     shift and go to state 92
-    menor_igual     shift and go to state 93
-    igualacion      shift and go to state 94
-    diferenciacion  shift and go to state 95
-    or              shift and go to state 96
-    and             shift and go to state 97
-    dospuntos       shift and go to state 98
-
-
-state 147
-
     (76) ARREGLO -> corchete_A EXP corchete_B .
 
     mas             reduce using rule 76 (ARREGLO -> corchete_A EXP corchete_B .)
@@ -5682,7 +5663,7 @@ state 147
     corchete_B      reduce using rule 76 (ARREGLO -> corchete_A EXP corchete_B .)
 
 
-state 148
+state 147
 
     (91) FOR -> for id in E . BLOQUE
     (48) E -> E . mas E
@@ -5771,7 +5752,7 @@ state 148
     local           shift and go to state 28
     global          shift and go to state 29
 
-    BLOQUE                         shift and go to state 165
+    BLOQUE                         shift and go to state 163
     INS                            shift and go to state 107
     I                              shift and go to state 2
     ASIGNACION                     shift and go to state 4
@@ -5789,57 +5770,90 @@ state 148
     SCOPE                          shift and go to state 17
     ID                             shift and go to state 18
 
-state 149
+state 148
 
     (30) ASIGNACION_VALOR -> E tipo TIPO .
 
     puntoycoma      reduce using rule 30 (ASIGNACION_VALOR -> E tipo TIPO .)
 
 
-state 150
+state 149
 
     (19) TIPO -> Int64 .
 
     puntoycoma      reduce using rule 19 (TIPO -> Int64 .)
 
 
-state 151
+state 150
 
     (20) TIPO -> Float64 .
 
     puntoycoma      reduce using rule 20 (TIPO -> Float64 .)
 
 
-state 152
+state 151
 
     (21) TIPO -> Bool .
 
     puntoycoma      reduce using rule 21 (TIPO -> Bool .)
 
 
-state 153
+state 152
 
     (22) TIPO -> Char .
 
     puntoycoma      reduce using rule 22 (TIPO -> Char .)
 
 
-state 154
+state 153
 
     (23) TIPO -> String .
 
     puntoycoma      reduce using rule 23 (TIPO -> String .)
 
 
-state 155
+state 154
 
     (33) IND -> IND corchete_A E corchete_B .
 
     igual           reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
     corchete_A      reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    mas             reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    menos           reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    asterisco       reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    barra           reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    caret           reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    modulo          reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    mayor           reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    menor           reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    mayor_igual     reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    menor_igual     reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    igualacion      reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    diferenciacion  reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    or              reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    and             reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    dospuntos       reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    error           reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    id              reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    function        reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    struct          reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    mutable         reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    if              reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    while           reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    for             reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    break           reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    continue        reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    return          reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    local           reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    global          reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    puntoycoma      reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    tipo            reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    parentesis_B    reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    coma            reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
+    corchete_B      reduce using rule 33 (IND -> IND corchete_A E corchete_B .)
 
 
-state 156
+state 155
 
     (46) EXP -> EXP coma E .
     (48) E -> E . mas E
@@ -5878,7 +5892,7 @@ state 156
     dospuntos       shift and go to state 98
 
 
-state 157
+state 156
 
     (35) FUNCION -> function id parentesis_A PAR parentesis_B . BLOQUE
     (17) BLOQUE -> . INS end
@@ -5937,7 +5951,7 @@ state 157
     local           shift and go to state 28
     global          shift and go to state 29
 
-    BLOQUE                         shift and go to state 166
+    BLOQUE                         shift and go to state 164
     INS                            shift and go to state 107
     I                              shift and go to state 2
     ASIGNACION                     shift and go to state 4
@@ -5955,44 +5969,44 @@ state 157
     SCOPE                          shift and go to state 17
     ID                             shift and go to state 18
 
-state 158
+state 157
 
     (37) PAR -> PAR coma . P
     (39) P -> . id
 
     id              shift and go to state 116
 
-    P                              shift and go to state 167
+    P                              shift and go to state 165
 
-state 159
+state 158
 
     (36) FUNCION -> function id parentesis_A parentesis_B BLOQUE .
 
     puntoycoma      reduce using rule 36 (FUNCION -> function id parentesis_A parentesis_B BLOQUE .)
 
 
-state 160
+state 159
 
     (44) A -> id tipo TIPO . puntoycoma
 
-    puntoycoma      shift and go to state 168
+    puntoycoma      shift and go to state 166
 
 
-state 161
+state 160
 
     (41) STRUCT -> mutable struct id ATR end .
 
     puntoycoma      reduce using rule 41 (STRUCT -> mutable struct id ATR end .)
 
 
-state 162
+state 161
 
     (89) ELSE -> else BLOQUE .
 
     puntoycoma      reduce using rule 89 (ELSE -> else BLOQUE .)
 
 
-state 163
+state 162
 
     (86) ELSEIF -> elseif E . BLOQUE
     (87) ELSEIF -> elseif E . BLOQUE_ABIERTO ELSEIF
@@ -6084,8 +6098,8 @@ state 163
     local           shift and go to state 28
     global          shift and go to state 29
 
-    BLOQUE                         shift and go to state 169
-    BLOQUE_ABIERTO                 shift and go to state 170
+    BLOQUE                         shift and go to state 167
+    BLOQUE_ABIERTO                 shift and go to state 168
     INS                            shift and go to state 99
     I                              shift and go to state 2
     ASIGNACION                     shift and go to state 4
@@ -6103,60 +6117,21 @@ state 163
     SCOPE                          shift and go to state 17
     ID                             shift and go to state 18
 
-state 164
-
-    (80) ACCESO_ARREGLO -> id corchete_A E corchete_B .
-
-    mas             reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    menos           reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    asterisco       reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    barra           reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    caret           reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    modulo          reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    mayor           reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    menor           reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    mayor_igual     reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    menor_igual     reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    igualacion      reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    diferenciacion  reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    or              reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    and             reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    dospuntos       reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    error           reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    id              reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    function        reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    struct          reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    mutable         reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    if              reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    while           reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    for             reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    break           reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    continue        reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    return          reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    local           reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    global          reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    puntoycoma      reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    tipo            reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    parentesis_B    reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    coma            reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-    corchete_B      reduce using rule 80 (ACCESO_ARREGLO -> id corchete_A E corchete_B .)
-
-
-state 165
+state 163
 
     (91) FOR -> for id in E BLOQUE .
 
     puntoycoma      reduce using rule 91 (FOR -> for id in E BLOQUE .)
 
 
-state 166
+state 164
 
     (35) FUNCION -> function id parentesis_A PAR parentesis_B BLOQUE .
 
     puntoycoma      reduce using rule 35 (FUNCION -> function id parentesis_A PAR parentesis_B BLOQUE .)
 
 
-state 167
+state 165
 
     (37) PAR -> PAR coma P .
 
@@ -6164,7 +6139,7 @@ state 167
     coma            reduce using rule 37 (PAR -> PAR coma P .)
 
 
-state 168
+state 166
 
     (44) A -> id tipo TIPO puntoycoma .
 
@@ -6172,14 +6147,14 @@ state 168
     id              reduce using rule 44 (A -> id tipo TIPO puntoycoma .)
 
 
-state 169
+state 167
 
     (86) ELSEIF -> elseif E BLOQUE .
 
     puntoycoma      reduce using rule 86 (ELSEIF -> elseif E BLOQUE .)
 
 
-state 170
+state 168
 
     (87) ELSEIF -> elseif E BLOQUE_ABIERTO . ELSEIF
     (88) ELSEIF -> elseif E BLOQUE_ABIERTO . ELSE
@@ -6191,17 +6166,17 @@ state 170
     elseif          shift and go to state 128
     else            shift and go to state 127
 
-    ELSEIF                         shift and go to state 171
-    ELSE                           shift and go to state 172
+    ELSEIF                         shift and go to state 169
+    ELSE                           shift and go to state 170
 
-state 171
+state 169
 
     (87) ELSEIF -> elseif E BLOQUE_ABIERTO ELSEIF .
 
     puntoycoma      reduce using rule 87 (ELSEIF -> elseif E BLOQUE_ABIERTO ELSEIF .)
 
 
-state 172
+state 170
 
     (88) ELSEIF -> elseif E BLOQUE_ABIERTO ELSE .
 

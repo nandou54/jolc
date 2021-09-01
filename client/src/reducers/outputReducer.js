@@ -1,4 +1,4 @@
-const outputReducer = (state = '', action) => {
+const outputReducer = (state = [], action) => {
   switch (action.type) {
     case '@output/log': {
       const newOutput = [...state, action.payload]

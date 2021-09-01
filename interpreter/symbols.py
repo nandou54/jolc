@@ -75,8 +75,8 @@ class Access:
   def __init__(self, ln, col, id, ex):
     self.ln = ln
     self.col = col
-    self.id = id,
-    self.ex:Expression = ex
+    self.id = id
+    self.index = ex
 
 class If:
   def __init__(self, ln, col, ex, ins, elseif):

@@ -41,12 +41,18 @@ class Struct:
     self.mutable = mutable
     self.attributes:Type[List[Attribute]] = attributes
 
+  def getAttribute(self, id):
+    for a in self.attributes:
+      if a.id.value==id: return a
+    return None
+
 class Attribute:
   def __init__(self, ln, col, id, type):
     self.ln = ln
     self.col = col
     self.id = id
     self.type = type
+    self.value = None
 
 class Expression:
   def __init__(self, ln, col, unary, expressionType, left, right):

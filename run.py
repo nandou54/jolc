@@ -1,28 +1,24 @@
 import json
 
 INPUT = '''
-println("Funciones nativas aritmeticas");
-# log(base, numero)
-println(log(2, 4));     # 2.0
-println(log(9, 135));   # 2.2324867603589635
-# log10()
-println(log10(2000));   # 3.3010299956639813
-println(log10(512));    # 2.709269960975831
-# trigonometricas
-println(sin(67/360*2*3.14));    # 0.9202730580752193
-println(cos(67/360*2*3.14));    # 0.39127675446016985
-println(tan(67/360*2*3.14));    # 2.351974778938468
-# sqrt
-println(sqrt(2^4));     # 4.0
-println(sqrt(1258));    # 35.4682957019364
+struct Square
+  nombre;
+  sides;
+end;
 
-println("Operaciones con cadenas");
-println("para" * "caidismo");   # paracaidismo
-println("Holaaa"^5);    # HolaaaHolaaaHolaaaHolaaaHolaaa
-# println("Hola Mundo!"[begin:5] * "Auxiliar" * "Auxiliar"[2:end]);    # Hola Auxiliar
-# println(length("Esto no sé cuanto mide"));  # 22
-println(uppercase("mayuscula"));    # MAYUSCULA
-println(lowercase("MINUSCULA"));    # minuscula
+struct Side
+  x;
+  y;
+end;
+
+side1 = Side(0, 0);
+side2 = Side(0, 2);
+side3 = Side(2, 0);
+side4 = Side(2, 2);
+
+square = Square("mine", [side1, side2, side3, side4]);
+square2 = Square("mine", [side1, side2, side3, side4]);
+print([square, square2]);
 '''
 
 lexer = False

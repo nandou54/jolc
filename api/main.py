@@ -1,6 +1,7 @@
 import os
 from pydantic import BaseModel
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import FileResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
@@ -12,6 +13,16 @@ class inputData(BaseModel):
   content: str
 
 app = FastAPI()
+
+origins = [
+  "http://localhost:3000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_methods=["POST"]
+)
 
 mime_types = {
   'txt':'text/plain',

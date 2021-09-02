@@ -1,15 +1,15 @@
+import { useLocation } from 'wouter'
 import React from 'react'
 import axios from 'axios'
 import styles from '@/styles/SideBar.module.css'
+import useKey from '@/hooks/useKey'
 import Logo from './Logo'
 import SideBarItem from './SideBarItem'
-import { useDispatch, useSelector } from 'react-redux'
+import SideBarButton from './SideBarButton'
 import { toggleLoading, toggleSideBar } from '@/actions/appActions'
 import { updateReports } from '@/actions/reportsActions'
-import { log, newOutput } from '@/actions/outputActions'
-import SideBarButton from './SideBarButton'
-import { useLocation } from 'wouter'
-import useKey from '@/hooks/useKey'
+import { logOutput, appendOutput, clearOutput } from '@/actions/outputActions'
+import { useDispatch, useSelector } from 'react-redux'
 
 function SideBar() {
   const [activePage] = useLocation()
@@ -25,18 +25,37 @@ function SideBar() {
 
   const handleRun = () => {
     if (loading) return
+    dispatch(clearOutput())
+
+    const start = performance.now()
     dispatch(toggleLoading(true))
+    dispatch(logOutput('Interpretando el código:'))
+
     axios
       .post('/api/', { content })
       .then(({ data }) => {
         console.log(data)
+        dispatch(appendOutput(data.output))
         const reports = { ast: data.ast, errors: data.errors, symbols: data.symbols }
         dispatch(updateReports(reports))
-        dispatch(newOutput(data.output))
-      })
-      .catch((error) => console.log(error))
 
-    dispatch(toggleLoading(false))
+        if (data.errors.length) {
+          dispatch(logOutput('Se encontraron errores'))
+          const errorsOutput = data.errors.map(
+            ({ ln, col, type, description }) => `[${ln},${col}] ${type}: ${description}`
+          )
+          dispatch(appendOutput(errorsOutput))
+        }
+
+        const end = performance.now()
+        dispatch(logOutput(`Tiempo de ejecución: ${(end - start).toFixed(6)} ms`))
+        dispatch(toggleLoading(false))
+      })
+      .catch((error) => {
+        console.log(error)
+        dispatch(logOutput('Hubo un problema interpretando el código'))
+        dispatch(toggleLoading(false))
+      })
   }
 
   useKey('Enter', handleRun, { ctrl: true }, activePage.includes('editor'))

@@ -1,11 +1,15 @@
-const log = (line) => ({
+const logOutput = (line) => ({
   type: '@output/log',
   payload: line
 })
 
-const newOutput = (output) => ({
-  type: '@output/newOutput',
+const appendOutput = (output) => ({
+  type: '@output/append',
   payload: output
 })
 
-export { log, newOutput }
+const clearOutput = () => ({
+  type: '@output/clear'
+})
+
+export { logOutput, appendOutput, clearOutput }

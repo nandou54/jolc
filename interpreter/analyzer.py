@@ -195,7 +195,7 @@ precedence = (
   ('right','caret'),
   ('right','op_negacion','not'),
   ('left','op_llamada'),
-  ('left','op_acceso_arreglo'),
+  ('left','op_acceso'),
   ('nonassoc','op_agrupacion')
 )
 
@@ -258,7 +258,7 @@ def p_TIPO(p):
         | Char
         | String
   '''
-  p[0] = p[1]
+  p[0] = p[1].lower()
 
 def p_SCOPE(p):
   '''
@@ -269,7 +269,7 @@ def p_SCOPE(p):
 
 def p_ASIGNACION(p):
   '''
-  ASIGNACION  : id igual ASIGNACION_VALOR
+  ASIGNACION  : ID igual ASIGNACION_VALOR
               | SCOPE id igual ASIGNACION_VALOR
               | SCOPE id
   '''
@@ -294,35 +294,23 @@ def p_ASIGNACION_VALOR(p):
                     | E tipo TIPO
   '''
   expression, type = p[1], None
-
-  if len(p)==4:
-    type = p[3]
+  if len(p)==4: type = p[3]
 
   p[0] = {'expression':expression, 'type':type}
 
-def p_ASIGNACION_STRUCT(p):
+def p_ID(p):
   '''
-  ASIGNACION_STRUCT : ID igual E
+  ID  : ID punto id
+      | ID corchete_A E corchete_B
+      | id
   '''
-  id, expression = p[1], p[3]
-  p[0] = StructAssignment(p.lexer.lineno, getColumn(p.lexer), id, expression)
+  if len(p)>2:
+    l, r = p[0], p[3]
+    type = 'chain' if p[2]=='.' else 'access'
 
-def p_ASIGNACION_ARRAY(p):
-  '''
-  ASIGNACION_ARRAY : id IND igual E
-  '''
-  id, index, expression = p[1], p[2], p[4]
-  p[0] = ArrayAssignment(p.lexer.lineno, getColumn(p.lexer), id, index, expression)
-
-def p_IND(p):
-  '''
-  IND : IND corchete_A E corchete_B
-      | corchete_A E corchete_B
-  '''
-  if len(p)==5:
-    p[0] = p[1]
-    p[0].append(p[3])
-  else: p[0] = [p[2]]
+    expression = Expression(p.lexer.lineno, getColumn(p.lexer), False, type, l, r)
+    p[0] = expression
+  else: p[0] = p[1]
 
 def p_FUNCION(p):
   '''
@@ -365,7 +353,7 @@ def p_STRUCT(p):
     id = p[3]
     attributes = p[4]
 
-  p[0] = Struct(p.lexer.lineno, getColumn(p.lexer), mutable, id, attributes)
+  p[0] = Struct(p.lexer.lineno, getColumn(p.lexer), id, mutable, attributes)
 
 def p_ATR(p):
   '''
@@ -417,12 +405,11 @@ def p_E(p):
     | E or E
     | E and E
     | not E
+    | ID                          %prec op_acceso
     | parentesis_A E parentesis_B %prec op_agrupacion
     | LLAMADA                     %prec op_llamada
-    | ACCESO_ARREGLO              %prec op_acceso_arreglo
     | RANGO                       %prec op_rango
     | ARREGLO
-    | ID
     | int64
     | float64
     | bool
@@ -479,16 +466,6 @@ def p_ACCESO_ARREGLO(p):
   '''
   id, expression = p[1], p[2]
   p[0] = Access(p.lexer.lineno, getColumn(p.lexer), id, expression)
-
-def p_ID(p):
-  '''
-  ID  : ID punto id
-      | id
-  '''
-  if len(p)==4:
-    p[0] = p[1]
-    p[0].append(p[3])
-  else: p[0] = [p[1]]
 
 def p_IF(p):
   '''

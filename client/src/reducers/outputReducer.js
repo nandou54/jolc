@@ -4,8 +4,12 @@ const outputReducer = (state = [], action) => {
       const newOutput = [...state, action.payload]
       return newOutput
     }
-    case '@output/newOutput': {
-      const newOutput = action.payload
+    case '@output/append': {
+      const newOutput = [...state, ...action.payload]
+      return newOutput
+    }
+    case '@output/clear': {
+      const newOutput = []
       return newOutput
     }
     default:

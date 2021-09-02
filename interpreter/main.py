@@ -1,8 +1,10 @@
+import copy
 from .analyzer import parse
 from .core import Environment, SemanticError, getOutput, getErrors, getSymbols, envs, functions, loops, reset
 from .core import RESERVED_FUNCTIONS, BINARY_OPERATIONS, UNARY_OPERATIONS, BINARY_OPERATION_RESULTS, UNARY_OPERATION_RESULTS
 from .symbols import Expression, Value, Assignment, StructAssignment, ArrayAssignment, Function, Struct, Call, Access, If, Else, While, For, Return, Break, Continue
 from .symbols import T_SENTENCE, EXECUTABLE_SENTENCE
+from .helper import graphAST
 
 def interpret(input):
   reset()
@@ -10,17 +12,17 @@ def interpret(input):
   envs.append(globalEnv)
 
   res = parse(input)
-  INS = res['ast'].copy()
+  INS = res['ast']
 
   for ins in INS:
     if type(ins) is Function: exFunction(ins, globalEnv)
-
   newINS = []
   for ins in INS:
     if type(ins) is not Function: newINS.append(ins)
 
   exInstructions(newINS, globalEnv)
 
+  # res['ast'] = graphAST(res['ast'])
   res['output'] = getOutput()
   res['errors'] += getErrors()
   res['symbols'] = getSymbols()
@@ -29,38 +31,42 @@ def interpret(input):
 def exInstructions(INS:T_SENTENCE, env:Environment):
   for ins in INS:
     if type(ins) in EXECUTABLE_SENTENCE:
-      fun = executables(type(ins))
-      result = fun(ins, env)
+      result = executables(ins, env)
       if not result: continue
       ins = result
 
     if type(ins) is Return:
       if len(functions)==0: return SemanticError(ins, 'Sentencia return fuera de una función')
       if ins.ex: ins.ex = exExpression(ins.ex, env)
-      return ins
-
     elif type(ins) is Break:
-      if len(loops)>0:
-        return ins
-      SemanticError(ins, 'Sentencia break fuera de un ciclo')
+      if len(loops)==0: return SemanticError(ins, 'Sentencia break fuera de un ciclo')
     elif type(ins) is Continue:
-      if len(loops)>0:
-        return ins
-      SemanticError(ins, 'Sentencia continue fuera de un ciclo')
-
+      if len(loops)==0: return SemanticError(ins, 'Sentencia continue fuera de un ciclo')
+    return ins
 def exExpression(ex:Expression, env:Environment) -> Value:
   if type(ex) is Call: return exCall(ex, env)
   if type(ex) is Access: return exAccess(ex, env)
-  if ex.type=='id': # TODO: concat ids
+  if ex.type=='id':
     if len(ex.value)==1:
       id = env.getGlobalSymbol(ex.value[0].value)
       if not id: return SemanticError(ex, "No se ha declarado '{}'".format(ex.value[0].value))
       if id.type=='Nothing': return SemanticError(ex, "No se le asignó un valor a '{}'".format(ex.value[0].value))
       return id
+    else:
+      struct = env.getGlobalSymbol(ex.value[0].value)
+      if not struct: return SemanticError(ex, "No se ha declarado '{}'".format(ex.value[0].value))
+
+      attribute = None
+      for i in range(1, len(ex.value)):
+        if attribute: struct = attribute.value
+        if type(struct.value) is not Struct: return SemanticError(ex, "La variable '{}' no es un struct".format(struct.value.id.value))
+        attribute = struct.value.getAttribute(ex.value[i].value)
+        if not attribute: return SemanticError(ex, "No existe el atributo '{}'".format(ex.value[i].value))
+      return attribute.value
   if ex.type=='array':
     for i in range(len(ex.value)):
       newValue = exExpression(ex.value[i], env)
-      if not newValue: return SemanticError(ex, "No se pudo crear el arreglo")
+      if not newValue: return SemanticError(ex, "No se pudo crear el array")
       ex.value[i] = newValue
     return ex
   if type(ex) is Value: return ex
@@ -122,7 +128,24 @@ def exAssignment(sen:Assignment, env:Environment):
   targetEnv.declareSymbol(sen.id.value, value)
 
 def exStructAssignment(sen:StructAssignment, env:Environment):
-  pass
+  struct = env.getGlobalSymbol(sen.id[0].value)
+  if not struct: return SemanticError(sen, "No se ha declarado '{}'".format(sen.id[0].value))
+
+  attribute = None
+  for i in range(1, len(sen.id)):
+    if attribute: struct = attribute.value
+    if type(struct.value) is not Struct: return SemanticError(sen, "La variable '{}' no es un struct".format(sen.id[0].value))
+    if not struct.value.mutable: return SemanticError(sen, "No se puede modificar el struct inmutable '{}'".format(struct.value.id.value))
+
+    attribute = struct.value.getAttribute(sen.id[i].value)
+    if not attribute: return SemanticError(sen, "No existe el atributo '{}'".format(sen.id[i].value))
+
+    if i==len(sen.id)-1:
+      ex = exExpression(sen.ex, env)
+      if not ex: return SemanticError(sen, "No se pudo asignar el valor al struct")
+      if attribute.type and attribute.type!=ex.type: "No se puede asignar un valor {} al atributo ({})".format(ex.type, attribute.type)
+
+      attribute.value = ex
 
 def exArrayAssignment(sen:ArrayAssignment, env:Environment):
   currentValue = env.getGlobalSymbol(sen.id.value)
@@ -149,48 +172,70 @@ def exArrayAssignment(sen:ArrayAssignment, env:Environment):
 
 def exFunction(sen:Function, env:Environment):
   if sen.id.value in RESERVED_FUNCTIONS.keys():
-    return SemanticError(sen, 'El id ({}) de la función está reservado'.format(sen.id.value))
+    return SemanticError(sen, "El id '{}' está reservado".format(sen.id.value))
 
   if env.id!='global':
     return SemanticError(sen, 'Solo se pueden declarar funciones en el entorno global')
 
-  if env.getGlobalSymbol(sen.id.value):
-    return SemanticError(sen, 'La función {} ya ha sido declarada'.format(sen.id.value))
+  if env.getLocalSymbol(sen.id.value):
+    return SemanticError(sen, "No se puede redeclarar '{}'".format(sen.id.value))
 
   env.declareSymbol(sen.id.value, sen)
 
 def exStruct(sen:Struct, env:Environment):
-  pass
+  if sen.id.value in RESERVED_FUNCTIONS.keys():
+    return SemanticError(sen, "El id '{}' está reservado".format(sen.id.value))
+
+  if env.id!='global':
+    return SemanticError(sen, 'Solo se pueden declarar struct en el entorno global')
+
+  if env.getLocalSymbol(sen.id.value):
+    return SemanticError(sen, "No se puede redeclarar '{}'".format(sen.id.value))
+
+  env.declareSymbol(sen.id.value, sen)
 
 def exCall(sen:Call, env:Environment):
   values = []
 
   for expression in sen.expressions:
-    value = exExpression(expression, env)
-    if not value: return SemanticError(sen, "No se pudo ejecutar la llamada de '{}'".format(sen.id.value))
-    values.append(value)
+    id = exExpression(expression, env)
+    if not id: return SemanticError(sen, "No se pudo ejecutar la llamada de '{}'".format(sen.id.value))
+    values.append(id)
 
   if sen.id.value in RESERVED_FUNCTIONS.keys():
     if not values: return SemanticError(sen, "No se pudo ejecutar la función '{}' con ningún parámetro".format(sen.id.value))
 
     return RESERVED_FUNCTIONS[sen.id.value](values)
 
-  function = env.getGlobalSymbol(sen.id.value)
-  if not function: return SemanticError(sen, "No se declaró la función '{}'".format(sen.id.value))
-  if type(function) is not Function: return SemanticError(sen, "La variable '{}' no es una función".format(sen.id.value))
+  id = env.getGlobalSymbol(sen.id.value)
+  if not id: return SemanticError(sen, "No se declaró '{}'".format(sen.id.value))
+  if type(id) is Function:
+    if len(values)!=len(id.parameters): return SemanticError(sen, "La función '{}' recibe {} parámetros".format(sen.id.value, len(id.parameters)))
 
-  if len(values)!=len(function.parameters): return SemanticError(sen, "La función '{}' recibe {} parámetros".format(sen.id.value, len(function.parameters)))
+    newEnv = Environment(env.id+"$"+sen.id.value, env)
+    envs.append(newEnv)
 
-  newEnv = Environment(env.id+"$"+sen.id.value, env)
-  envs.append(newEnv)
+    for i in range(len(id.parameters)):
+      newEnv.declareSymbol(id.parameters[i].value, values[i])
 
-  for i in range(len(function.parameters)):
-    newEnv.declareSymbol(function.parameters[i].value, values[i])
+    functions.append(sen.id.value)
+    result = exInstructions(id.ins, newEnv)
+    functions.pop()
+    if type(result) is Return: return result.ex
+    return result
+  elif type(id) is Struct:
+    if len(values)!=len(id.attributes): return SemanticError(sen, "El struct '{}' necesita {} atributos".format(sen.id.value, len(id.attributes)))
 
-  functions.append(sen.id.value)
-  result = exInstructions(function.ins, newEnv)
-  functions.pop()
-  return result
+    struct = copy.deepcopy(id)
+    for i in range(len(struct.attributes)):
+      attribute = struct.attributes[i]
+      if attribute.type and attribute.type!=values[i].type:
+        return SemanticError(sen, "No se puede asignar un valor {} al atributo '{}' ({})".format(values[i].type, attribute.id.value, attribute.type))
+      attribute.value = values[i]
+
+    newValue = Value(sen.ln, sen.col, struct, struct.id.value)
+    return newValue
+  else: return SemanticError(sen, "No se puede llamar la variable '{}'".format(sen.id.value))
 
 def exAccess(sen:Access, env:Environment):
   currentValue = env.getGlobalSymbol(sen.id.value)
@@ -209,6 +254,7 @@ def exAccess(sen:Access, env:Environment):
     else:
       if index.l.value<1 or index.r.value>len(currentValue.value):
         return SemanticError(sen, "No se pudo acceder al array ({}) con el rango {}:{}".format(len(currentValue.value), index.l.value, index.r.value))
+      currentValue = copy.deepcopy(currentValue)
       currentValue.value = currentValue.value[index.l.value-1:index.r.value]
 
   return currentValue
@@ -288,14 +334,15 @@ def exFor(sen:For, env:Environment):
       return
     elif type(result) is Continue: continue
 
-def executables(T):
-  if T is Assignment: return exAssignment
-  if T is StructAssignment: return exStructAssignment
-  if T is ArrayAssignment: return exArrayAssignment
-  if T is Function: return exFunction
-  if T is Struct: return exStruct
-  if T is Call: return exCall
-  if T is Access: return exAccess
-  if T is If: return exIf
-  if T is While: return exWhile
-  if T is For: return exFor
+def executables(sen, env):
+  T = type(sen)
+  if T is Assignment: return exAssignment(sen, env)
+  if T is StructAssignment: return exStructAssignment(sen, env)
+  if T is ArrayAssignment: return exArrayAssignment(sen, env)
+  if T is Function: return exFunction(sen, env)
+  if T is Struct: return exStruct(sen, env)
+  if T is Call: return exCall(sen, env)
+  if T is Access: return exAccess(sen, env)
+  if T is If: return exIf(sen, env)
+  if T is While: return exWhile(sen, env)
+  if T is For: return exFor(sen, env)

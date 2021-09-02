@@ -1,3 +1,5 @@
+from .symbols import Assignment, Expression, StructAssignment, ArrayAssignment, Function, Struct, Call, Access, If, While, For, Return, Break, Continue
+
 def graphAST(parsed):
   s = '''digraph G {
 		nodesep=0.4;
@@ -11,232 +13,288 @@ def graphAST(parsed):
   return s
 
 def printInstructions(INS, backNode = ''):
-  tempStr = ''
+  s = ''
 
   for sen in INS:
-    name = nodeName(sen.Tipo, sen.ln, sen.col)
-    tempStr+=printNode(name, sen.Tipo)
-    tempStr+=linkNodes(backNode, name)
-    tempStr+=print[sen.Tipo](name, sen)
+    name = nodeName(sen)
+    s+=printNode(name, senType(sen))
+    s+=linkNodes(backNode, name)
+    s+=executables(sen, backNode)
 
-  return tempStr
+  return s
 
-def printNode(node, text):
-  return '''${} [fontsize=13 fontname = "helvetica" label="${}"];\n'''.format(node, text)
+def printNode(name, label):
+  return '''{} [fontsize=13 fontname = "helvetica" label="{}"];\n'''.format(name, label)
 
-def nodeName(Tipo, ins):
-  return '${}_${}_${}'.format(Tipo, ins.ln, ins.col)
+def nodeName(sen):
+  return '{}_{}_{}'.format(senType(sen), sen.ln, sen.col)
 
-def linkNodes(backNode, nexNode):
-  return '${} -> ${};\n'.format(backNode, nexNode)
+def linkNodes(backNode, nextNode):
+  return '{} -> {};\n'.format(backNode, nextNode)
 
-def printOperacion(Operacion, backNode, dif):
-  temp_str = ''
+def printExpression(sen:Expression, backNode, dif=''):
+  s = ''
 
-  if Operacion.Tipo not in ['int', 'double', 'char', 'string', 'boolean', 'id', 'vector', 'list']:
-    name = nodeName('Primitivo', Operacion.ins.ln, Operacion.ins.col)
-    temp_str += printNode(name, '''Primitivo <${Operacion.Tipo}>\\n${Operacion.Valor}''')
-    temp_str += linkNodes(backNode, name)
-    return temp_str
+  if sen.Tipo not in ['int', 'double', 'char', 'string', 'boolean', 'id', 'vector', 'list']:
+    name = nodeName(sen)
+    s += printNode(name, '''Primitivo <{Operacion.Tipo}>\\n{Operacion.Valor}''')
+    s += linkNodes(backNode, name)
+    return s
 
-  if Operacion.type== 'Llamada':
-    name = nodeName('Llamada', Operacion.ins.ln, Operacion.ins.col)
-    temp_str += printNode(name, '''Llamada\\n${Operacion.ID}''')
-    temp_str += printLlamada(name, Operacion)
-    temp_str += linkNodes(backNode, name)
-  if Operacion.type== 'Acceso_vector':
-    name = nodeName('Acceso_vector', Operacion.ins.ln, Operacion.ins.col)
-    temp_str += printNode(name, '''Acceso a vector\\n${Operacion.ID}''')
+  if sen.type== 'Llamada':
+    name = nodeName(sen)
+    s += printNode(name, '''Llamada\\n{Operacion.ID}''')
+    s += printCall(name, sen)
+    s += linkNodes(backNode, name)
+  if sen.type== 'Acceso_vector':
+    name = nodeName(sen)
+    s += printNode(name, '''Acceso a vector\\n{Operacion.ID}''')
     # temp_str += printAccesoVector(name, Operacion)
-    temp_str += linkNodes(backNode, name)
+    s += linkNodes(backNode, name)
   else:
-    name = nodeName(Operacion.Tipo + dif, Operacion.ins.ln, Operacion.ins.col)
-    temp_str += printNode(name, '''Operacion ${Operacion.Tipo}''')
-    temp_str += linkNodes(backNode, name)
-    temp_str += printOperacion(Operacion.Izquierda, name, 'i')
-    if Operacion.r: temp_str += printOperacion(Operacion.Derecha, name, 'd')
+    name = nodeName(sen)
+    s += printNode(name, '''Operacion {Operacion.Tipo}''')
+    s += linkNodes(backNode, name)
+    s += printExpression(sen.Izquierda, name, 'i')
+    if sen.r: s += printExpression(sen.Derecha, name, 'd')
 
-  return temp_str
+  return s
 
-def printAsignacion(backNode, ins):
+def printAssignment(sen:Assignment, backNode):
+  s = ''
+
+  name = nodeName(sen)
+  s += printNode(name, 'ID\\n{ID}'.format(sen.id.value))
+  s += linkNodes(backNode, name)
+
+  name = nodeName(sen)
+  s += printNode(name, 'Expresion')
+  s += printExpression(sen.ex, name)
+  s += linkNodes(backNode, name)
+
+  return s
+
+def printStructAssignment(sen:StructAssignment, backNode):
   temp_str = ''
 
-  name = nodeName('ID', ins.ln, ins.col)
-  temp_str += printNode(name, '''ID\\n${ID}''')
+  name = nodeName(sen)
+  temp_str += printNode(name, 'Tipo: {ID}')
   temp_str += linkNodes(backNode, name)
 
-  name = nodeName('Expresion', ins.ln, ins.col)
+  name = nodeName(sen)
+  temp_str += printNode(name, '''Índice''')
+  # temp_str += printExpression(sen.index, name)
+  temp_str += linkNodes(backNode, name)
+
+  name = nodeName(sen)
   temp_str += printNode(name, '''Expresion''')
-  temp_str += printOperacion(ins.ex, name)
+  # temp_str += printExpression(sen.ex, name)
   temp_str += linkNodes(backNode, name)
 
   return temp_str
 
-def printFuncion(backNode, ins):
+def printArrayAssignment(sen:ArrayAssignment, backNode):
   temp_str = ''
 
-  name = nodeName('ID', ins.ln, ins.col)
-  temp_str += printNode(name, '''ID\\n${ID}''')
+  name = nodeName(sen)
+  temp_str += printNode(name, '''Tipo: {ID}''')
   temp_str += linkNodes(backNode, name)
 
-  name = nodeName('Tipo_retorno', ins.ln, ins.col)
-  temp_str += printNode(name, '''Tipo\\n${Tipo_retorno}''')
+  name = nodeName(sen)
+  temp_str += printNode(name, '''Índice''')
+  temp_str += printExpression(sen.index, name)
   temp_str += linkNodes(backNode, name)
 
-  name = nodeName('ins.ins', ins.ln, ins.col)
+  name = nodeName(sen)
+  temp_str += printNode(name, '''Expresion''')
+  temp_str += printExpression(sen.ex, name)
+  temp_str += linkNodes(backNode, name)
+
+  return temp_str
+
+def printFunction(sen:Function, backNode):
+  temp_str = ''
+
+  name = nodeName(sen)
+  temp_str += printNode(name, '''ID\\n{ID}''')
+  temp_str += linkNodes(backNode, name)
+
+  name = nodeName(sen)
+  temp_str += printNode(name, '''Tipo\\n{Tipo_retorno}''')
+  temp_str += linkNodes(backNode, name)
+
+  name = nodeName(sen)
   temp_str += printNode(name, '''ins.ins''')
-  temp_str += printInstructions(ins.ins, name)
+  temp_str += printInstructions(sen.ins, name)
   temp_str += linkNodes(backNode, name)
 
   return temp_str
 
-def printLlamada(backNode, ins):
+def printStruct(sen:Struct, backNode):
   temp_str = ''
 
-  name = nodeName('ID', ins.ln, ins.col)
-  temp_str += printNode(name, '''ID\\n${ID}''')
+  name = nodeName(sen)
+  temp_str += printNode(name, '''ID\\n{ID}''')
   temp_str += linkNodes(backNode, name)
 
-  name = nodeName('Parametros', ins.ln, ins.col)
+  name = nodeName(sen)
+  temp_str += printNode(name, '''Tipo\\n{Tipo_retorno}''')
+  temp_str += linkNodes(backNode, name)
+
+  name = nodeName(sen)
+  temp_str += printNode(name, '''ins.ins''')
+  temp_str += printInstructions(sen.ins, name)
+  temp_str += linkNodes(backNode, name)
+
+  return temp_str
+
+def printCall(sen:Call, backNode):
+  temp_str = ''
+
+  name = nodeName(sen)
+  temp_str += printNode(name, '''ID\\n{ID}''')
+  temp_str += linkNodes(backNode, name)
+
+  name = nodeName(sen)
   temp_str += printNode(name, '''Parametros''')
   temp_str += linkNodes(backNode, name)
 
-  for Parametro in ins.parametros:
-    temp_str += printOperacion(Parametro, name)
+  for Parametro in sen.parametros:
+    temp_str += printExpression(Parametro, name)
 
   return temp_str
 
-def printAccesoLista(backNode, ins):
+def printAccess(sen:Access, backNode):
   temp_str = ''
 
-  name = nodeName('ID', ins.ln, ins.col)
-  temp_str += printNode(name, '''Tipo: ${ID}''')
+  name = nodeName(sen)
+  temp_str += printNode(name, '''Tipo: {ID}''')
   temp_str += linkNodes(backNode, name)
 
-  name = nodeName('Index', ins.ln, ins.col)
+  name = nodeName(sen)
   temp_str += printNode(name, '''Índice''')
-  temp_str += printOperacion(ins.index, name)
+  temp_str += printExpression(sen.index, name)
   temp_str += linkNodes(backNode, name)
 
   return temp_str
 
-def printModificacionLista(backNode, ins):
+def printIf(sen:If, backNode):
   temp_str = ''
 
-  name = nodeName('ID', ins.ln, ins.col)
-  temp_str += printNode(name, '''Tipo: ${ID}''')
-  temp_str += linkNodes(backNode, name)
-
-  name = nodeName('Index', ins.ln, ins.col)
-  temp_str += printNode(name, '''Índice''')
-  temp_str += printOperacion(ins.index, name)
-  temp_str += linkNodes(backNode, name)
-
-  name = nodeName('Expresion', ins.ln, ins.col)
-  temp_str += printNode(name, '''Expresion''')
-  temp_str += printOperacion(ins.ex, name)
-  temp_str += linkNodes(backNode, name)
-
-  return temp_str
-
-def printIf(backNode, ins):
-  temp_str = ''
-
-  name = nodeName('Condicion', ins.ln, ins.col)
+  name = nodeName(sen)
   temp_str += printNode(name, '''Condicion''')
-  temp_str += printOperacion(ins.ex, name)
+  temp_str += printExpression(sen.ex, name)
   temp_str += linkNodes(backNode, name)
 
-  name = nodeName('Instrucciones_true', ins.ln, ins.col)
+  name = nodeName(sen)
   temp_str += printNode(name, '''ins.ins true''')
-  temp_str += printInstructions(ins.ins, name)
+  temp_str += printInstructions(sen.ins, name)
   temp_str += linkNodes(backNode, name)
 
-  name = nodeName('Instrucciones_false', ins.ln, ins.col)
+  name = nodeName(sen)
   temp_str += printNode(name, '''ins.ins false''')
   # temp_str += printInstructions(Instrucciones_false, name)
   temp_str += linkNodes(backNode, name)
 
   return temp_str
 
-def printWhile(backNode, ins):
+def printWhile(sen:While, backNode):
   temp_str = ''
 
-  name = nodeName('Condicion', ins.ln, ins.col)
+  name = nodeName(sen)
   temp_str += printNode(name, '''Condicion''')
-  temp_str += printOperacion(ins.ex, name)
+  temp_str += printExpression(sen.ex, name)
   temp_str += linkNodes(backNode, name)
 
-  name = nodeName('ins.ins', ins.ln, ins.col)
+  name = nodeName(sen)
   temp_str += printNode(name, '''ins.ins''')
-  temp_str += printInstructions(ins.ins, name)
+  temp_str += printInstructions(sen.ins, name)
   temp_str += linkNodes(backNode, name)
 
   return temp_str
 
-def printFor(backNode, ins):
+def printFor(sen:For, backNode):
   temp_str = ''
 
-  name = nodeName('Inicializacion', ins.ln, ins.col)
+  name = nodeName(sen)
   temp_str += printNode(name, '''Tipo: Inicializacion''')
   temp_str += linkNodes(backNode, name)
 
-  name = nodeName('Condicion', ins.ln, ins.col)
+  name = nodeName(sen)
   temp_str += printNode(name, '''Tipo: Condicion''')
   temp_str += linkNodes(backNode, name)
 
-  name = nodeName('Actualizacion', ins.ln, ins.col)
+  name = nodeName(sen)
   temp_str += printNode(name, '''Tipo: Actualizacion''')
   temp_str += linkNodes(backNode, name)
 
-  name = nodeName('ins.ins', ins.ln, ins.col)
+  name = nodeName(sen)
   temp_str += printNode(name, '''ins.ins''')
   temp_str += linkNodes(backNode, name)
-  temp_str += printInstructions(ins.ins, name)
+  temp_str += printInstructions(sen.ins, name)
 
   return temp_str
 
-def printBreak(backNode, ins):
+def printBreak(sen:Break, backNode):
   temp_str = ''
 
-  name = nodeName('Break', ins.ln, ins.col)
+  name = nodeName(sen)
   temp_str += printNode(name, '''Sentencia Break''')
   temp_str += linkNodes(backNode, name)
 
   return temp_str
 
-def printContinue(backNode, ins):
+def printContinue(sen:Continue, backNode):
   temp_str = ''
 
-  name = nodeName('Continue', ins.ln, ins.col)
+  name = nodeName(sen)
   temp_str += printNode(name, '''Sentencia Continue''')
   temp_str += linkNodes(backNode, name)
 
   return temp_str
 
-def printReturn(backNode, ins):
+def printReturn(sen:Return, backNode):
   temp_str = ''
 
-  name = nodeName('Return', ins.ln, ins.col)
+  name = nodeName(sen)
   temp_str += printNode(name, '''Sentencia Return''')
   temp_str += linkNodes(backNode, name)
 
-  name = nodeName('Expresion', ins.ln, ins.col)
+  name = nodeName(sen)
   temp_str += printNode(name, '''Expresion''')
-  temp_str += printOperacion(ins.ex, name)
+  temp_str += printExpression(sen.ex, name)
   temp_str += linkNodes(backNode, name)
 
   return temp_str
 
-print = {
-  "Asignacion": printAsignacion,
-  "Funcion": printFuncion,
-  "Llamada": printLlamada,
-  "Modificacion_lista": printModificacionLista,
-  "If": printIf,
-  "While": printWhile,
-  "For": printFor,
-  "Break": printBreak,
-  "Continue": printContinue,
-  "Return": printReturn
-}
+def executables(sen, backNode):
+  T = type(sen)
+  if T is Assignment: return printAssignment(sen, backNode)
+  if T is StructAssignment: return printStructAssignment(sen, backNode)
+  if T is ArrayAssignment: return printArrayAssignment(sen, backNode)
+  if T is Function: return printFunction(sen, backNode)
+  if T is Struct: return printStruct(sen, backNode)
+  if T is Call: return printCall(sen, backNode)
+  if T is Access: return printAccess(sen, backNode)
+  if T is If: return printIf(sen, backNode)
+  if T is While: return printWhile(sen, backNode)
+  if T is For: return printFor(sen, backNode)
+  if T is Return: return printFor(sen, backNode)
+  if T is Break: return printBreak(sen, backNode)
+  if T is Continue: return printContinue(sen, backNode)
+
+def senType(ins):
+  T = type(ins)
+  if T is Assignment: return 'Asignacion'
+  if T is StructAssignment: return 'Asignacion_struct'
+  if T is ArrayAssignment: return 'Asignacion_array'
+  if T is Function: return 'Funcion'
+  if T is Struct: return 'Struct'
+  if T is Call: return 'Llamada'
+  if T is Access: return 'Access'
+  if T is If: return 'If'
+  if T is While: return 'While'
+  if T is For: return 'For'
+  if T is Return: return 'Return'
+  if T is Break: return 'Break'
+  if T is Continue: return 'Continue'

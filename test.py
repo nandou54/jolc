@@ -1,6 +1,2 @@
-
-x = [1,2,6,8]
-
-
-res = ", ".join(x)
-res
+for i in range(1, 2):
+  print(i)

@@ -1,6 +1,6 @@
 import copy
 from math import log10 as __log10, log as __log, sin as __sin, cos as __cos, tan as __tan, sqrt as __sqrt
-from .symbols import Function, Value, _Error
+from .symbols import Function, Struct, Value, _Error
 
 output = ''
 errors = []
@@ -225,14 +225,20 @@ def unnest(val):
   if type(val) is list:
     for i in range(len(val)):
       val[i] = unnest(val[i].value)
+  elif type(val) is Struct:
+    d = dict()
+    d['struct']=val.id.value
+    for a in val.attributes:
+      d[a.id.value] = unnest(a.value.value)
+    val = d
   return val
 
 def _string(values):
   if len(values)>1: return SemanticError(values[0], "La función nativa 'string' recibe un parámetro")
 
   newValue = copy.deepcopy(values[0])
-  newValue.type = 'string'
   newValue.value = str(unnest(newValue.value))
+  newValue.type = 'string'
   return newValue
 
 def _uppercase(values):

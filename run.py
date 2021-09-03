@@ -1,8 +1,18 @@
 import json
 
 INPUT = '''
-x = "probando jeje";
-print(x[:]);
+struct Person
+  nombre;
+end;
+
+p = Person("original");
+
+function main(ss)
+  ss.nombre="new bro";
+end;
+
+main(p);
+print(p.nombre);
 '''
 
 lexer = False

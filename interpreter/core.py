@@ -15,8 +15,6 @@ def getOutput():
 
 def getErrors(): return errors
 
-d:dict={}
-
 def getSymbols():
   symbols = []
   for env in envs:
@@ -33,16 +31,16 @@ def getSymbols():
         symbolType = 'Struct'
         attributes = ', '.join([attribute.id.value for attribute in value.attributes])
 
-      symbol = [
-        value.ln,
-        value.col,
-        env.id,
-        id,
-        valueType,
-        parameters,
-        attributes,
-        symbolType
-      ]
+      symbol = {
+        "ln":value.ln,
+        "col":value.col,
+        "env":env.id,
+        "id":id,
+        "type":valueType,
+        "parameters":parameters,
+        "attributes":attributes,
+        "symbol":symbolType
+      }
       symbols.append(symbol)
   return symbols
 
@@ -65,6 +63,7 @@ class Environment():
     self.id = id
     self.parent:Environment = parent
     self.symbols = {}
+    envs.append(self)
 
   def declareSymbol(self, id, value):
     self.symbols[id] = value

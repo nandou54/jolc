@@ -1,4 +1,4 @@
-from .symbols import Assignment, Expression, StructAssignment, ArrayAssignment, Function, Struct, Call, Access, If, While, For, Return, Break, Continue
+from .symbols import Assignment, Expression, Function, Struct, Call, If, While, For, Return, Break, Continue
 
 def graphAST(parsed):
   s = '''digraph G {

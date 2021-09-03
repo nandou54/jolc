@@ -1,8 +1,8 @@
 from interpreter.ply.yacc import yacc
 from interpreter.ply.lex import lex
 
-from .symbols import *
-from .symbols import _Error
+from .symbols import Assignment, Expression, Value, Function, Struct, Attribute, Call, If, Else, While, For, Break, Continue, Return, _Error
+from .symbols import operations
 
 INPUT:str
 errors:list
@@ -55,10 +55,10 @@ reserved = [
 
 tokens = [
   'id',
-  'parentesis_A',
-  'parentesis_B',
-  'corchete_A',
-  'corchete_B',
+  'parA',
+  'parB',
+  'corA',
+  'corB',
   'int64',
   'float64',
   'bool',
@@ -84,6 +84,7 @@ tokens = [
   'coma',
   'dospuntos',
   'tipo',
+  'interrog',
   'puntoycoma'
 ] + reserved
 
@@ -92,10 +93,10 @@ t_ignore                       =  ' \t'
 t_ignore_comentario            = r'[#].*'
 t_ignore_comentario_multilinea = r'[#]=([^=]|[\r\n]|(=+([^#])))*=+[#]'
 
-t_parentesis_A   = r'\('
-t_parentesis_B   = r'\)'
-t_corchete_A     = r'\['
-t_corchete_B     = r'\]'
+t_parA           = r'\('
+t_parB           = r'\)'
+t_corA           = r'\['
+t_corB           = r'\]'
 t_mas            = r'\+'
 t_menos          = r'-'
 t_asterisco      = r'\*'
@@ -115,6 +116,7 @@ t_punto          = r'\.'
 t_coma           = r','
 t_igual          = r'='
 t_tipo           = r'::'
+t_interrog       = r'\?'
 t_dospuntos      = r':'
 t_puntoycoma     = r';'
 
@@ -186,6 +188,7 @@ lexer = lex()
 # Precedencia de menos a más
 precedence = (
   ('left','op_rango'),
+  ('right','op_ternaria'),
   ('left','or'),
   ('left','and'),
   ('left','igualacion','diferenciacion'),
@@ -299,7 +302,7 @@ def p_ASIGNACION_VALOR(p):
 def p_ID(p):
   '''
   ID  : ID punto id
-      | ID corchete_A E corchete_B
+      | ID corA E corB
       | id
   '''
   if len(p)>2:
@@ -312,8 +315,8 @@ def p_ID(p):
 
 def p_FUNCION(p):
   '''
-  FUNCION : function id parentesis_A PAR parentesis_B BLOQUE
-          | function id parentesis_A parentesis_B BLOQUE
+  FUNCION : function id parA PAR parB BLOQUE
+          | function id parA parB BLOQUE
   '''
   id, parameters, instructions = p[2], [], p[5]
 
@@ -403,10 +406,11 @@ def p_E(p):
     | E or E
     | E and E
     | not E
-    | ID                          %prec op_acceso
-    | parentesis_A E parentesis_B %prec op_agrupacion
-    | LLAMADA                     %prec op_llamada
-    | RANGO                       %prec op_rango
+    | E interrog E dospuntos E  %prec op_ternaria
+    | ID                        %prec op_acceso
+    | parA E parB               %prec op_agrupacion
+    | LLAMADA                   %prec op_llamada
+    | RANGO                     %prec op_rango
     | ARREGLO
     | int64
     | float64
@@ -426,7 +430,12 @@ def p_E(p):
 
   unary, l, r, expressionType = False, None, None, None
 
-  if len(p)==4:
+  if len(p)==6:
+    unary = p[1]
+    l = p[3]
+    r = p[5]
+    expressionType = 'ternary'
+  elif len(p)==4:
     l = p[1]
     r = p[3]
     expressionType = operations[p[2]]
@@ -439,8 +448,8 @@ def p_E(p):
 
 def p_ARREGLO(p):
   '''
-  ARREGLO : corchete_A EXP corchete_B
-          | corchete_A corchete_B
+  ARREGLO : corA EXP corB
+          | corA corB
   '''
   value = []
   if len(p)==4: value = p[2]
@@ -448,8 +457,8 @@ def p_ARREGLO(p):
 
 def p_LLAMADA(p):
   '''
-  LLAMADA : id parentesis_A EXP parentesis_B
-          | id parentesis_A parentesis_B
+  LLAMADA : id parA EXP parB
+          | id parA parB
   '''
   id, expressions = p[1], []
 

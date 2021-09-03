@@ -1,24 +1,8 @@
 import json
 
 INPUT = '''
-struct Square
-  nombre;
-  sides;
-end;
-
-struct Side
-  x;
-  y;
-end;
-
-side1 = Side(0, 0);
-side2 = Side(0, 2);
-side3 = Side(2, 0);
-side4 = Side(2, 2);
-
-square = Square("mine", [side1, side2, side3, side4]);
-square2 = Square("mine", [side1, side2, side3, side4]);
-print([square, square2]);
+x = "probando jeje";
+print(x[:]);
 '''
 
 lexer = False

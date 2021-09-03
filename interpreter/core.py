@@ -1,5 +1,5 @@
 import copy
-from math import log10 as __log10, log as __log, sin as __sin, cos as __cos, tan as __tan, sqrt as __sqrt
+from math import log10, log, sin, cos, tan, sqrt
 from .symbols import Function, Struct, Value, _Error
 
 output = ''
@@ -10,7 +10,8 @@ envs = []
 functions = []
 loops = []
 
-def getOutput(): return output.strip().split('\n')
+def getOutput():
+  return output.strip().split('\n') if output else []
 
 def getErrors(): return errors
 
@@ -48,19 +49,19 @@ def getSymbols():
 def reset():
   global output
 
-  errors.clear()
   output = ''
+  errors.clear()
   symbols.clear()
 
   functions.clear()
   loops.clear()
   envs.clear()
 
-def SemanticError(ins, description):
-  errors.append(_Error(ins.ln, ins.col, 'Semántico', description))
+def SemanticError(sen, description):
+  errors.append(_Error(sen.ln, sen.col, 'Semántico', description))
 
 class Environment():
-  def __init__(self, id = 'global', parent = None) -> None:
+  def __init__(self, id = 'global', parent = None):
     self.id = id
     self.parent:Environment = parent
     self.symbols = {}
@@ -94,8 +95,6 @@ def _print(values):
   for value in values:
     string+=_string([value]).value+' '
   output+=string[0:-1]
-  ex = values[0]
-  return Value(ex.ln, ex.col, None, 'Nothing')
 
 def _println(values):
   global output
@@ -103,8 +102,6 @@ def _println(values):
   for value in values:
     string+=_string([value]).value+' '
   output+=string[0:-1]+'\n'
-  ex = values[0]
-  return Value(ex.ln, ex.col, None, 'Nothing')
 
 def _log10(values):
   if len(values)>1: return SemanticError(values[0], "La función nativa 'log10' recibe un parámetro")
@@ -115,7 +112,7 @@ def _log10(values):
 
   newValue = copy.deepcopy(ex)
   newValue.type = 'float64'
-  newValue.value = __log10(newValue.value)
+  newValue.value = log10(newValue.value)
   return newValue
 
 def _log(values):
@@ -127,7 +124,7 @@ def _log(values):
 
   newValue = copy.deepcopy(ex)
   newValue.type = 'float64'
-  newValue.value = __log(newValue.value, base.value)
+  newValue.value = log(newValue.value, base.value)
   return newValue
 
 def _sin(values):
@@ -139,7 +136,7 @@ def _sin(values):
 
   newValue = copy.deepcopy(ex)
   newValue.type = 'float64'
-  newValue.value = __sin(newValue.value)
+  newValue.value = sin(newValue.value)
   return newValue
 
 def _cos(values):
@@ -151,7 +148,7 @@ def _cos(values):
 
   newValue = copy.deepcopy(ex)
   newValue.type = 'float64'
-  newValue.value = __cos(newValue.value)
+  newValue.value = cos(newValue.value)
   return newValue
 
 def _tan(values):
@@ -163,7 +160,7 @@ def _tan(values):
 
   newValue = copy.deepcopy(ex)
   newValue.type = 'float64'
-  newValue.value = __tan(newValue.value)
+  newValue.value = tan(newValue.value)
   return newValue
 
 def _sqrt(values):
@@ -175,7 +172,7 @@ def _sqrt(values):
 
   newValue = copy.deepcopy(ex)
   newValue.type = 'float64'
-  newValue.value = __sqrt(newValue.value)
+  newValue.value = sqrt(newValue.value)
   return newValue
 
 def _parse(values):
@@ -279,7 +276,6 @@ def _push(values):
   if arr.type!='array':
     return SemanticError(arr, "La función nativa 'push' recibe un array")
   arr.value.append(ex)
-  return Value(ex.ln, ex.col, None, 'Nothing')
 
 def _pop(values):
   if len(values)>1: return SemanticError(values[0], "La función nativa 'pop' recibe un parámetro")

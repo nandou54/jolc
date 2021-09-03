@@ -224,8 +224,6 @@ def p_INS_error(p):
 def p_I(p):
   '''
   I : ASIGNACION
-    | ASIGNACION_STRUCT
-    | ASIGNACION_ARRAY
     | FUNCION
     | STRUCT
     | LLAMADA
@@ -305,7 +303,7 @@ def p_ID(p):
       | id
   '''
   if len(p)>2:
-    l, r = p[0], p[3]
+    l, r = p[1], p[3]
     type = 'chain' if p[2]=='.' else 'access'
 
     expression = Expression(p.lexer.lineno, getColumn(p.lexer), False, type, l, r)
@@ -460,13 +458,6 @@ def p_LLAMADA(p):
 
   p[0] = Call(p.lexer.lineno, getColumn(p.lexer), id, expressions)
 
-def p_ACCESO_ARREGLO(p):
-  '''
-  ACCESO_ARREGLO : id IND
-  '''
-  id, expression = p[1], p[2]
-  p[0] = Access(p.lexer.lineno, getColumn(p.lexer), id, expression)
-
 def p_IF(p):
   '''
   IF  : if E BLOQUE
@@ -517,9 +508,12 @@ def p_FOR(p):
 def p_RANGO(p):
   '''
   RANGO : E dospuntos E
+        | dospuntos
   '''
-  izq, der = p[1], p[3]
-  p[0] = Expression(p.lexer.lineno, getColumn(p.lexer), False, 'rango', izq, der)
+  izq, der = None, None
+  if len(p)==4:
+    izq, der = p[1], p[3]
+  p[0] = Expression(p.lexer.lineno, getColumn(p.lexer), False, 'range', izq, der)
 
 def p_BREAK(p):
   '''

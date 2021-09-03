@@ -10,21 +10,6 @@ class Assignment:
     self.scope = scope
     self.type = type
 
-class StructAssignment:
-  def __init__(self, ln, col, id, ex):
-    self.ln = ln
-    self.col = col
-    self.id = id
-    self.ex:Expression = ex
-
-class ArrayAssignment:
-  def __init__(self, ln, col, id, index, ex):
-    self.ln = ln
-    self.col = col
-    self.id = id
-    self.index = index
-    self.ex:Expression = ex
-
 class Function:
   def __init__(self, ln, col, id, parameters, ins):
     self.ln = ln
@@ -77,13 +62,6 @@ class Call:
     self.id = id
     self.expressions = expressions
 
-class Access:
-  def __init__(self, ln, col, id, ex):
-    self.ln = ln
-    self.col = col
-    self.id = id
-    self.index = ex
-
 class If:
   def __init__(self, ln, col, ex, ins, elseif):
     self.ln = ln
@@ -129,7 +107,7 @@ class Return:
     self.col = col
     self.ex:Expression = ex
 
-EXECUTABLE_SENTENCE = [Assignment, StructAssignment, ArrayAssignment, Function, Struct, Call, Access, If, While, For]
+EXECUTABLE_SENTENCE = [Assignment, Function, Struct, Call, If, While, For]
 
 SENTENCE = EXECUTABLE_SENTENCE + [Break, Continue, Return]
 

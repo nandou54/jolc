@@ -114,7 +114,7 @@ SENTENCE = EXECUTABLE_SENTENCE + [Break, Continue, Return]
 T_SENTENCE = type(SENTENCE)
 
 def _Error(ln, col, type, description):
-  time = _datetime.today().strftime('%d/%m/%Y %H:%M:%S.%f')
+  time = _datetime.today().strftime('%d/%m/%Y %H:%M:%S')
   return {"ln":ln, "col":col, "type":type, "description":description, "time":time}
 
 operations = {

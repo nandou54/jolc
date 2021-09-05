@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from '@/styles/SideBarButton.module.css'
 
-function SideBarButton({ onClick, img, highlight }) {
+function SideBarButton({ onClick, img, highlight = false }) {
   return (
     <button
       className={styles.base}

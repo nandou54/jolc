@@ -6,25 +6,21 @@ import { Route, Router } from 'wouter'
 import WelcomePage from '@/pages/WelcomePage'
 import EditorPage from '@/pages/EditorPage'
 import ReportsPage from '@/pages/ReportsPage'
-import DocsPage from '@/pages/DocsPage'
 
 function App() {
   return (
     <>
       <SideBar />
       <div className={styles.base}>
-        <Router base='/client'>
-          <Route path='/'>
+        <Router base='/client/'>
+          <Route path=''>
             <WelcomePage />
           </Route>
-          <Route path='/editor'>
+          <Route path='editor'>
             <EditorPage />
           </Route>
-          <Route path='/reports'>
+          <Route path='reports'>
             <ReportsPage />
-          </Route>
-          <Route path='/docs'>
-            <DocsPage />
           </Route>
         </Router>
       </div>

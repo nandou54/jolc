@@ -12,7 +12,7 @@ import { logOutput, appendOutput, clearOutput } from '@/actions/outputActions'
 import { useDispatch, useSelector } from 'react-redux'
 
 function SideBar() {
-  const [activePage] = useLocation()
+  const [location] = useLocation()
   const [{ show, loading }, content] = useSelector((state) => [state.app, state.editor])
   const dispatch = useDispatch()
 
@@ -47,45 +47,54 @@ function SideBar() {
           dispatch(appendOutput(errorsOutput))
         }
 
-        const end = performance.now()
-        dispatch(logOutput(`Tiempo de ejecución: ${(end - start).toFixed(6)} ms`))
-        dispatch(toggleLoading(false))
+        const duration = performance.now() - start
+        setTimeout(
+          () => {
+            dispatch(logOutput(`Tiempo de ejecución: ${duration} ms`))
+            dispatch(toggleLoading(false))
+          },
+          duration < 900 ? 900 - duration : 0
+        )
       })
-      .catch((error) => {
-        console.log(error)
-        dispatch(logOutput('Hubo un problema interpretando el código'))
-        dispatch(toggleLoading(false))
+      .catch(() => {
+        const duration = performance.now() - start
+        setTimeout(
+          () => {
+            dispatch(logOutput('Hubo un problema interpretando el código'))
+            dispatch(toggleLoading(false))
+          },
+          duration < 900 ? 900 - duration : 0
+        )
       })
   }
 
-  useKey('Enter', handleRun, { ctrl: true }, activePage.includes('editor'))
+  useKey('Enter', handleRun, { ctrl: true }, location.includes('editor'))
 
   const items = [
     {
-      to: '/client/editor',
+      to: 'editor',
       label: 'Editor',
       img: 'pastel-glyph/64/seo-text--v1.png',
-      active: activePage.includes('editor')
+      active: location.includes('editor')
     },
     {
-      to: '/client/reports',
+      to: 'reports',
       label: 'Reportes',
       img: 'pastel-glyph/64/report-file--v4.png',
-      active: activePage.includes('reports')
+      active: location.includes('reports')
     }
   ]
 
   const buttons = [
     {
       onClick: handleToggleSideBar,
-      img: 'ios-filled/50/FFFFFF/menu-2.png',
-      highlight: false
+      img: 'ios-filled/50/FFFFFF/menu-2.png'
     },
     {
       onClick: handleRun,
       img: 'material-outlined/24/FFFFFF/play--v1.png',
       highlight: true,
-      condition: activePage.includes('editor')
+      condition: location.includes('editor')
     }
   ]
 
@@ -107,7 +116,7 @@ function SideBar() {
         </div>
       </div>
       {loading && <Loader />}
-      {(show || loading) && (
+      {show && (
         <div className={styles.outside} onClick={() => handleHideSideBar(false)} />
       )}
     </div>

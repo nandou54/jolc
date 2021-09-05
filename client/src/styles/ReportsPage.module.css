@@ -11,34 +11,80 @@
   justify-content: flex-end;
 }
 
-.reports {
-  margin-top: 50px;
-  display: flex;
-  flex-wrap: wrap;
+.report {
+  margin: 20px 0;
 }
 
-.reports > div {
-  font-size: 25px;
-  height: 250px;
-  width: 300px;
-  margin: 20px 10px;
-
-  border-radius: 30px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
+h2,
+h3 {
+  margin: 10px 0;
 }
 
-.reports > div:hover {
-  cursor: pointer;
-  font-size: 24px;
+.report > div {
+  overflow: auto;
+  max-height: 700px;
 }
 
-.reports > div:active {
-  height: 240px;
-  width: 290px;
-  margin: 25px 15px;
+.report > div,
+table,
+th,
+td {
+  border: 1px rgb(45, 42, 61) solid;
+}
+
+table {
+  table-layout: fixed;
+  text-align: center;
+  border-radius: 15px;
+
+  width: 100%;
+  height: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  padding: 5px 0;
+  background: rgb(15, 15, 25);
+}
+
+td {
+  padding: 5px 0;
+  background: rgb(35, 35, 50);
+}
+
+.errors th:nth-child(1),
+.variables th:nth-child(1),
+.functions th:nth-child(1),
+.structs th:nth-child(1) {
+  width: 180px;
+}
+
+.errors th:nth-child(2),
+.errors th:nth-child(3),
+.variables th:nth-child(2),
+.variables th:nth-child(3),
+.functions th:nth-child(2),
+.functions th:nth-child(3),
+.structs th:nth-child(2),
+.structs th:nth-child(3) {
+  width: 90px;
+}
+
+.errors th:nth-child(4) {
+  width: 110px;
+}
+
+.variables th:nth-child(4),
+.functions th:nth-child(4),
+.structs th:nth-child(4) {
+  width: 220px;
+}
+
+.errors th:nth-child(5),
+.variables th:nth-child(5),
+.functions th:nth-child(5),
+.structs th:nth-child(5) {
+  width: 400px;
 }
 
 @media only screen and (max-width: 768px) {

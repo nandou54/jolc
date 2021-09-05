@@ -26,7 +26,7 @@ def parse(input):
   errors = []
 
   ast = parser.parse(input)
-  if ast == None: ast = []
+  if ast is None: ast = []
   return {'ast':ast, 'errors':errors, 'output':'', 'symbols':[]}
 
 reserved = [
@@ -219,10 +219,7 @@ def p_INS_error(p):
   INS : INS error puntoycoma
       | error puntoycoma
   '''
-  if len(p)==4:
-    p[0] = p[1]
-  else:
-    p[0] = []
+  p[0] = p[1] if len(p)==4 else []
 
 def p_I(p):
   '''

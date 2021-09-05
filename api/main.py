@@ -37,8 +37,7 @@ templates = Jinja2Templates(directory="dist")
 
 @app.post("/api/")
 def analyze_input(input: inputData):
-  result = interpret(input.content)
-  return result
+  return interpret(input.content)
 
 @app.get("/client/")
 async def serve_app(request: Request):

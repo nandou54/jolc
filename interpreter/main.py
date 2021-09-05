@@ -122,7 +122,7 @@ def exCall(sen:Call, env:Environment):
 
 def exAccess(ex:Expression, env:Environment):
   expression = exExpression(ex.left, env)
-  if not expression: return SemanticError(ex, "No se ha declarado el array '{}'".format(ex.left.value))
+  if not expression: return SemanticError(ex, "No se ha declarado el array")
   if expression.type not in ['string', 'array']: return SemanticError(ex, "Se esperaba un string o un array")
 
   index = exExpression(ex.right, env)

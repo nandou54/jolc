@@ -22,14 +22,14 @@ def getSymbols():
       valueType, parameters, attributes = 'no aplica', 'no aplica', 'no aplica'
 
       if type(value) is Value:
-        symbolType = 'Variable'
+        symbolType = 'variable'
         valueType = value.type
       elif type(value) is Function:
-        symbolType = 'Función'
-        parameters = ', '.join([parameter.value for parameter in value.parameters])
+        symbolType = 'function'
+        parameters = ', '.join(parameter.value for parameter in value.parameters)
       else:
-        symbolType = 'Struct'
-        attributes = ', '.join([attribute.id.value for attribute in value.attributes])
+        symbolType = 'struct'
+        attributes = ', '.join(attribute.id.value for attribute in value.attributes)
 
       symbol = {
         "ln":value.ln,
@@ -39,7 +39,7 @@ def getSymbols():
         "type":valueType,
         "parameters":parameters,
         "attributes":attributes,
-        "symbol":symbolType
+        "symbolType":symbolType
       }
       symbols.append(symbol)
   return symbols
@@ -90,16 +90,12 @@ class Environment():
 
 def _print(values):
   global output
-  string = ''
-  for value in values:
-    string+=_string([value]).value+' '
+  string = ''.join(_string([value]).value+' ' for value in values)
   output+=string[0:-1]
 
 def _println(values):
   global output
-  string = ''
-  for value in values:
-    string+=_string([value]).value+' '
+  string = ''.join(_string([value]).value+' ' for value in values)
   output+=string[0:-1]+'\n'
 
 def _log10(values):
@@ -222,8 +218,7 @@ def unnest(val):
     for i in range(len(val)):
       val[i] = unnest(val[i].value)
   elif type(val) is Struct:
-    d = dict()
-    d['struct']=val.id.value
+    d = {'struct': val.id.value}
     for a in val.attributes:
       d[a.id.value] = unnest(a.value.value)
     val = d
@@ -283,8 +278,7 @@ def _pop(values):
   if arr.type!='array':
     return SemanticError(arr, "La función nativa 'pop' recibe un array")
 
-  value = arr.value.pop()
-  return value
+  return arr.value.pop()
 
 def _length(values):
   if len(values)>1: return SemanticError(values[0], "La función nativa 'length' recibe un parámetro")

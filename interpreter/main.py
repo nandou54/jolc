@@ -15,10 +15,7 @@ def interpret(input):
 
   for ins in INS:
     if type(ins) is Function: exFunction(ins, globalEnv)
-  newINS = []
-  for ins in INS:
-    if type(ins) is not Function: newINS.append(ins)
-
+  newINS = [ins for ins in INS if type(ins) is not Function]
   exInstructions(newINS, globalEnv)
 
   # res['ast'] = graphAST(res['ast'])
@@ -37,10 +34,8 @@ def exInstructions(INS:T_SENTENCE, env:Environment):
     if type(ins) is Return:
       if len(functions)==0: return SemanticError(ins, 'Sentencia return fuera de una función')
       if ins.ex: ins.ex = exExpression(ins.ex, env)
-    if type(ins) is Break:
-      if len(loops)==0: return SemanticError(ins, 'Sentencia break fuera de un ciclo')
-    if type(ins) is Continue:
-      if len(loops)==0: return SemanticError(ins, 'Sentencia continue fuera de un ciclo')
+    if type(ins) is Break and len(loops) == 0: return SemanticError(ins, 'Sentencia break fuera de un ciclo')
+    if type(ins) is Continue and len(loops) == 0: return SemanticError(ins, 'Sentencia continue fuera de un ciclo')
     return ins
 
 def exExpression(ex:Expression, env:Environment) -> Value:
@@ -122,9 +117,7 @@ def exCall(sen:Call, env:Environment):
       if attribute.type and attribute.type!=values[i].type:
         return SemanticError(sen, "No se puede asignar un valor {} al atributo '{}' ({})".format(values[i].type, attribute.id.value, attribute.type))
       attribute.value = values[i]
-
-    newValue = Value(sen.ln, sen.col, struct, struct.id.value)
-    return newValue
+    return Value(sen.ln, sen.col, struct, struct.id.value)
   else: return SemanticError(sen, "No se puede llamar la variable '{}'".format(sen.id.value))
 
 def exAccess(ex:Expression, env:Environment):
@@ -182,7 +175,7 @@ def exTernary(ex:Expression, env:Environment):
     if not l: return SemanticError(ex, "No se pudo ejecutar la operación ternaria")
     return l
   else:
-    if not l: return SemanticError(ex, "No se pudo ejecutar la operación ternaria")
+    if not r: return SemanticError(ex, "No se pudo ejecutar la operación ternaria")
     return r
 
 def exAssignment(sen:Assignment, env:Environment):
@@ -196,12 +189,10 @@ def exAssignment(sen:Assignment, env:Environment):
 
       if sen.scope=='local':
         targetEnv.declareSymbol(sen.id.value, value)
-      else:
-        if not env.getGlobalSymbol(sen.id.value): return SemanticError(sen, "No existe la variable '{}' en el entorno global".format(sen.id.value))
-        targetEnv = env.getParentEnvById(sen.id.value)
-    else:
-      if env.getGlobalSymbol(sen.id.value):
-        targetEnv = env.getParentEnvById(sen.id.value)
+      elif not env.getGlobalSymbol(sen.id.value): return SemanticError(sen, "No existe la variable '{}' en el entorno global".format(sen.id.value))
+      else: targetEnv = env.getParentEnvById(sen.id.value)
+    elif env.getGlobalSymbol(sen.id.value):
+      targetEnv = env.getParentEnvById(sen.id.value)
 
     if sen.ex:
       value = exExpression(sen.ex, env)
@@ -293,9 +284,10 @@ def exFor(sen:For, env:Environment):
 
   if iterable.type=='range':
     if not iterable.left: return SemanticError(sen, "El rango del for no es válido")
-    val = []
-    for num in range(iterable.l.value, iterable.r.value+1):
-      val.append(Value(iterable.ln, iterable.col, num, 'int64'))
+    val = [
+        Value(iterable.ln, iterable.col, num, 'int64')
+        for num in range(iterable.l.value, iterable.r.value + 1)
+    ]
     iterable = Value(iterable.ln, iterable.col, val, 'array')
 
   loops.append('for')

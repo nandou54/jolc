@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { updateContent } from '@/actions/editorActions'
 
 import AceEditor from 'react-ace'
+import 'ace-builds/src-noconflict/mode-julia'
 import 'ace-builds/src-noconflict/theme-dracula'
 
 function EditorArea() {
@@ -20,6 +21,7 @@ function EditorArea() {
       <div className={`${styles.title} unselectable`}>editor</div>
       <AceEditor
         className={styles.editor}
+        mode='julia'
         theme='dracula'
         onChange={handleChange}
         fontSize={16}

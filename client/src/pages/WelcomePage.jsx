@@ -1,18 +1,18 @@
 import React from 'react'
 import styles from '@/styles/WelcomePage.module.css'
 
-// import logo from '@img/logo_usac.png'
+import logo from '@img/logo_usac.png'
 
 function WelcomePage() {
   return (
     <div className={styles.base}>
-      {/* <div className={styles.title}>
+      <div className={styles.title}>
         <h2>Universidad de San Carlos de Guatemala</h2>
         <img src={logo} width={80} />
-      </div> */}
+      </div>
       <div className={styles.small}>Agosto - Septiembre de 2021</div>
       <div className={styles.group}>
-        <h3>¡Bienvenido a Jolc!</h3>
+        <h2>¡Bienvenido a Jolc!</h2>
         <p>El primer proyecto del curso de Organización de Lenguajes y Compiladores 2</p>
       </div>
       <div className={styles.group}>

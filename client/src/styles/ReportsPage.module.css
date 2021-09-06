@@ -44,12 +44,12 @@ table {
 
 th {
   padding: 5px 0;
-  background: rgb(15, 15, 25);
+  background: rgb(112, 112, 175);
 }
 
 td {
   padding: 5px 0;
-  background: rgb(35, 35, 50);
+  background: rgb(147, 147, 179);
 }
 
 .errors th:nth-child(1),

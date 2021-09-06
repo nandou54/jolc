@@ -116,7 +116,7 @@ function SideBar() {
         </div>
       </div>
       {loading && <Loader />}
-      {show && (
+      {(show || loading) && (
         <div className={styles.outside} onClick={() => handleHideSideBar(false)} />
       )}
     </div>

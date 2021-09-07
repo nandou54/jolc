@@ -2,11 +2,12 @@ import React from 'react'
 import styles from '@/styles/ReportsPage.module.css'
 import { useSelector } from 'react-redux'
 import { Link } from 'wouter'
+import { Graphviz } from 'graphviz-react'
 
 function ReportsPage() {
-  const { ast, errors, symbols } = useSelector((state) => state.reports)
+  const { ast, symbols, errors } = useSelector((state) => state.reports)
 
-  const existsAST = !!ast.length
+  const existsAST = !!ast
   const existsErrors = !!errors.length
   const existsSymbols = !!symbols.length
   const existsReports = existsAST || existsErrors || existsSymbols
@@ -22,7 +23,7 @@ function ReportsPage() {
   return (
     <div className={styles.base}>
       <div className={styles.small}>Agosto - Septiembre de 2021</div>
-      <h1>Reportes de la aplicación</h1>
+      <h2>Reportes de la aplicación</h2>
       <p>Datos sobre la última ejecución de código</p>
       {!existsReports ? (
         <p>
@@ -31,10 +32,22 @@ function ReportsPage() {
         </p>
       ) : (
         <>
-          {/* <div>
-            <h2>AST</h2>
-            {JSON.stringify(ast)}
-          </div> */}
+          <div>
+            <h3>AST</h3>
+            {!existsAST ? (
+              <p>Sin datos</p>
+            ) : (
+              <Graphviz
+                className={styles.graph}
+                dot={ast}
+                options={{
+                  width: null,
+                  height: null,
+                  fit: true
+                }}
+              />
+            )}
+          </div>
           <h3>Reporte de errores</h3>
           <div className={styles.report}>
             {!existsErrors ? (
@@ -43,11 +56,13 @@ function ReportsPage() {
               <div>
                 <table className={styles.errors}>
                   <thead>
-                    <th>Hora</th>
-                    <th>Línea</th>
-                    <th>Columna</th>
-                    <th>Tipo</th>
-                    <th>Descripción</th>
+                    <tr>
+                      <th>Hora</th>
+                      <th>Línea</th>
+                      <th>Columna</th>
+                      <th>Tipo</th>
+                      <th>Descripción</th>
+                    </tr>
                   </thead>
                   <tbody>
                     {errors.map(({ time, ln, col, type, description }) => (
@@ -77,11 +92,13 @@ function ReportsPage() {
                   <div>
                     <table className={styles.variables}>
                       <thead>
-                        <th>Entorno</th>
-                        <th>Línea</th>
-                        <th>Columna</th>
-                        <th>ID</th>
-                        <th>Tipo</th>
+                        <tr>
+                          <th>Entorno</th>
+                          <th>Línea</th>
+                          <th>Columna</th>
+                          <th>ID</th>
+                          <th>Tipo</th>
+                        </tr>
                       </thead>
                       <tbody>
                         {variables.map(({ env, ln, col, id, type }) => (
@@ -106,11 +123,13 @@ function ReportsPage() {
                   <div>
                     <table className={styles.functions}>
                       <thead>
-                        <th>Entorno</th>
-                        <th>Línea</th>
-                        <th>Columna</th>
-                        <th>ID</th>
-                        <th>Parametros</th>
+                        <tr>
+                          <th>Entorno</th>
+                          <th>Línea</th>
+                          <th>Columna</th>
+                          <th>ID</th>
+                          <th>Parametros</th>
+                        </tr>
                       </thead>
                       <tbody>
                         {functions.map(({ env, ln, col, id, parameters }) => (
@@ -135,11 +154,13 @@ function ReportsPage() {
                   <div>
                     <table className={styles.structs}>
                       <thead>
-                        <th>Entorno</th>
-                        <th>Línea</th>
-                        <th>Columna</th>
-                        <th>ID</th>
-                        <th>Atributos</th>
+                        <tr>
+                          <th>Entorno</th>
+                          <th>Línea</th>
+                          <th>Columna</th>
+                          <th>ID</th>
+                          <th>Atributos</th>
+                        </tr>
                       </thead>
                       <tbody>
                         {structs.map(({ env, ln, col, id, attributes }) => (

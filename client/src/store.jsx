@@ -13,11 +13,11 @@ const reducer = combineReducers({
   reports: reportsReducer
 })
 
-const editor = localStorage.getItem('editor') || '/* get started */'
+const editor = localStorage.getItem('editor') || 'println("hello, world!");'
 
 const reports = localStorage.getItem('reports')
   ? JSON.parse(localStorage.getItem('reports'))
-  : { ast: [], errors: [], symbols: [] }
+  : { ast: '', errors: [], symbols: [] }
 
 const initialState = {
   app: { show: false, loading: false },

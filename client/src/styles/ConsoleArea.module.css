@@ -4,6 +4,7 @@
 
 .title {
   background: rgb(25, 25, 40);
+  color: white;
   height: 35px;
 
   display: flex;

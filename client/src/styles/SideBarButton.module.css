@@ -20,13 +20,6 @@
   cursor: pointer;
 }
 
-.base:active {
-  width: calc(100% + 3px - 13px);
-  height: 46px;
-  margin-top: 2px;
-  margin-bottom: 12px;
-}
-
 .base img {
   height: 60%;
   margin-left: 5px;

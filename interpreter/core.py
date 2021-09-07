@@ -58,6 +58,9 @@ def reset():
 def SemanticError(sen, description):
   errors.append(_Error(sen.ln, sen.col, 'Semántico', description))
 
+def ApplicationError(description):
+  errors.append(_Error(1, 1, 'Aplicación', description))
+
 class Environment():
   def __init__(self, id = 'global', parent = None):
     self.id = id

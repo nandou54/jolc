@@ -6,18 +6,21 @@ import logo from '@img/logo_usac.png'
 function WelcomePage() {
   return (
     <div className={styles.base}>
+      <div className={styles.small}>Agosto - Septiembre de 2021</div>
       <div className={styles.title}>
         <h2>Universidad de San Carlos de Guatemala</h2>
-        <img src={logo} width={80} />
+        <img src={logo} width={100} />
       </div>
-      <div className={styles.small}>Agosto - Septiembre de 2021</div>
       <div className={styles.group}>
-        <h2>¡Bienvenido a Jolc!</h2>
+        <h3>¡Bienvenido a Jolc!</h3>
         <p>El primer proyecto del curso de Organización de Lenguajes y Compiladores 2</p>
       </div>
       <div className={styles.group}>
         <h3>¿Qué es Jolc?</h3>
-        <p>Un intérprete de Julia ejecutable en la web.</p>
+        <p>
+          Un intérprete de un lenguaje llamado Jolc, una lenguaje basado en Julia
+          ejecutable en la web.
+        </p>
       </div>
       <div className={styles.group}>
         <h3>Autor</h3>

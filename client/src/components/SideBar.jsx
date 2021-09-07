@@ -34,32 +34,33 @@ function SideBar() {
     axios
       .post('/api/', { content })
       .then(({ data }) => {
-        console.log(data)
-        dispatch(appendOutput(data.output))
-        const reports = { ast: data.ast, errors: data.errors, symbols: data.symbols }
-        dispatch(updateReports(reports))
-
-        if (data.errors.length) {
-          dispatch(logOutput('Se encontraron errores'))
-          const errorsOutput = data.errors.map(
-            ({ ln, col, type, description }) => `[${ln},${col}] ${type}: ${description}`
-          )
-          dispatch(appendOutput(errorsOutput))
-        }
-
         const duration = performance.now() - start
         setTimeout(
           () => {
+            dispatch(appendOutput(data.output))
+            const reports = { ast: data.ast, errors: data.errors, symbols: data.symbols }
+            dispatch(updateReports(reports))
+
+            if (data.errors.length) {
+              dispatch(logOutput('Se encontraron errores'))
+              const errorsOutput = data.errors.map(
+                ({ ln, col, type, description }) =>
+                  `[${ln},${col}] ${type}: ${description}`
+              )
+              dispatch(appendOutput(errorsOutput))
+            }
+
             dispatch(logOutput(`Tiempo de ejecución: ${duration} ms`))
             dispatch(toggleLoading(false))
           },
           duration < 900 ? 900 - duration : 0
         )
       })
-      .catch(() => {
+      .catch((error) => {
         const duration = performance.now() - start
         setTimeout(
           () => {
+            console.log(error)
             dispatch(logOutput('Hubo un problema interpretando el código'))
             dispatch(toggleLoading(false))
           },

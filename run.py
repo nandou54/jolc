@@ -1,18 +1,12 @@
 import json
 
 INPUT = '''
-struct Person
-  nombre;
+println(fib(4));
+
+function fib(num)
+  print(num);
+  return 1;
 end;
-
-p = Person("original");
-
-function main(ss)
-  ss.nombre="new bro";
-end;
-
-main(p);
-print(p.nombre);
 '''
 
 lexer = False

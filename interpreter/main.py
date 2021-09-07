@@ -1,10 +1,10 @@
 import copy
 from .analyzer import parse
-from .core import Environment, SemanticError, getOutput, getErrors, getSymbols, envs, functions, loops, reset
+from .core import Environment, SemanticError, ApplicationError, getOutput, getErrors, getSymbols, envs, functions, loops, reset
 from .core import RESERVED_FUNCTIONS, BINARY_OPERATIONS, UNARY_OPERATIONS, BINARY_OPERATION_RESULTS, UNARY_OPERATION_RESULTS
 from .symbols import Expression, Value, Assignment, Function, Struct, Call, If, Else, While, For, Return, Break, Continue
 from .symbols import T_SENTENCE, EXECUTABLE_SENTENCE
-# from .helper import graphAST
+from .helper import graphAST
 
 def interpret(input):
   reset()
@@ -16,31 +16,41 @@ def interpret(input):
   for ins in INS:
     if type(ins) is Function: exFunction(ins, globalEnv)
   newINS = [ins for ins in INS if type(ins) is not Function]
-  exInstructions(newINS, globalEnv)
 
-  # res['ast'] = graphAST(res['ast'])
+  import traceback
+  try:
+    exInstructions(newINS, globalEnv)
+  except:
+    traceback.print_exc()
+    ApplicationError('Error en la ejecución del código')
+
+  try:
+    res['ast'] = graphAST(res['ast'])
+  except:
+    traceback.print_exc()
+    ApplicationError('Error en la generación del dot')
+
   res['output'] = getOutput()
-  res['errors'] += getErrors()
   res['symbols'] = getSymbols()
+  res['errors'] += getErrors()
   return res
 
 def exInstructions(INS:T_SENTENCE, env:Environment):
   for ins in INS:
     if type(ins) in EXECUTABLE_SENTENCE:
       result = execute(ins, env)
-      if env.id=='global' or not result: continue
+      if env.id=='global' or type(result) is not Return: continue
       ins = result
 
     if type(ins) is Return:
       if len(functions)==0: return SemanticError(ins, 'Sentencia return fuera de una función')
       if ins.ex: ins.ex = exExpression(ins.ex, env)
-    if type(ins) is Break and len(loops) == 0: return SemanticError(ins, 'Sentencia break fuera de un ciclo')
-    if type(ins) is Continue and len(loops) == 0: return SemanticError(ins, 'Sentencia continue fuera de un ciclo')
+    if type(ins) is Break and len(loops)==0: return SemanticError(ins, 'Sentencia break fuera de un ciclo')
+    if type(ins) is Continue and len(loops)==0: return SemanticError(ins, 'Sentencia continue fuera de un ciclo')
     return ins
 
 def exExpression(ex:Expression, env:Environment) -> Value:
   if type(ex) is Call: return exCall(ex, env)
-  if ex.type=='id': return exId(ex, env)
   if ex.type=='array':
     for i in range(len(ex.value)):
       newValue = exExpression(ex.value[i], env)
@@ -51,6 +61,7 @@ def exExpression(ex:Expression, env:Environment) -> Value:
   if ex.type=='chain': return exChain(ex, env)
   if ex.type=='range': return exRange(ex, env)
   if ex.type=='ternary': return exTernary(ex, env)
+  if ex.type=='id': return exId(ex, env)
   if type(ex) is Value: return ex
 
   l = exExpression(ex.left, env) if ex.left else None
@@ -76,7 +87,7 @@ def exId(ex, env:Environment):
   if id.type=='Nothing': return SemanticError(ex, "No se le asignó un valor a '{}'".format(ex.value))
   return id
 
-def exCall(sen:Call, env:Environment):
+def exCall(sen:Call, env:Environment):  # sourcery skip: extract-method
   values = []
 
   for expression in sen.expressions:
@@ -88,13 +99,14 @@ def exCall(sen:Call, env:Environment):
     if not values: return SemanticError(sen, "No se pudo ejecutar la función '{}' con ningún parámetro".format(sen.id.value))
 
     result = RESERVED_FUNCTIONS[sen.id.value](values)
-    if result: return result
-    else: return Value(sen.ln, sen.col, None, 'Nothing')
+    if not result: result = Return(sen.ln, sen.col, Value(sen.ln, sen.col, None, 'Nothing'))
+    return result.ex
 
   function = env.getGlobalSymbol(sen.id.value)
   if not function: return SemanticError(sen, "No se declaró '{}'".format(sen.id.value))
   if type(function) is Function:
-    if len(values)!=len(function.parameters): return SemanticError(sen, "La función '{}' recibe {} parámetros".format(sen.id.value, len(function.parameters)))
+    if len(values)!=len(function.parameters):
+      return SemanticError(sen, "La función '{}' recibe {} parámetros".format(sen.id.value, len(function.parameters)))
 
     newEnv = Environment(env.id+"$"+sen.id.value, env)
 
@@ -105,9 +117,8 @@ def exCall(sen:Call, env:Environment):
     result = exInstructions(function.ins, newEnv)
     functions.pop()
 
-    if not result: return Value(sen.ln, sen.col, None, 'Nothing')
-    if type(result) is Return: return result.ex
-    else: return result
+    if not result: result = Return(sen.ln, sen.col, Value(sen.ln, sen.col, None, 'Nothing'))
+    return result.ex
   elif type(function) is Struct:
     if len(values)!=len(function.attributes): return SemanticError(sen, "El struct '{}' necesita {} atributos".format(sen.id.value, len(function.attributes)))
 
@@ -159,8 +170,10 @@ def exRange(ex:Expression, env:Environment):
 
   l = exExpression(ex.left, env)
   r = exExpression(ex.right, env)
+
   if l.type!='int64' or r.type!='int64': return SemanticError(ex, "Se esperaba un int64 en el rango")
   if l.value>=r.value: return SemanticError(ex, "El rango no es válido")
+
   ex.l, ex.r = l, r
   return ex
 

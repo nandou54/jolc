@@ -11,6 +11,17 @@
   justify-content: flex-end;
 }
 
+.graph {
+  margin: 20px 0;
+  height: 500px;
+  overflow: auto;
+}
+
+.graph svg {
+  height: calc(100% - 7px);
+  width: max-content;
+}
+
 .report {
   margin: 20px 0;
 }
@@ -26,7 +37,7 @@ h3 {
 }
 
 .report > div,
-table,
+.graph,
 th,
 td {
   border: 1px rgb(45, 42, 61) solid;

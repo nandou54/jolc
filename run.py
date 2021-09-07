@@ -1,11 +1,16 @@
 import json
 
 INPUT = '''
-println(fib(4));
+for i in 1:10
+  println(i, ':', fib(i));
+end;
 
 function fib(num)
-  print(num);
-  return 1;
+  if num<2
+    return 1;
+  else
+    return fib(num-1)+fib(num-2);
+  end;
 end;
 '''
 

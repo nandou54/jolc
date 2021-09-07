@@ -87,7 +87,7 @@ def exId(ex, env:Environment):
   if id.type=='Nothing': return SemanticError(ex, "No se le asignó un valor a '{}'".format(ex.value))
   return id
 
-def exCall(sen:Call, env:Environment):  # sourcery skip: extract-method
+def exCall(sen:Call, env:Environment):
   values = []
 
   for expression in sen.expressions:

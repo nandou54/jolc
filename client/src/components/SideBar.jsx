@@ -2,7 +2,6 @@ import { useLocation } from 'wouter'
 import React from 'react'
 import axios from 'axios'
 import styles from '@/styles/SideBar.module.css'
-import useKey from '@/hooks/useKey'
 import Logo from './Logo'
 import SideBarItem from './SideBarItem'
 import SideBarButton from './SideBarButton'
@@ -13,7 +12,8 @@ import { useDispatch, useSelector } from 'react-redux'
 
 function SideBar() {
   const [location] = useLocation()
-  const [{ show, loading }, content] = useSelector((state) => [state.app, state.editor])
+  const { show, loading } = useSelector(({ app }) => app)
+  const content = useSelector(({ editor }) => editor)
   const dispatch = useDispatch()
 
   const handleToggleSideBar = () => {
@@ -68,8 +68,6 @@ function SideBar() {
         )
       })
   }
-
-  useKey('Enter', handleRun, { ctrl: true }, location.includes('editor'))
 
   const items = [
     {

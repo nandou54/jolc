@@ -1,17 +1,7 @@
 import json
 
 INPUT = '''
-for i in 1:10
-  println(i, ':', fib(i));
-end;
-
-function fib(num)
-  if num<2
-    return 1;
-  else
-    return fib(num-1)+fib(num-2);
-  end;
-end;
+x=1;
 '''
 
 lexer = False

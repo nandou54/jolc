@@ -225,6 +225,7 @@ def unnest(val):
     for a in val.attributes:
       d[a.id.value] = unnest(a.value.value)
     val = d
+  elif val is None: return 'Nothing'
   return val
 
 def _string(values):

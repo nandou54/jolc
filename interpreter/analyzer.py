@@ -547,8 +547,8 @@ def p_RETURN(p):
 
 def p_error(p):
   if p:
-    if type(p.value) is dict: msg = "Sintáxis no válida en {}".format(p.type)
-    else: msg = "Sintaxis no válida cerca de '{}' ({})" .format(p.value, p.type)
+    if type(p.value) in [str, int, float, bool]: msg = "Sintaxis no válida cerca de '{}' ({})" .format(p.value, p.type)
+    else: msg = "Sintáxis no válida en {}".format(p.type)
     error = SyntacticError(p.lineno, getColumn(p), msg)
   else:
     error = SyntacticError(0, 0, "Ninguna instrucción válida")

@@ -39,7 +39,7 @@ def exInstructions(INS:T_SENTENCE, env:Environment):
   for ins in INS:
     if type(ins) in EXECUTABLE_SENTENCE:
       result = execute(ins, env)
-      if env.id=='global' or type(result) is not Return: continue
+      if env.id=='global' or type(result) is Value: continue
       ins = result
 
     if type(ins) is Return:

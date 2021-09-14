@@ -1,2 +1,2 @@
 # JOLC
-deployed on [heroku](https://quiet-sea-40585.herokuapp.com/)!
+deployed on [heroku](http://jolc2.herokuapp.com/client/)!

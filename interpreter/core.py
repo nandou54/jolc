@@ -102,7 +102,7 @@ def _println(values):
   output+=string[0:-1]+'\n'
 
 def _log10(values):
-  if len(values)>1: return SemanticError(values[0], "La función nativa 'log10' recibe un parámetro")
+  if len(values)!=1: return SemanticError(values[0], "La función nativa 'log10' recibe un parámetro")
 
   ex = values[0]
   if ex.type not in ['int64', 'float64']:
@@ -126,7 +126,7 @@ def _log(values):
   return newValue
 
 def _sin(values):
-  if len(values)>1: return SemanticError(values[0], "La función nativa 'sin' recibe un parámetro")
+  if len(values)!=1: return SemanticError(values[0], "La función nativa 'sin' recibe un parámetro")
 
   ex = values[0]
   if ex.type not in ['int64', 'float64']:
@@ -138,7 +138,7 @@ def _sin(values):
   return newValue
 
 def _cos(values):
-  if len(values)>1: return SemanticError(values[0], "La función nativa 'cos' recibe un parámetro")
+  if len(values)!=1: return SemanticError(values[0], "La función nativa 'cos' recibe un parámetro")
 
   ex = values[0]
   if ex.type not in ['int64', 'float64']:
@@ -150,7 +150,7 @@ def _cos(values):
   return newValue
 
 def _tan(values):
-  if len(values)>1: return SemanticError(values[0], "La función nativa 'tan' recibe un parámetro")
+  if len(values)!=1: return SemanticError(values[0], "La función nativa 'tan' recibe un parámetro")
 
   ex = values[0]
   if ex.type not in ['int64', 'float64']:
@@ -162,7 +162,7 @@ def _tan(values):
   return newValue
 
 def _sqrt(values):
-  if len(values)>1: return SemanticError(values[0], "La función nativa 'sqrt' recibe un parámetro")
+  if len(values)!=1: return SemanticError(values[0], "La función nativa 'sqrt' recibe un parámetro")
 
   ex = values[0]
   if ex.type not in ['int64', 'float64']:
@@ -174,7 +174,7 @@ def _sqrt(values):
   return newValue
 
 def _parse(values):
-  if len(values)>1: return SemanticError(values[0], "La función nativa 'typeof' recibe un parámetro")
+  if len(values)!=1: return SemanticError(values[0], "La función nativa 'typeof' recibe un parámetro")
 
   ex = values[0]
   if ex.type!='string':
@@ -193,7 +193,7 @@ def _parse(values):
   return newValue
 
 def _trunc(values):
-  if len(values)>1: return SemanticError(values[0], "La función nativa 'trunc' recibe un parámetro")
+  if len(values)!=1: return SemanticError(values[0], "La función nativa 'trunc' recibe un parámetro")
 
   ex = values[0]
   if ex.type!='float64':
@@ -205,7 +205,7 @@ def _trunc(values):
   return newValue
 
 def _float(values):
-  if len(values)>1: return SemanticError(values[0], "La función nativa 'float' recibe un parámetro")
+  if len(values)!=1: return SemanticError(values[0], "La función nativa 'float' recibe un parámetro")
 
   ex = values[0]
   if ex.type!='int64':
@@ -225,11 +225,10 @@ def unnest(val):
     for a in val.attributes:
       d[a.id.value] = unnest(a.value.value)
     val = d
-  elif val is None: return 'Nothing'
   return val
 
 def _string(values):
-  if len(values)>1: return SemanticError(values[0], "La función nativa 'string' recibe un parámetro")
+  if len(values)!=1: return SemanticError(values[0], "La función nativa 'string' recibe un parámetro")
 
   newValue = copy.deepcopy(values[0])
   newValue.value = str(unnest(newValue.value))
@@ -237,7 +236,7 @@ def _string(values):
   return newValue
 
 def _uppercase(values):
-  if len(values)>1: return SemanticError(values[0], "La función nativa 'uppercase' recibe un parámetro")
+  if len(values)!=1: return SemanticError(values[0], "La función nativa 'uppercase' recibe un parámetro")
 
   ex = values[0]
   if ex.type!='string':
@@ -248,7 +247,7 @@ def _uppercase(values):
   return newValue
 
 def _lowercase(values):
-  if len(values)>1: return SemanticError(values[0], "La función nativa 'lowercase' recibe un parámetro")
+  if len(values)!=1: return SemanticError(values[0], "La función nativa 'lowercase' recibe un parámetro")
 
   ex = values[0]
   if ex.type!='string':
@@ -259,7 +258,7 @@ def _lowercase(values):
   return newValue
 
 def _typeof(values):
-  if len(values)>1: return SemanticError(values[0], "La función nativa 'typeof' recibe un parámetro")
+  if len(values)!=1: return SemanticError(values[0], "La función nativa 'typeof' recibe un parámetro")
 
   ex = values[0]
   value = copy.deepcopy(ex)
@@ -276,7 +275,7 @@ def _push(values):
   arr.value.append(ex)
 
 def _pop(values):
-  if len(values)>1: return SemanticError(values[0], "La función nativa 'pop' recibe un parámetro")
+  if len(values)!=1: return SemanticError(values[0], "La función nativa 'pop' recibe un parámetro")
 
   arr = values[0]
   if arr.type!='array':
@@ -285,7 +284,7 @@ def _pop(values):
   return arr.value.pop()
 
 def _length(values):
-  if len(values)>1: return SemanticError(values[0], "La función nativa 'length' recibe un parámetro")
+  if len(values)!=1: return SemanticError(values[0], "La función nativa 'length' recibe un parámetro")
 
   ex = values[0]
   if ex.type not in ['string', 'array']:
@@ -312,8 +311,8 @@ RESERVED_FUNCTIONS = {
   'uppercase': _uppercase,
   'lowercase': _lowercase,
   'typeof': _typeof,
-  'push': _push,
-  'pop': _pop,
+  'push!': _push,
+  'pop!': _pop,
   'length': _length
 }
 
@@ -353,7 +352,9 @@ def _mayor_igual(l:Value, r:Value):
   return l.value>=r.value
 
 def _igualacion(l:Value, r:Value):
-  return l.value==r.value
+  strL = _string([l])
+  strR = _string([r])
+  return strL.value==strR.value
 
 def _diferenciacion(l:Value, r:Value):
   return l.value!=r.value
@@ -505,38 +506,6 @@ BINARY_OPERATION_RESULTS = {
     }
   },
   'mayor_igual':{
-    'int64':{
-      'int64':'bool',
-      'float64':'bool'
-    },
-    'float64':{
-      'int64':'bool',
-      'float64':'bool'
-    },
-    'bool':{
-      'bool':'bool'
-    },
-    'string':{
-      'string':'bool'
-    }
-  },
-  'igualacion':{
-    'int64':{
-      'int64':'bool',
-      'float64':'bool'
-    },
-    'float64':{
-      'int64':'bool',
-      'float64':'bool'
-    },
-    'bool':{
-      'bool':'bool'
-    },
-    'string':{
-      'string':'bool'
-    }
-  },
-  'diferenciacion':{
     'int64':{
       'int64':'bool',
       'float64':'bool'

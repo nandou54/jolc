@@ -163,12 +163,12 @@ def t_string(t):
   return t
 
 def t_Nothing(t):
-  r'Nothing'
-  t.value = Value(t.lineno, getColumn(t), None, 'Nothing')
+  r'nothing'
+  t.value = Value(t.lineno, getColumn(t), None, 'nothing')
   return t
 
 def t_id(t):
-  r'[a-zA-Z_][a-zA-Z_0-9]*'
+  r'[a-zA-Z_][a-zA-Z_0-9!]*'
   if t.value in reserved: t.type = t.value
   else: t.value = Value(t.lineno, getColumn(t), t.value, 'id')
   return t

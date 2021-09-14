@@ -1,4 +1,6 @@
-import copy
+import copy, sys
+sys.setrecursionlimit(4000)
+del sys
 from .analyzer import parse
 from .core import Environment, SemanticError, ApplicationError, getOutput, getErrors, getSymbols, envs, functions, loops, reset
 from .core import RESERVED_FUNCTIONS, BINARY_OPERATIONS, UNARY_OPERATIONS, BINARY_OPERATION_RESULTS, UNARY_OPERATION_RESULTS
@@ -39,14 +41,21 @@ def exInstructions(INS:T_SENTENCE, env:Environment):
   for ins in INS:
     if type(ins) in EXECUTABLE_SENTENCE:
       result = execute(ins, env)
-      if env.id=='global' or type(result) is Value: continue
+      if not result or type(result) is Value: continue
       ins = result
 
     if type(ins) is Return:
-      if len(functions)==0: return SemanticError(ins, 'Sentencia return fuera de una función')
-      if ins.ex: ins.ex = exExpression(ins.ex, env)
-    if type(ins) is Break and len(loops)==0: return SemanticError(ins, 'Sentencia break fuera de un ciclo')
-    if type(ins) is Continue and len(loops)==0: return SemanticError(ins, 'Sentencia continue fuera de un ciclo')
+      if len(functions)==0:
+        SemanticError(ins, 'Sentencia return fuera de una función')
+        continue
+      ins = copy.deepcopy(ins)
+      ins.ex = exExpression(ins.ex, env)
+    if type(ins) is Break and len(loops)==0:
+      SemanticError(ins, 'Sentencia break fuera de un ciclo')
+      continue
+    if type(ins) is Continue and len(loops)==0:
+      SemanticError(ins, 'Sentencia continue fuera de un ciclo')
+      continue
     return ins
 
 def exExpression(ex:Expression, env:Environment) -> Value:
@@ -73,9 +82,13 @@ def exExpression(ex:Expression, env:Environment) -> Value:
     try: returnType = UNARY_OPERATION_RESULTS[ex.type][l.type]
     except: return SemanticError(ex, "No se pudo aplicar '{}' a '{}' y '{}'".format(ex.type, l.type, r.type))
   else:
-    if not r: return SemanticError(ex, "No se pudo realizar la operación '{}'".format(ex.type))
-    try: returnType = BINARY_OPERATION_RESULTS[ex.type][l.type][r.type]
-    except: return SemanticError(ex, "No se pudo aplicar '{}' a '{}' y '{}'".format(ex.type, l.type, r.type))
+    if not r :
+      if ex.type in ['or', 'and']: r = Value(ex.ln, ex.col, False, 'bool')
+      else: return SemanticError(ex, "No se pudo realizar la operación '{}'".format(ex.type))
+    if ex.type in ['igualacion', 'diferenciacion']: returnType = 'bool'
+    else:
+      try: returnType = BINARY_OPERATION_RESULTS[ex.type][l.type][r.type]
+      except: return SemanticError(ex, "No se pudo aplicar '{}' a '{}' y '{}'".format(ex.type, l.type, r.type))
 
   if ex.unary: newValue = Value(ex.ln, ex.col, UNARY_OPERATIONS[ex.type](l), returnType)
   else: newValue = Value(ex.ln, ex.col, BINARY_OPERATIONS[ex.type](l, r), returnType)
@@ -84,7 +97,6 @@ def exExpression(ex:Expression, env:Environment) -> Value:
 def exId(ex, env:Environment):
   id = env.getGlobalSymbol(ex.value)
   if not id: return SemanticError(ex, "No se ha declarado '{}'".format(ex.value))
-  if id.type=='Nothing': return SemanticError(ex, "No se le asignó un valor a '{}'".format(ex.value))
   return id
 
 def exCall(sen:Call, env:Environment):
@@ -96,11 +108,9 @@ def exCall(sen:Call, env:Environment):
     values.append(value)
 
   if sen.id.value in RESERVED_FUNCTIONS.keys():
-    if not values: return SemanticError(sen, "No se pudo ejecutar la función '{}' con ningún parámetro".format(sen.id.value))
-
     result = RESERVED_FUNCTIONS[sen.id.value](values)
-    if not result: result = Return(sen.ln, sen.col, Value(sen.ln, sen.col, None, 'Nothing'))
-    return result.ex
+    if not result: result = Value(sen.ln, sen.col, None, 'nothing')
+    return result
 
   function = env.getGlobalSymbol(sen.id.value)
   if not function: return SemanticError(sen, "No se declaró '{}'".format(sen.id.value))
@@ -117,7 +127,7 @@ def exCall(sen:Call, env:Environment):
     result = exInstructions(function.ins, newEnv)
     functions.pop()
 
-    if not result: result = Return(sen.ln, sen.col, Value(sen.ln, sen.col, None, 'Nothing'))
+    if not result: result = Return(sen.ln, sen.col, Value(sen.ln, sen.col, None, 'nothing'))
     return result.ex
   elif type(function) is Struct:
     if len(values)!=len(function.attributes): return SemanticError(sen, "El struct '{}' necesita {} atributos".format(sen.id.value, len(function.attributes)))
@@ -172,7 +182,7 @@ def exRange(ex:Expression, env:Environment):
   r = exExpression(ex.right, env)
 
   if l.type!='int64' or r.type!='int64': return SemanticError(ex, "Se esperaba un int64 en el rango")
-  if l.value>=r.value: return SemanticError(ex, "El rango no es válido")
+  if l.value>r.value: return SemanticError(ex, "El rango no es válido")
 
   ex.l, ex.r = l, r
   return ex
@@ -193,7 +203,7 @@ def exTernary(ex:Expression, env:Environment):
 
 def exAssignment(sen:Assignment, env:Environment):
   if sen.id.type=='id':
-    value = Value(sen.ln, sen.col, None, 'Nothing')
+    value = Value(sen.ln, sen.col, None, 'nothing')
     targetEnv = env
 
     if sen.scope:
@@ -204,6 +214,7 @@ def exAssignment(sen:Assignment, env:Environment):
         targetEnv.declareSymbol(sen.id.value, value)
       elif not env.getGlobalSymbol(sen.id.value): return SemanticError(sen, "No existe la variable '{}' en el entorno global".format(sen.id.value))
       else: targetEnv = env.getParentEnvById(sen.id.value)
+      if not sen.ex: return
     elif env.getGlobalSymbol(sen.id.value):
       targetEnv = env.getParentEnvById(sen.id.value)
 
@@ -259,9 +270,8 @@ def exIf(sen:If, env:Environment):
   newEnv = Environment(env.id + '#if({},{})'.format(sen.ln, sen.col), env)
 
   if condition.value: return exInstructions(sen.ins, newEnv)
-  elif sen.elseif:
-    if type(sen.elseif) is Else: return exInstructions(sen.elseif.ins, newEnv)
-    else: return exIf(sen.elseif, env)
+  elif type(sen.elseif) is Else: return exInstructions(sen.elseif.ins, newEnv)
+  elif type(sen.elseif) is If: return exIf(sen.elseif, env)
 
 def exWhile(sen:While, env:Environment):
   loops.append('while')

@@ -37,6 +37,8 @@ def linkNodes(backNode, nextNode):
 
 def printExpression(ex:Expression, backNode):
   s = ''
+  if not ex: return s
+
   node = nodeName(ex)
   s += linkNodes(backNode, node)
 

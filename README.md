@@ -1,2 +1,2 @@
 # JOLC
-deployed on [heroku](http://jolc2.herokuapp.com/client/)!
+deployed on [heroku](https://jolc2.herokuapp.com/client/)!

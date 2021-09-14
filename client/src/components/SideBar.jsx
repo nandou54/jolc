@@ -37,7 +37,6 @@ function SideBar() {
         const duration = performance.now() - start
         setTimeout(
           () => {
-            dispatch(toggleLoading(false))
             dispatch(appendOutput(data.output))
             const reports = { ast: data.ast, errors: data.errors, symbols: data.symbols }
             dispatch(updateReports(reports))
@@ -52,6 +51,7 @@ function SideBar() {
             }
 
             dispatch(logOutput(`Tiempo de ejecución: ${duration} ms`))
+            dispatch(toggleLoading(false))
           },
           duration < 900 ? 900 - duration : 0
         )
@@ -60,9 +60,9 @@ function SideBar() {
         const duration = performance.now() - start
         setTimeout(
           () => {
-            dispatch(toggleLoading(false))
-            dispatch(logOutput('Hubo un problema interpretando el código'))
             console.log(error)
+            dispatch(logOutput('Hubo un problema interpretando el código'))
+            dispatch(toggleLoading(false))
           },
           duration < 900 ? 900 - duration : 0
         )

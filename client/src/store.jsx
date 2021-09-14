@@ -15,9 +15,7 @@ const reducer = combineReducers({
 
 const editor = localStorage.getItem('editor') || 'println("hello, world!");'
 
-const reports = localStorage.getItem('reports')
-  ? JSON.parse(localStorage.getItem('reports'))
-  : { ast: '', errors: [], symbols: [] }
+const reports = { ast: '', errors: [], symbols: [] }
 
 const initialState = {
   app: { show: false, loading: false },

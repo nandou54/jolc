@@ -28,6 +28,7 @@ def interpret(input):
 
   try:
     res['ast'] = graphAST(res['ast'])
+    pass
   except:
     traceback.print_exc()
     ApplicationError('Error en la generación del dot')
@@ -71,6 +72,7 @@ def exExpression(ex:Expression, env:Environment) -> Value:
   if ex.type=='range': return exRange(ex, env)
   if ex.type=='ternary': return exTernary(ex, env)
   if ex.type=='id': return exId(ex, env)
+  if ex.type=='string': return exString(ex, env)
   if type(ex) is Value: return ex
 
   l = exExpression(ex.left, env) if ex.left else None
@@ -94,9 +96,30 @@ def exExpression(ex:Expression, env:Environment) -> Value:
   else: newValue = Value(ex.ln, ex.col, BINARY_OPERATIONS[ex.type](l, r), returnType)
   return newValue
 
+def exString(ex, env:Environment):
+  ex = copy.deepcopy(ex)
+
+  newValue = ''
+
+  for val in ex.value:
+    if val.type=='string': newValue+=val.value
+    else:
+      result = exExpression(val, env)
+      if not result: return SemanticError(ex, 'No se pudo evaluar el string')
+
+      result = RESERVED_FUNCTIONS['string']([result])
+      newValue+=result.value
+
+  ex.value = newValue
+  return ex
+
 def exId(ex, env:Environment):
   id = env.getGlobalSymbol(ex.value)
   if not id: return SemanticError(ex, "No se ha declarado '{}'".format(ex.value))
+  if type(id) is Function:
+    print("es funcion")
+    return SemanticError(ex, 'Error al obtener una funcion')
+  if type(id) is Struct: return SemanticError(ex, 'Error al obtener un struct')
   return id
 
 def exCall(sen:Call, env:Environment):

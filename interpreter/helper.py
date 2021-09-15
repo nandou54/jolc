@@ -51,11 +51,10 @@ def printExpression(ex:Expression, backNode):
     s += printNode(node, 'Arreglo')
     for val in ex.value:
       valueNode = nodeName(val)
-      s += printNode(valueNode, val.value)
+      s += printExpression(valueNode, val.value)
       s += linkNodes(node, valueNode)
   elif ex.type=='access':
     s += printNode(node, 'Acceso')
-    # s += print(node, ex)
   elif ex.type=='chain':
     s += printNode(node, 'Chain')
 
@@ -102,6 +101,13 @@ def printExpression(ex:Expression, backNode):
     s += printNode(exNode, 'Falso')
     s += linkNodes(node, exNode)
     s += printExpression(ex.right, exNode)
+  elif ex.type=='string':
+    s += printNode(node, 'string')
+    for val in ex.value:
+      valueNode = nodeName(val)
+      if val.type=='string': printNode(valueNode, val.value)
+      else: s += printExpression(val, valueNode)
+      s += linkNodes(node, valueNode)
   elif type(ex) is Value:
     s += printNode(node, '<{}>\\n{}'.format(ex.type, ex.value))
   else:

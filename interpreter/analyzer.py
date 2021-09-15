@@ -4,8 +4,8 @@ from interpreter.ply.lex import lex
 from .symbols import Assignment, Expression, Value, Function, Struct, Attribute, Call, If, Else, While, For, Break, Continue, Return, _Error
 from .symbols import operations
 
-INPUT:str
-errors:list
+INPUT = ''
+errors = []
 
 def LexicalError(ln, col, description):
   return _Error(ln, col, 'Léxico', description)
@@ -29,7 +29,7 @@ def parse(input):
   if ast is None: ast = []
   return {'ast':ast, 'errors':errors, 'output':'', 'symbols':[]}
 
-reserved = [
+reserved = (
   'Nothing',
   'Int64',
   'Float64',
@@ -51,14 +51,16 @@ reserved = [
   'return',
   'mutable',
   'in'
-]
+)
 
-tokens = [
+tokens = (
   'id',
   'parA',
   'parB',
   'corA',
   'corB',
+  'llaveA',
+  'llaveB',
   'int64',
   'float64',
   'bool',
@@ -86,12 +88,19 @@ tokens = [
   'tipo',
   'interrog',
   'puntoycoma'
-] + reserved
+) + reserved
+
+states = (
+  ('string','exclusive'),
+  ('expresion','inclusive')
+)
 
 # Lexemas ignorados
 t_ignore                       =  ' \t'
 t_ignore_comentario            = r'[#].*'
 t_ignore_comentario_multilinea = r'[#]=([^=]|[\r\n]|(=+([^#])))*=+[#]'
+t_string_ignore = ""
+t_expresion_ignore = t_ignore
 
 t_parA           = r'\('
 t_parB           = r'\)'
@@ -119,6 +128,30 @@ t_tipo           = r'::'
 t_interrog       = r'\?'
 t_dospuntos      = r':'
 t_puntoycoma     = r';'
+
+def t_begin_string(t):
+  r'"'
+  t.lexer.push_state('string')
+
+def t_string_string(t):
+  r'[^"\n{]+'
+  value, valueType = t.value, 'string'
+  t.value = Value(t.lineno, getColumn(t), value, valueType)
+  return t
+
+def t_string_llaveA(t):
+  r'\{'
+  t.lexer.push_state('expresion')
+  return t
+
+def t_string_end(t):
+  r'"'
+  t.lexer.pop_state()
+
+def t_expresion_llaveB(t):
+  r'\}'
+  t.lexer.pop_state()
+  return t
 
 def t_float64(t):
   r'\d+\.\d+'
@@ -156,12 +189,6 @@ def t_char(t):
   t.value = Value(t.lineno, getColumn(t), value, valueType)
   return t
 
-def t_string(t):
-  r'"[^"\n]*"'
-  value, valueType = t.value[1:-1], 'string'
-  t.value = Value(t.lineno, getColumn(t), value, valueType)
-  return t
-
 def t_Nothing(t):
   r'nothing'
   t.value = Value(t.lineno, getColumn(t), None, 'nothing')
@@ -182,8 +209,8 @@ def t_error(t):
   errors.append(error)
   t.lexer.skip(1)
 
-# Analizador léxico
-lexer = lex()
+t_string_error = t_error
+t_expresion_error = t_error
 
 # Precedencia de menos a más
 precedence = (
@@ -413,12 +440,11 @@ def p_E(p):
     | float64
     | bool
     | char
-    | string
+    | STRING
     | Nothing
   '''
   if len(p)==2:
     p[0] = p[1]
-    if type(p[0]) is list: p[0] = Value(0, 0, p[0], 'id')
     return
 
   if p[1]=='(':
@@ -442,6 +468,25 @@ def p_E(p):
     expressionType = 'negacion' if p[1]=='-' else 'not'
 
   p[0] = Expression(p.lexer.lineno, getColumn(p.lexer), unary, expressionType, l, r)
+
+def p_STRING(p):
+  '''
+  STRING  : STRING S
+          | S
+  '''
+  if len(p)==3:
+    p[0] = p[1]
+    p[0].value.append(p[2])
+  else:
+    value = Value(p.lexer.lineno, getColumn(p.lexer), [p[1]], 'string')
+    p[0] = value
+
+def p_S(p):
+  '''
+  S : string
+    | llaveA E llaveB
+  '''
+  p[0] = p[1] if len(p)==2 else p[2]
 
 def p_ARREGLO(p):
   '''
@@ -554,6 +599,9 @@ def p_error(p):
     error = SyntacticError(0, 0, "Ninguna instrucción válida")
 
   errors.append(error)
+
+# Analizador léxico
+lexer = lex()
 
 # Analizador sintáctico
 parser = yacc()

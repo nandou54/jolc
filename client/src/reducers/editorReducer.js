@@ -3,7 +3,11 @@ const editorReducer = (state = defaultState, action) => {
   switch (action.type) {
     case '@editor/update': {
       const newContent = action.payload
-      save(newContent)
+      try {
+        save(newContent)
+      } catch {
+        console.log('Error al guardar el código localmente')
+      }
       return newContent
     }
     default:

@@ -1,9 +1,9 @@
 .base {
   font-size: 17px;
+  border-bottom: 2px rgba(25, 25, 35, 0.5) solid;
 
   width: calc(100% - 16px);
   height: 50px;
-  margin-bottom: 10px;
   border-radius: 23px;
 
   display: flex;
@@ -11,8 +11,7 @@
 }
 
 .base:hover {
-  border-bottom: 1px rgba(55, 55, 70, 0.5) solid;
-  margin-bottom: 9px;
+  border-bottom: 2px rgba(55, 55, 70, 0.5) solid;
 }
 
 .base img {

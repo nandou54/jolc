@@ -16,7 +16,7 @@ function SideBarItem({ to, label, img, active }) {
       onClick={handleClick}
       className={styles.base}
       style={active ? { background: 'rgb(40, 40, 65)' } : {}}>
-      <img src={`https://img.icons8.com/${active ? '77CC77' : 'FFFFFF'}/${img}`} />
+      <img src={`https://img.icons8.com/${active ? '64D264' : 'FFFFFF'}/${img}`} />
       {label}
     </Link>
   )

@@ -39,7 +39,10 @@ def printExpression(ex:Expression, backNode):
   s = ''
   if not ex: return s
 
-  node = nodeName(ex, ex.type)
+  if hasattr(ex, 'type'): extra = ex.type
+  else: extra = type(ex).__name__
+
+  node = nodeName(ex, extra)
   s += linkNodes(backNode, node)
 
   if type(ex) is Call:

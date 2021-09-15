@@ -132,21 +132,31 @@ t_puntoycoma     = r';'
 def t_begin_string(t):
   r'"'
   t.lexer.push_state('string')
+  t.lexer.nothingRecognized = True
 
 def t_string_string(t):
   r'[^"\n{]+'
   value, valueType = t.value, 'string'
   t.value = Value(t.lineno, getColumn(t), value, valueType)
+  t.lexer.nothingRecognized = False
   return t
 
 def t_string_llaveA(t):
   r'\{'
+  t.lexer.nothingRecognized = False
   t.lexer.push_state('expresion')
   return t
 
 def t_string_end(t):
   r'"'
   t.lexer.pop_state()
+
+  if t.lexer.nothingRecognized:
+    value, valueType = '', 'string'
+    t.value = Value(t.lineno, getColumn(t), value, valueType)
+    t.type = valueType
+    return t
+
 
 def t_expresion_llaveB(t):
   r'\}'

@@ -2,6 +2,7 @@
   grid-area: logo;
   font-family: 'Averia Serif Libre', cursive;
 
+  z-index: 10;
   font-size: 65px;
 
   display: flex;

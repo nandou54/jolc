@@ -13,7 +13,7 @@ function Logo() {
 
   return (
     <Link
-      to='/client/'
+      to='.'
       style={{ opacity: show ? '100%' : '0%' }}
       className={styles.base}
       onClick={handleClick}>

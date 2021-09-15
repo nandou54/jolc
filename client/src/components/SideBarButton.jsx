@@ -4,7 +4,7 @@ import styles from '@/styles/SideBarButton.module.css'
 function SideBarButton({ onClick, img, highlight = false }) {
   return (
     <button
-      className={styles.base}
+      className={`${styles.base} unselectable`}
       onClick={onClick}
       style={
         highlight

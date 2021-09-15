@@ -28,17 +28,12 @@ function WelcomePage() {
         <p>Carné: 201901698</p>
         <li>
           <a target='blank' href='mailto:pablofernando50259107@gmail.com'>
-            Correo: pablofernando50259107@gmail.com
-          </a>
-        </li>
-        <li>
-          <a target='blank' href='https://www.linkedin.com/in/pablo-cabrera-2a567b209/'>
-            Perfil de Linkedin
+            E-mail
           </a>
         </li>
         <br />
         <div>
-          Proyecto disponible en <a href='https://github.com/pabloc54/jolc'>GitHub</a>
+          Source del proyecto: <a href='https://github.com/pabloc54/jolc'>GitHub</a>
         </div>
         <div>
           Icons by <a href='https://icons8.com'>Icons8</a>

@@ -66,3 +66,12 @@ body::-webkit-scrollbar {
   -ms-user-select: none;
   user-select: none;
 }
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+
+  color: rgb(60, 60, 90);
+}

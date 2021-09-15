@@ -14,7 +14,7 @@ function SideBarItem({ to, label, img, active }) {
     <Link
       to={to}
       onClick={handleClick}
-      className={styles.base}
+      className={`${styles.base} unselectable`}
       style={active ? { background: 'rgb(40, 40, 65)' } : {}}>
       <img src={`https://img.icons8.com/${active ? '64D264' : 'FFFFFF'}/${img}`} />
       {label}

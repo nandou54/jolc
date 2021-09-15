@@ -16,32 +16,21 @@ def getOutput():
 def getErrors(): return errors
 
 def getSymbols():
-  symbols = []
+  symbols = {"variables": [], "functions": [], "structs": []}
   for env in envs:
     for id, value in env.symbols.items():
-      valueType, parameters, attributes = 'no aplica', 'no aplica', 'no aplica'
-
       if type(value) is Value:
-        symbolType = 'variable'
-        valueType = value.type
+        array = symbols["variables"]
+        extra = value.type
       elif type(value) is Function:
-        symbolType = 'function'
-        parameters = ', '.join(parameter.value for parameter in value.parameters)
+        array = symbols["functions"]
+        extra = ', '.join(parameter.value for parameter in value.parameters)
       else:
-        symbolType = 'struct'
-        attributes = ', '.join(attribute.id.value for attribute in value.attributes)
+        array = symbols["structs"]
+        extra = ', '.join(attribute.id.value for attribute in value.attributes)
 
-      symbol = {
-        "ln":value.ln,
-        "col":value.col,
-        "env":env.id,
-        "id":id,
-        "type":valueType,
-        "parameters":parameters,
-        "attributes":attributes,
-        "symbolType":symbolType
-      }
-      symbols.append(symbol)
+    symbol = [env.id, value.ln, value.col, id, extra]
+    array.append(symbol)
   return symbols
 
 def reset():

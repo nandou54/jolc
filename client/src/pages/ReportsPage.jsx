@@ -6,19 +6,16 @@ import { Graphviz } from 'graphviz-react'
 
 function ReportsPage() {
   const { ast, symbols, errors } = useSelector((state) => state.reports)
-
-  const existsAST = !!ast
-  const existsErrors = !!errors.length
-  const existsSymbols = !!symbols.length
-  const existsReports = existsAST || existsErrors || existsSymbols
-
-  const variables = symbols.filter(({ symbolType }) => symbolType == 'variable')
-  const functions = symbols.filter(({ symbolType }) => symbolType == 'function')
-  const structs = symbols.filter(({ symbolType }) => symbolType == 'struct')
+  const { variables, functions, structs } = symbols
 
   const existsVariables = !!variables.length
   const existsFunctions = !!functions.length
   const existsStructs = !!structs.length
+
+  const existsAST = !!ast
+  const existsErrors = !!errors.length
+  const existsSymbols = existsVariables || existsFunctions || existsStructs
+  const existsReports = existsAST || existsErrors || existsSymbols
 
   return (
     <div className={styles.base}>
@@ -32,11 +29,9 @@ function ReportsPage() {
         </p>
       ) : (
         <>
-          <div>
-            <h3>AST</h3>
-            {!existsAST ? (
-              <p>Sin datos</p>
-            ) : (
+          {existsAST && (
+            <div>
+              <h3>AST</h3>
               <Graphviz
                 className={styles.graph}
                 dot={ast}
@@ -46,141 +41,88 @@ function ReportsPage() {
                   fit: true
                 }}
               />
-            )}
-          </div>
-          <h3>Reporte de errores</h3>
-          <div className={styles.report}>
-            {!existsErrors ? (
-              <p>Sin datos</p>
-            ) : (
-              <div>
-                <table className={styles.errors}>
-                  <thead>
-                    <tr>
-                      <th>Hora</th>
-                      <th>Línea</th>
-                      <th>Columna</th>
-                      <th>Tipo</th>
-                      <th>Descripción</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {errors.map(({ time, ln, col, type, description }) => (
-                      <tr key={time}>
-                        <td>{time}</td>
-                        <td>{ln}</td>
-                        <td>{col}</td>
-                        <td>{type}</td>
-                        <td>{description}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-          <h3>Reporte de símbolos</h3>
-          {!existsSymbols ? (
-            <p>Sin datos</p>
-          ) : (
+            </div>
+          )}
+          {existsErrors && (
             <>
+              <h3>Reporte de errores</h3>
               <div className={styles.report}>
-                <h4>Variables</h4>
-                {!existsVariables ? (
-                  <p>Sin datos</p>
-                ) : (
-                  <div>
-                    <table className={styles.variables}>
-                      <thead>
-                        <tr>
-                          <th>Entorno</th>
-                          <th>Línea</th>
-                          <th>Columna</th>
-                          <th>ID</th>
-                          <th>Tipo</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {variables.map(({ env, ln, col, id, type }) => (
-                          <tr key={col + ',' + id}>
-                            <td>{env}</td>
-                            <td>{ln}</td>
-                            <td>{col}</td>
-                            <td>{id}</td>
-                            <td>{type}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                <Table
+                  headers={['Hora', 'Línea', 'Columna', 'Tipo', 'Descripción']}
+                  body={errors}
+                  className={styles.errors}
+                />
+              </div>
+            </>
+          )}
+          {existsSymbols && (
+            <>
+              <h3>Reporte de símbolos</h3>
+              <div className={styles.report}>
+                {existsVariables && (
+                  <>
+                    <h4>Variables</h4>
+                    <Table
+                      headers={['Entorno', 'Línea', 'Columna', 'ID', 'Tipo']}
+                      body={variables}
+                      className={styles.variables}
+                    />
+                  </>
                 )}
               </div>
               <div className={styles.report}>
-                <h4>Funciones</h4>
-                {!existsFunctions ? (
-                  <p>Sin datos</p>
-                ) : (
-                  <div>
-                    <table className={styles.functions}>
-                      <thead>
-                        <tr>
-                          <th>Entorno</th>
-                          <th>Línea</th>
-                          <th>Columna</th>
-                          <th>ID</th>
-                          <th>Parametros</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {functions.map(({ env, ln, col, id, parameters }) => (
-                          <tr key={col + ',' + id}>
-                            <td>{env}</td>
-                            <td>{ln}</td>
-                            <td>{col}</td>
-                            <td>{id}</td>
-                            <td>{parameters}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                {existsFunctions && (
+                  <>
+                    <h4>Funciones</h4>
+                    <Table
+                      headers={['Entorno', 'Línea', 'Columna', 'ID', 'Parámetros']}
+                      body={functions}
+                      className={styles.functions}
+                    />
+                  </>
                 )}
               </div>
               <div className={styles.report}>
-                <h4>Structs</h4>
-                {!existsStructs ? (
-                  <p>Sin datos</p>
-                ) : (
-                  <div>
-                    <table className={styles.structs}>
-                      <thead>
-                        <tr>
-                          <th>Entorno</th>
-                          <th>Línea</th>
-                          <th>Columna</th>
-                          <th>ID</th>
-                          <th>Atributos</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {structs.map(({ env, ln, col, id, attributes }) => (
-                          <tr key={col + ',' + id}>
-                            <td>{env}</td>
-                            <td>{ln}</td>
-                            <td>{col}</td>
-                            <td>{id}</td>
-                            <td>{attributes}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                {existsStructs && (
+                  <>
+                    <h4>Structs</h4>
+                    <Table
+                      headers={['Entorno', 'Línea', 'Columna', 'ID', 'Atributos']}
+                      body={structs}
+                      className={styles.structs}
+                    />
+                  </>
                 )}
               </div>
             </>
           )}
         </>
       )}
+    </div>
+  )
+}
+
+function Table({ headers, body, className }) {
+  return (
+    <div>
+      <table className={className}>
+        <thead>
+          <tr>
+            {headers.map((col, i) => (
+              <th key={i}>{col}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {body.map((row, i) => (
+            <tr key={i}>
+              {row.map((col, j) => (
+                <td key={j}>{col}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }

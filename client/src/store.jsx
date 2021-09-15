@@ -15,7 +15,11 @@ const reducer = combineReducers({
 
 const editor = localStorage.getItem('editor') || 'println("hello, world!");'
 
-const reports = { ast: '', errors: [], symbols: [] }
+const reports = {
+  ast: '',
+  errors: [],
+  symbols: { variables: [], functions: [], structs: [] }
+}
 
 const initialState = {
   app: { show: false, loading: false },

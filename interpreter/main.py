@@ -84,7 +84,7 @@ def exExpression(ex:Expression, env:Environment) -> Value:
     try: returnType = UNARY_OPERATION_RESULTS[ex.type][l.type]
     except: return SemanticError(ex, "No se pudo aplicar '{}' a '{}' y '{}'".format(ex.type, l.type, r.type))
   else:
-    if not r :
+    if not r:
       if ex.type in ['or', 'and']: r = Value(ex.ln, ex.col, False, 'bool')
       else: return SemanticError(ex, "No se pudo realizar la operación '{}'".format(ex.type))
     if ex.type in ['igualacion', 'diferenciacion']: returnType = 'bool'

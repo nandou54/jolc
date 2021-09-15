@@ -1,5 +1,6 @@
 INPUT = r'''
-print("2+2 es {2+2}");
+#print("numero ");
+print("hola bb {2+2}");
 '''
 
 lexer = False
@@ -33,11 +34,15 @@ def run(INPUT, lexer=False, parser=False, interpreter=False):
     res = interpret(INPUT)
 
     print('\n'.join(res['output']))
+
+    dot = open('./test.dot', 'w')
+    dot.write(res['ast'])
+    dot.close()
     try:
-      print(json.dumps(res['ast'], indent=2))
+    #   print(json.dumps(res['ast'], indent=2))
       print(json.dumps(res['errors'], indent=2))
     except:
-      print(res['ast'])
+    #   print(res['ast'])
       print(res['errors'])
 
 run(INPUT, lexer, parser, interpreter)

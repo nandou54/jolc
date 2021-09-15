@@ -98,11 +98,10 @@ def exExpression(ex:Expression, env:Environment) -> Value:
 
 def exString(ex, env:Environment):
   ex = copy.deepcopy(ex)
-
   newValue = ''
 
   for val in ex.value:
-    if val.type=='string': newValue+=val.value
+    if type(val) is Value and type(val.value) is str: newValue+=val.value
     else:
       result = exExpression(val, env)
       if not result: return SemanticError(ex, 'No se pudo evaluar el string')

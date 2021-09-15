@@ -39,7 +39,7 @@ def printExpression(ex:Expression, backNode):
   s = ''
   if not ex: return s
 
-  node = nodeName(ex)
+  node = nodeName(ex, ex.type)
   s += linkNodes(backNode, node)
 
   if type(ex) is Call:
@@ -50,9 +50,7 @@ def printExpression(ex:Expression, backNode):
   elif ex.type=='array':
     s += printNode(node, 'Arreglo')
     for val in ex.value:
-      valueNode = nodeName(val)
-      s += printExpression(valueNode, val.value)
-      s += linkNodes(node, valueNode)
+      s += printExpression(val, node)
   elif ex.type=='access':
     s += printNode(node, 'Acceso')
   elif ex.type=='chain':
@@ -70,15 +68,8 @@ def printExpression(ex:Expression, backNode):
     s += printNode(node, 'Rango')
 
     if ex.left:
-      exNode = nodeName(ex, 'l')
-      s += printNode(exNode, 'Izquierda')
-      s += linkNodes(node, exNode)
-      s += printExpression(ex.left, exNode)
-
-      exNode = nodeName(ex, 'r')
-      s += printNode(exNode, 'Índice')
-      s += linkNodes(node, exNode)
-      s += printExpression(ex.right, exNode)
+      s += printExpression(ex.left, node)
+      s += printExpression(ex.right, node)
     else:
       exNode = nodeName(ex, 'v')
       s += printNode(exNode, 'Vacío')
@@ -102,28 +93,19 @@ def printExpression(ex:Expression, backNode):
     s += linkNodes(node, exNode)
     s += printExpression(ex.right, exNode)
   elif ex.type=='string':
-    s += printNode(node, 'string')
+    s += printNode(node, 'String')
     for val in ex.value:
-      valueNode = nodeName(val)
-      if val.type=='string': printNode(valueNode, val.value)
-      else: s += printExpression(val, valueNode)
-      s += linkNodes(node, valueNode)
+      exNode = nodeName(val)
+      if type(val) is Value and type(val.value) is str:
+        s += printNode(exNode, val.value)
+        s += linkNodes(node, exNode)
+      else: s += printExpression(val, node)
   elif type(ex) is Value:
     s += printNode(node, '<{}>\\n{}'.format(ex.type, ex.value))
   else:
-    node = nodeName(ex)
-    s += printNode(node, 'Operacion {}'.format(ex.type))
-
-    exNode = nodeName(ex, 'l')
-    s += printNode(exNode, 'Izquierda')
-    s += linkNodes(node, exNode)
-    s += printExpression(ex.left, exNode)
-
-    if ex.right:
-      exNode = nodeName(ex, 'r')
-      s += printNode(exNode, 'Derecha')
-      s += linkNodes(node, exNode)
-      s += printExpression(ex.right, exNode)
+    s += printNode(node, 'Operación {}'.format(ex.type))
+    s += printExpression(ex.left, node)
+    if ex.right: s += printExpression(ex.right, node)
 
   return s
 

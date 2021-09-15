@@ -3,11 +3,11 @@
 .vscode
 node_modules
 legacy.*
+test.*
 
 # api
 __pycache__
 .mypy_cache
-test.py
 
 # interpreter
 interpreter/parser.out

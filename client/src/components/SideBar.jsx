@@ -44,7 +44,7 @@ function SideBar() {
             if (data.errors.length) {
               dispatch(logOutput('Se encontraron errores'))
               const errorsOutput = data.errors.map(
-                ({ ln, col, type, description }) =>
+                ([, ln, col, type, description]) =>
                   `[${ln},${col}] ${type}: ${description}`
               )
               dispatch(appendOutput(errorsOutput))

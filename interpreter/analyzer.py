@@ -373,6 +373,7 @@ def p_PAR(p):
 def p_P(p):
   '''
   P : id
+    | id tipo TIPO
   '''
   p[0] = p[1]
 

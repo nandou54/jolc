@@ -29,8 +29,8 @@ def getSymbols():
         array = symbols["structs"]
         extra = ', '.join(attribute.id.value for attribute in value.attributes)
 
-    symbol = [env.id, value.ln, value.col, id, extra]
-    array.append(symbol)
+      symbol = [env.id, value.ln, value.col, id, extra]
+      array.append(symbol)
   return symbols
 
 def reset():

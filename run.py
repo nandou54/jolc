@@ -1,5 +1,5 @@
 INPUT = r'''
-print("me gustan los {"culos ricos"} {[":v"]}");
+print("testing");
 '''
 
 lexer = False

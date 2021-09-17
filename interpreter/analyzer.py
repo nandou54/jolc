@@ -25,7 +25,10 @@ def parse(input):
   INPUT = input
   errors = []
 
+  lexer.lineno = 1
+
   ast = parser.parse(input)
+
   if ast is None: ast = []
   return {'ast':ast, 'errors':errors, 'output':'', 'symbols':[]}
 
@@ -611,8 +614,5 @@ def p_error(p):
 
   errors.append(error)
 
-# Analizador léxico
 lexer = lex()
-
-# Analizador sintáctico
 parser = yacc()

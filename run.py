@@ -1,4 +1,6 @@
-INPUT = r'''print(2);'''
+INPUT = r'''
+print("me gustan los {"culos ricos"} {[":v"]}");
+'''
 
 lexer = False
 parser = False

@@ -96,13 +96,12 @@ def printExpression(ex:Expression, backNode):
     s += linkNodes(node, exNode)
     s += printExpression(ex.right, exNode)
   elif ex.type=='string':
-    s += printNode(node, 'String')
-    for val in ex.value:
-      exNode = nodeName(val)
-      if type(val) is Value and type(val.value) is str:
-        s += printNode(exNode, val.value)
-        s += linkNodes(node, exNode)
-      else: s += printExpression(val, node)
+    if type(ex.value) is str:
+      s += printNode(node, '<string>\\n{}'.format(ex.value))
+    else:
+      s += printNode(node, 'String')
+      for val in ex.value:
+        s += printExpression(val, node)
   elif type(ex) is Value:
     s += printNode(node, '<{}>\\n{}'.format(ex.type, ex.value))
   else:

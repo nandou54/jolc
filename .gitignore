@@ -4,13 +4,11 @@
 node_modules
 legacy.*
 test.*
-
-# api
 __pycache__
 .mypy_cache
 
 # interpreter
-interpreter/parser.out
+parser.out
 parsetab.py
 
 # client

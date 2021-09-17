@@ -32,6 +32,7 @@ def interpret(input):
   except:
     traceback.print_exc()
     ApplicationError('Error en la generación del dot')
+    res['ast'] = graphAST([])
 
   res['output'] = getOutput()
   res['symbols'] = getSymbols()

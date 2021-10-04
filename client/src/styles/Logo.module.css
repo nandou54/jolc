@@ -1,22 +1,33 @@
 .base {
+  opacity: 0;
   grid-area: logo;
   font-family: 'Averia Serif Libre', cursive;
 
   z-index: 10;
-  font-size: 65px;
+  font-size: 4em;
 
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 15px;
 
-  transition: opacity 0.3s;
+  transition: opacity 0.25s;
 }
 
-.base:hover {
-  color: rgb(191, 165, 238);
+.base.show {
+  opacity: 1;
 }
 
 .base img {
-  height: 55px;
-  margin-right: 15px;
+  height: 60px;
+}
+
+@media (max-height: 600px) {
+  .base {
+    font-size: 3em;
+  }
+
+  .base img {
+    height: 50px;
+  }
 }

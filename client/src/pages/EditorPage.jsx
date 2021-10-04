@@ -1,6 +1,6 @@
+import styles from '@/styles/EditorPage.module.css'
 import React from 'react'
 import Split from 'react-split-grid'
-import styles from '@/styles/EditorPage.module.css'
 
 import EditorArea from '@/components/EditorArea'
 import ConsoleArea from '@/components/ConsoleArea'

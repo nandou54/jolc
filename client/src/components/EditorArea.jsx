@@ -1,10 +1,10 @@
-import React from 'react'
 import styles from '@/styles/EditorArea.module.css'
-
+import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import AceEditor from 'react-ace'
+
 import { updateContent } from '@/actions/editorActions'
 
-import AceEditor from 'react-ace'
 import 'ace-builds/src-noconflict/mode-julia'
 import 'ace-builds/src-noconflict/theme-dracula'
 

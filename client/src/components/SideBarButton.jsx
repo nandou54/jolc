@@ -1,21 +1,16 @@
-import React from 'react'
 import styles from '@/styles/SideBarButton.module.css'
+import React from 'react'
 
-function SideBarButton({ onClick, img, highlight = false }) {
+function SideBarButton({ onClick, img, tooltip = 'none', highlight = false }) {
   return (
-    <button
-      className={`${styles.base} unselectable`}
-      onClick={onClick}
-      style={
-        highlight
-          ? {
-              background: 'rgb(100, 210, 100)',
-              borderRight: '3px rgb(70, 150, 70) solid'
-            }
-          : {}
-      }>
-      <img src={`https://img.icons8.com/${img}`} />
-    </button>
+    <div className={styles.base}>
+      <button
+        className={`${styles.button} ${highlight ? styles.highlight : ''}`}
+        onClick={onClick}>
+        <img src={`https://img.icons8.com/${img}`} />
+      </button>
+      <div className={styles.tooltip}>{tooltip}</div>
+    </div>
   )
 }
 

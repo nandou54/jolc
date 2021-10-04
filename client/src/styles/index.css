@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@700&display=swap'); /*logo*/
-/* @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&display=swap'); title */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap'); /*regular*/
 @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap'); /*code*/
 
@@ -34,6 +33,10 @@ a:visited {
 a:hover {
   color: rgb(25, 37, 206);
   text-decoration: 3px underline rgb(22, 43, 197);
+}
+
+button:hover {
+  cursor: pointer;
 }
 
 li {

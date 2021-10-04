@@ -1,5 +1,6 @@
-import React, { lazy, Suspense } from 'react'
 import styles from '@/styles/App.module.css'
+import React, { lazy, Suspense } from 'react'
+
 import SideBar from './SideBar'
 import { Route, Router } from 'wouter'
 

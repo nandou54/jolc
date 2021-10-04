@@ -2,59 +2,72 @@
   z-index: 10;
   position: fixed;
   display: flex;
-  height: 100vh;
+  height: 100%;
 }
 
 .sidebar {
-  z-index: 10;
-  background: linear-gradient(rgb(20, 25, 40), rgb(30, 30, 50), rgb(20, 20, 40));
-  color: white;
-  width: 250px;
   height: 100%;
+  background: linear-gradient(rgb(20, 25, 40), rgb(30, 30, 50), rgb(20, 20, 40));
   border-right: 3px rgb(20, 20, 35) solid;
+  margin-left: -193px;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: margin-left 0.5s;
+}
+
+.sidebar.show {
+  margin-left: 0;
+}
+
+.sidebar > div {
+  height: fit-content;
+  width: 250px;
 
   display: grid;
-  grid-template-columns: 190px 2px 58px;
-  grid-template-rows: 140px 1fr;
+  grid-template-columns: 190px 60px;
+  grid-template-rows: 150px 100%;
   grid-template-areas:
-    'logo logo logo'
-    'items separator buttons';
-
-  transition: margin-left 0.4s;
+    'logo logo'
+    'items buttons';
 }
 
 .items {
   grid-area: items;
-  margin-top: -140px;
+  height: fit-content;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 15px;
+
+  position: relative;
 }
 
-.separator {
-  grid-area: separator;
-  background: linear-gradient(
-    rgba(15, 15, 30, 0),
-    rgba(15, 15, 30, 0.3),
-    rgba(15, 15, 30, 0.6),
-    rgba(15, 15, 30, 0.3),
-    rgba(15, 15, 30, 0)
-  );
-  margin: 5px 0;
+.items::after {
+  content: '';
+  display: block;
+
+  position: absolute;
+  right: -1px;
+  top: -10%;
+
+  height: 120%;
+  width: 2px;
+
+  background: linear-gradient(transparent, rgb(40, 40, 60), transparent);
 }
 
 .buttons {
   grid-area: buttons;
-  margin-top: -140px;
+  height: fit-content;
   margin-right: -3px;
 
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  justify-content: center;
   gap: 15px;
 }
 
@@ -86,7 +99,7 @@
   bottom: 0;
   left: 0;
 
-  animation: borealisBar 0.9s ease-in infinite;
+  animation: borealisBar 0.8s ease-in infinite;
 }
 
 @keyframes borealisBar {
@@ -95,5 +108,15 @@
   }
   100% {
     top: 130%;
+  }
+}
+
+@media (max-height: 600px) {
+  .sidebar {
+    justify-content: initial;
+  }
+
+  .sidebar > div {
+    grid-template-rows: 110px 100%;
   }
 }

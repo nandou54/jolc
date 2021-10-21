@@ -1,0 +1,4 @@
+[MESSAGES CONTROL]
+
+disable=missing-class-docstring,missing-module-docstring,missing-function-docstring,no-name-in-module,bare-except,unspecified-encoding,line-too-long
+

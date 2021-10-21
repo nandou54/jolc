@@ -29,7 +29,7 @@ function useSideBar() {
     dispatch(logOutput('Interpretando el código:'))
 
     axios
-      .post('/api/', { content })
+      .post('/api/interpret', { content })
       .then(({ data }) => {
         const duration = performance.now() - start
         setTimeout(

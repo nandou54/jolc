@@ -1,5 +1,5 @@
-from interpreter.ply.yacc import yacc
-from interpreter.ply.lex import lex
+from .ply.yacc import yacc
+from .ply.lex import lex
 
 from .symbols import Assignment, Expression, Value, Function, Struct, Attribute, Call, If, Else, While, For, Break, Continue, Return, _Error
 from .symbols import operations
@@ -24,7 +24,6 @@ def parse(input):
 
   INPUT = input
   errors = []
-
   lexer.lineno = 1
 
   ast = parser.parse(input)

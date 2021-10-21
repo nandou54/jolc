@@ -3,7 +3,6 @@ import reactRefresh from '@vitejs/plugin-react-refresh'
 import path from 'path'
 
 export default defineConfig({
-  base: '/client/',
   build: {
     outDir: '../dist',
     emptyOutDir: true,
@@ -19,7 +18,7 @@ export default defineConfig({
   css: {
     modules: {
       generateScopedName: (name, filename, css) => {
-        const index = css.indexOf('.' + name)
+        const index = css.indexOf(`.${name}`)
         const line = css.substr(0, index).split(/[\r\n]/).length
 
         const file = path.basename(filename).split('.')[0]

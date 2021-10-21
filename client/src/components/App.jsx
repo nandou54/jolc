@@ -10,7 +10,7 @@ const ReportsPage = lazy(() => import('@/pages/ReportsPage'))
 
 function App() {
   return (
-    <Router base='/client/'>
+    <Router base='/'>
       <SideBar />
       <div className={styles.base}>
         <Suspense fallback={<div className='loader'>Un momento...</div>}>

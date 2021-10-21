@@ -8,7 +8,7 @@ from starlette.templating import Jinja2Templates
 from starlette.exceptions import HTTPException
 
 from .interpreter.main import interpret
-from .translator.main import translate
+# from .translator.main import translate
 
 class InputData(BaseModel):
   content: str
@@ -37,13 +37,14 @@ mime_types = {
 
 templates = Jinja2Templates(directory="dist")
 
-@app.post("/api/interpret") # execute
+@app.post("/api/interpret")
 def analyze_input(input_data: InputData):
   return interpret(input_data.content)
 
 @app.post("/api/translate")
 def analyze_input(input_data: InputData):
-  return translate(input_data.content)
+  # return translate(input_data.content)
+  return 'wip'
 
 @app.post("/api/optimize")
 def analyze_input(input_data: InputData):

@@ -1,8 +1,8 @@
 from .ply.yacc import yacc
 from .ply.lex import lex
 
-from .symbols import Assignment, Expression, Value, Function, Struct, Attribute, Call, If, Else, While, For, Break, Continue, Return, _Error
-from .symbols import operations
+from ..symbols import Assignment, Expression, Value, Function, Struct, Attribute, Call, If, Else, While, For, Break, Continue, Return, _Error
+from ..symbols import operations
 
 INPUT = ''
 errors = []
@@ -596,11 +596,7 @@ def p_RETURN(p):
   RETURN  : return E
           | return
   '''
-  expression = None
-
-  if len(p)==3:
-    expression = p[2]
-
+  expression = p[2] if len(p)==3 else None
   p[0] = Return(p.lexer.lineno, getColumn(p.lexer), expression)
 
 def p_error(p):

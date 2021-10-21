@@ -1,6 +1,6 @@
 import copy
 from math import log10, log, sin, cos, tan, sqrt
-from .symbols import Function, Struct, Value, _Error
+from ..symbols import Function, Struct, Value, _Error
 
 output = ''
 errors = []

@@ -1,12 +1,15 @@
-import copy, sys
-sys.setrecursionlimit(4000)
-del sys
-from .analyzer import parse
+import copy
+from ..analyzer.main import parse
+from .grapher import graphAST
+from ..symbols import Expression, Value, Assignment, Function, Struct, Call, If, Else, While, For, Return, Break, Continue
+from ..symbols import T_SENTENCE, EXECUTABLE_SENTENCE
+
 from .core import Environment, SemanticError, ApplicationError, getOutput, getErrors, getSymbols, envs, functions, loops, reset
 from .core import RESERVED_FUNCTIONS, BINARY_OPERATIONS, UNARY_OPERATIONS, BINARY_OPERATION_RESULTS, UNARY_OPERATION_RESULTS
-from .symbols import Expression, Value, Assignment, Function, Struct, Call, If, Else, While, For, Return, Break, Continue
-from .symbols import T_SENTENCE, EXECUTABLE_SENTENCE
-from .helper import graphAST
+
+import sys
+sys.setrecursionlimit(4000)
+del sys
 
 def interpret(input):
   reset()

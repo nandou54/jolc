@@ -14,7 +14,6 @@
 
   display: flex;
   flex-direction: column;
-  justify-content: center;
   transition: margin-left 0.5s;
 }
 
@@ -28,7 +27,7 @@
 
   display: grid;
   grid-template-columns: 190px 60px;
-  grid-template-rows: 150px 100%;
+  grid-template-rows: 175px 100%;
   grid-template-areas:
     'logo logo'
     'items buttons';
@@ -117,6 +116,6 @@
   }
 
   .sidebar > div {
-    grid-template-rows: 110px 100%;
+    grid-template-rows: 125px 100%;
   }
 }

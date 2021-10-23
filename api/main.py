@@ -8,7 +8,7 @@ from starlette.templating import Jinja2Templates
 from starlette.exceptions import HTTPException
 
 from .interpreter.main import interpret
-# from .translator.main import translate
+from .translator.main import translate
 
 class InputData(BaseModel):
   content: str
@@ -43,8 +43,7 @@ def analyze_input(input_data: InputData):
 
 @app.post("/api/translate")
 def analyze_input(input_data: InputData):
-  # return translate(input_data.content)
-  return 'wip'
+  return translate(input_data.content)
 
 @app.post("/api/optimize")
 def analyze_input(input_data: InputData):

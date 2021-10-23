@@ -1,6 +1,6 @@
-import copy
+from copy import deepcopy
 from math import log10, log, sin, cos, tan, sqrt
-from ..symbols import Function, Struct, Value, _Error
+from symbols import Function, Struct, Value, Error
 
 output = ''
 errors = []
@@ -10,10 +10,22 @@ envs = []
 functions = []
 loops = []
 
-def getOutput():
-  return output.strip().split('\n') if output else []
+def reset():
+  global output
 
-def getErrors(): return errors
+  output = ''
+
+  errors.clear()
+  symbols.clear()
+  functions.clear()
+  loops.clear()
+  envs.clear()
+
+def getOutput():
+  return output.split('\n') if output else []
+
+def getErrors():
+  return errors
 
 def getSymbols():
   symbols = {"variables": [], "functions": [], "structs": []}
@@ -33,22 +45,11 @@ def getSymbols():
       array.append(symbol)
   return symbols
 
-def reset():
-  global output
-
-  output = ''
-  errors.clear()
-  symbols.clear()
-
-  functions.clear()
-  loops.clear()
-  envs.clear()
-
 def SemanticError(sen, description):
-  errors.append(_Error(sen.ln, sen.col, 'Semántico', description))
+  errors.append(Error(sen.ln, sen.col, 'Semántico', description))
 
 def ApplicationError(description):
-  errors.append(_Error(1, 1, 'Aplicación', description))
+  errors.append(Error(1, 1, 'Aplicación', description))
 
 class Environment():
   def __init__(self, id = 'global', parent = None):
@@ -97,7 +98,7 @@ def _log10(values):
   if ex.type not in ['int64', 'float64']:
     return SemanticError(ex, "La función nativa 'log10' recibe un valor numérico")
 
-  newValue = copy.deepcopy(ex)
+  newValue = deepcopy(ex)
   newValue.type = 'float64'
   newValue.value = log10(newValue.value)
   return newValue
@@ -109,7 +110,7 @@ def _log(values):
   if base.type not in ['int64', 'float64'] or ex.type not in ['int64', 'float64']:
     return SemanticError(ex, "La función nativa 'log' recibe dos valores numéricos")
 
-  newValue = copy.deepcopy(ex)
+  newValue = deepcopy(ex)
   newValue.type = 'float64'
   newValue.value = log(newValue.value, base.value)
   return newValue
@@ -121,7 +122,7 @@ def _sin(values):
   if ex.type not in ['int64', 'float64']:
     return SemanticError(ex, "La función nativa 'sin' recibe un valor numérico")
 
-  newValue = copy.deepcopy(ex)
+  newValue = deepcopy(ex)
   newValue.type = 'float64'
   newValue.value = sin(newValue.value)
   return newValue
@@ -133,7 +134,7 @@ def _cos(values):
   if ex.type not in ['int64', 'float64']:
     return SemanticError(ex, "La función nativa 'cos' recibe un valor numérico")
 
-  newValue = copy.deepcopy(ex)
+  newValue = deepcopy(ex)
   newValue.type = 'float64'
   newValue.value = cos(newValue.value)
   return newValue
@@ -145,7 +146,7 @@ def _tan(values):
   if ex.type not in ['int64', 'float64']:
     return SemanticError(ex, "La función nativa 'tan' recibe un valor numérico")
 
-  newValue = copy.deepcopy(ex)
+  newValue = deepcopy(ex)
   newValue.type = 'float64'
   newValue.value = tan(newValue.value)
   return newValue
@@ -157,7 +158,7 @@ def _sqrt(values):
   if ex.type not in ['int64', 'float64']:
     return SemanticError(ex, "La función nativa 'sqrt' recibe un valor numérico")
 
-  newValue = copy.deepcopy(ex)
+  newValue = deepcopy(ex)
   newValue.type = 'float64'
   newValue.value = sqrt(newValue.value)
   return newValue
@@ -169,7 +170,7 @@ def _parse(values):
   if ex.type!='string':
     return SemanticError(ex, "La función nativa 'parse' recibe un valor string")
 
-  newValue = copy.deepcopy(ex)
+  newValue = deepcopy(ex)
   try:
     newValue.value = int(newValue.value)
     newValue.type = 'int64'
@@ -188,7 +189,7 @@ def _trunc(values):
   if ex.type!='float64':
     return SemanticError(ex, "La función nativa 'trunc' recibe un valor float64")
 
-  newValue = copy.deepcopy(ex)
+  newValue = deepcopy(ex)
   newValue.type = 'int64'
   newValue.value = int(newValue.value)
   return newValue
@@ -200,7 +201,7 @@ def _float(values):
   if ex.type!='int64':
     return SemanticError(ex, "La función nativa 'trunc' recibe un valor int64")
 
-  newValue = copy.deepcopy(ex)
+  newValue = deepcopy(ex)
   newValue.type = 'float64'
   newValue.value = float(newValue.value)
   return newValue
@@ -219,7 +220,7 @@ def unnest(val):
 def _string(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'string' recibe un parámetro")
 
-  newValue = copy.deepcopy(values[0])
+  newValue = deepcopy(values[0])
   newValue.value = str(unnest(newValue.value))
   newValue.type = 'string'
   return newValue
@@ -231,7 +232,7 @@ def _uppercase(values):
   if ex.type!='string':
     return SemanticError(ex, "La función nativa 'uppercase' recibe un valor string")
 
-  newValue = copy.deepcopy(ex)
+  newValue = deepcopy(ex)
   newValue.value = newValue.value.upper()
   return newValue
 
@@ -242,7 +243,7 @@ def _lowercase(values):
   if ex.type!='string':
     return SemanticError(ex, "La función nativa 'lowercase' recibe un valor string")
 
-  newValue = copy.deepcopy(ex)
+  newValue = deepcopy(ex)
   newValue.value = newValue.value.lower()
   return newValue
 
@@ -250,7 +251,7 @@ def _typeof(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'typeof' recibe un parámetro")
 
   ex = values[0]
-  value = copy.deepcopy(ex)
+  value = deepcopy(ex)
   value.value = value.type
   value.type = 'string'
   return value
@@ -279,7 +280,7 @@ def _length(values):
   if ex.type not in ['string', 'array']:
     return SemanticError(ex, "La función nativa 'length' recibe un string o un array")
 
-  newValue = copy.deepcopy(ex)
+  newValue = deepcopy(ex)
   newValue.type = 'int64'
   newValue.value = len(ex.value)
   return newValue

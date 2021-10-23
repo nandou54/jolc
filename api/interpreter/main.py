@@ -1,14 +1,16 @@
-import copy
-from ..analyzer.main import parse
+from copy import deepcopy
+from traceback import print_exc
+
+from analyzer.main import parse
 from .grapher import graphAST
-from ..symbols import Expression, Value, Assignment, Function, Struct, Call, If, Else, While, For, Return, Break, Continue
-from ..symbols import T_SENTENCE, EXECUTABLE_SENTENCE
+from symbols import Expression, Value, Assignment, Function, Struct, Call, If, Else, While, For, Return, Break, Continue
+from symbols import T_SENTENCE, EXECUTABLE_SENTENCE
 
 from .core import Environment, SemanticError, ApplicationError, getOutput, getErrors, getSymbols, envs, functions, loops, reset
 from .core import RESERVED_FUNCTIONS, BINARY_OPERATIONS, UNARY_OPERATIONS, BINARY_OPERATION_RESULTS, UNARY_OPERATION_RESULTS
 
 import sys
-sys.setrecursionlimit(4000)
+sys.setrecursionlimit(5000)
 del sys
 
 def interpret(input):
@@ -20,22 +22,20 @@ def interpret(input):
 
   for ins in INS:
     if type(ins) is Function: exFunction(ins, globalEnv)
-  newINS = [ins for ins in INS if type(ins) is not Function]
+  NEW_INS = [ins for ins in INS if type(ins) is not Function]
 
-  import traceback
   try:
-    exInstructions(newINS, globalEnv)
+    exInstructions(NEW_INS, globalEnv)
   except:
-    traceback.print_exc()
+    print_exc()
     ApplicationError('Error en la ejecución del código')
 
   try:
     res['ast'] = graphAST(res['ast'])
-    pass
   except:
-    traceback.print_exc()
-    ApplicationError('Error en la generación del dot')
+    print_exc()
     res['ast'] = graphAST([])
+    ApplicationError('Error en la generación del dot')
 
   res['output'] = getOutput()
   res['symbols'] = getSymbols()
@@ -53,7 +53,7 @@ def exInstructions(INS:T_SENTENCE, env:Environment):
       if len(functions)==0:
         SemanticError(ins, 'Sentencia return fuera de una función')
         continue
-      ins = copy.deepcopy(ins)
+      ins = deepcopy(ins)
       ins.ex = exExpression(ins.ex, env)
     if type(ins) is Break and len(loops)==0:
       SemanticError(ins, 'Sentencia break fuera de un ciclo')
@@ -101,7 +101,7 @@ def exExpression(ex:Expression, env:Environment) -> Value:
   return newValue
 
 def exString(ex, env:Environment):
-  ex = copy.deepcopy(ex)
+  ex = deepcopy(ex)
   newValue = ''
 
   for val in ex.value:
@@ -158,7 +158,7 @@ def exCall(sen:Call, env:Environment):
   elif type(function) is Struct:
     if len(values)!=len(function.attributes): return SemanticError(sen, "El struct '{}' necesita {} atributos".format(sen.id.value, len(function.attributes)))
 
-    struct = copy.deepcopy(function)
+    struct = deepcopy(function)
     for i in range(len(struct.attributes)):
       attribute = struct.attributes[i]
       if attribute.type and attribute.type!=values[i].type:
@@ -181,7 +181,7 @@ def exAccess(ex:Expression, env:Environment):
     if expression.type=='string': expression.value = expression.value[index.value-1]
     else: expression = expression.value[index.value-1]
   else:
-    expression = copy.deepcopy(expression)
+    expression = deepcopy(expression)
     if not index.left: return expression
     if index.left.value<1 or index.right.value>len(expression.value):
       return SemanticError(ex, "No se pudo acceder al array ({}) con el rango {}:{}".format(len(expression.value), index.left.value, index.right.value))
@@ -248,7 +248,7 @@ def exAssignment(sen:Assignment, env:Environment):
       value = exExpression(sen.ex, env)
       if not value: return SemanticError(sen, 'No se pudo realizar la asignación')
       if sen.type and sen.type!=value.type: return SemanticError(sen, 'No se puede asignar un valor {} a una variable {}'.format(value.type, sen.type))
-    targetEnv.declareSymbol(sen.id.value, copy.deepcopy(value))
+    targetEnv.declareSymbol(sen.id.value, deepcopy(value))
   else:
     inform(sen.id)
     id = exExpression(sen.id, env)

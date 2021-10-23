@@ -113,7 +113,7 @@ SENTENCE = EXECUTABLE_SENTENCE + [Break, Continue, Return]
 
 T_SENTENCE = type(SENTENCE)
 
-def _Error(ln, col, type, description):
+def Error(ln, col, type, description):
   time = _datetime.today().strftime('%d/%m/%Y %H:%M:%S')
   return [time, ln, col, type, description]
 

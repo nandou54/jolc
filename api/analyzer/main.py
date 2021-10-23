@@ -1,17 +1,17 @@
 from .ply.yacc import yacc
 from .ply.lex import lex
 
-from ..symbols import Assignment, Expression, Value, Function, Struct, Attribute, Call, If, Else, While, For, Break, Continue, Return, _Error
-from ..symbols import operations
+from symbols import Assignment, Expression, Value, Function, Struct, Attribute, Call, If, Else, While, For, Break, Continue, Return, Error
+from symbols import operations
 
 INPUT = ''
 errors = []
 
 def LexicalError(ln, col, description):
-  return _Error(ln, col, 'Léxico', description)
+  return Error(ln, col, 'Léxico', description)
 
 def SyntacticError(ln, col, description):
-  return _Error(ln, col, 'Sintáctico', description)
+  return Error(ln, col, 'Sintáctico', description)
 
 def getColumn(t):
   global INPUT

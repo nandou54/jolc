@@ -7,8 +7,8 @@ from starlette.responses import FileResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
 from starlette.exceptions import HTTPException
 
-from .interpreter.main import interpret
-from .translator.main import translate
+from api.interpreter.main import interpret
+from api.translator.main import translate
 
 class InputData(BaseModel):
   content: str

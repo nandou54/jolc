@@ -1,8 +1,8 @@
 from .ply.yacc import yacc
 from .ply.lex import lex
 
-from symbols import Assignment, Expression, Value, Function, Struct, Attribute, Call, If, Else, While, For, Break, Continue, Return, Error
-from symbols import operations
+from api.symbols import Assignment, Expression, Value, Function, Struct, Attribute, Call, If, Else, While, For, Break, Continue, Return, Error
+from api.symbols import operations
 
 INPUT = ''
 errors = []

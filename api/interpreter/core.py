@@ -1,6 +1,6 @@
 from copy import deepcopy
 from math import log10, log, sin, cos, tan, sqrt
-from symbols import Function, Struct, Value, Error
+from api.symbols import Function, Struct, Value, Error
 
 output = ''
 errors = []

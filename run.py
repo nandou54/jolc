@@ -1,8 +1,8 @@
 import json
 import os
-from analyzer.main import lexer, parse
-from interpreter.main import interpret
-from translator.main import translate
+from api.analyzer.main import lexer, parse
+from api.interpreter.main import interpret
+from api.translator.main import translate
 
 INPUT = r'''
 if 5==5

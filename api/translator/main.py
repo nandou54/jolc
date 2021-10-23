@@ -1,9 +1,8 @@
 from traceback import print_exc
 
-
-from analyzer.main import parse
-from symbols import Expression, Value, Assignment, Function, Struct, Call, If, Else, While, For, Return, Break, Continue
-from symbols import T_SENTENCE, EXECUTABLE_SENTENCE
+from api.analyzer.main import parse
+from api.symbols import Expression, Value, Assignment, Function, Struct, Call, If, Else, While, For, Return, Break, Continue
+from api.symbols import T_SENTENCE, EXECUTABLE_SENTENCE
 
 from .core import getOutput, getTemps, BINARY_OPERATIONS, UNARY_OPERATIONS
 from .core import reset, Label, Temp, ApplicationError

@@ -1,4 +1,4 @@
-from symbols import Error
+from api.symbols import Error
 
 INITIAL_OUTPUT = '''package main
 import "fmt"

@@ -5,11 +5,7 @@ from api.interpreter.main import interpret
 from api.translator.main import translate
 
 INPUT = r'''
-if 5==5
-  x = 1 + 1;
-elseif 6==6
-  x = 100 + 100;
-end;
+x = 3*5;
 '''
 
 LEXER = False

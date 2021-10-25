@@ -46,6 +46,7 @@ def getErrors():
   return errors
 
 def getTemps():
+  if len(temps)==0: return '\n'
   return 'var ' + ','.join(temps) + ' float64\n\n'
 
 def getFunction(id):
@@ -121,10 +122,10 @@ class Temp:
     return ''.join(str(tag) + ':\n' for tag in self.false_tags)
 
 def _print(temps):
-  return '\n'.join(f'fmt.Print({temp})' for temp in temps)
+  return '\n'.join(f'fmt.Print({temp})' for temp in temps)+'\n'
 
 def _println(temps):
-  return '\n'.join(f'fmt.Println({temp})' for temp in temps)
+  return '\n'.join(f'fmt.Println({temp})' for temp in temps)+'\n'
 
 def _log10(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'log10' recibe un parámetro")

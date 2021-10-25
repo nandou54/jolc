@@ -5,17 +5,17 @@ from api.symbols import Expression, Value, Assignment, Function, Struct, Call, I
 from api.symbols import T_SENTENCE, EXECUTABLE_SENTENCE
 
 from .core import RESERVED_FUNCTIONS, Environment, SemanticError, addFunction, addTemp, getEnv, getFunction, getOutput, getTemps, BINARY_OPERATIONS, UNARY_OPERATIONS
-from .core import reset, Label, Temp, ApplicationError
+from .core import reset, output, errors, Label, Temp, ApplicationError
 # from .core import RESERVED_FUNCTIONS, BINARY_OPERATIONS, UNARY_OPERATIONS, BINARY_OPERATION_RESULTS, UNARY_OPERATION_RESULTS
 
 def translate(input):
+  global output, errors
   reset()
+
   mainEnv = Environment('main')
 
   res = parse(input)
   INS = res['ast']
-
-  output = getOutput()
 
   try:
     NEW_INS = [ins for ins in INS if type(ins) is not Function]
@@ -33,6 +33,7 @@ def translate(input):
     ApplicationError('Error en la traducción a C3D')
 
   res['output'] = output
+  res['errors'] = errors
   return res
 
 def trInstructions(INS:T_SENTENCE, env:Environment):
@@ -85,14 +86,13 @@ def trCall(sen:Call, env:Environment):
   values = []
 
   for expression in sen.expressions:
-    tempBase = trExpression(expression, env)
-    if not tempBase:
+    temp_base = trExpression(expression, env)
+    if not temp_base:
       return SemanticError(sen, f"No se pudo realizar la llamda a '{sen.id}'")
-    values.append(tempBase)
+    values.append(temp_base)
 
   if sen.id.value in RESERVED_FUNCTIONS.keys():
-    for value in values:
-      s += value.output
+    for value in values: s += value.output
     s += RESERVED_FUNCTIONS[sen.id.value](values)
     return s
 
@@ -102,19 +102,29 @@ def trCall(sen:Call, env:Environment):
     if len(values)!=len(function.parameters):
       return SemanticError(sen, f"La función '{sen.id.value}' recibe {len(function.parameters)} parámetros")
 
-    newEnv = getEnv(sen.id.value)
+    new_env = getEnv(sen.id.value)
+    temp_base = Temp()
+    new_base = new_env.base-env.base+env.length
 
-    tempBase = Temp()
-    s += f'{tempBase}=p+{newEnv.base-env.base} // base de la nueva funcion\n'
+    s += f'{temp_base}=p+{new_base} // base de la nueva funcion\n'
     for i in range(len(function.parameters)):
-      temp = Temp()
-      parameter = function.parameters[i]
+      temp_par_pos = Temp()
+      parameter = function.parameters[i].value
 
-      s += f'{temp}={tempBase}+{env.getSymbolPosition(parameter)} // posicion de parametro {parameter}\n'
       s += values[i].output
-      s += f'stack[int({temp})] // asignacion de parametro {parameter}\n'
+      s += f'{temp_par_pos}={temp_base}+{new_env.getSymbolPosition(parameter)} // posicion de parametro {parameter}\n'
+      s += f'stack[int({temp_par_pos})]={values[i]} // asignacion de parametro {parameter}\n'
 
+    s += f'p=p+{new_base} // cambio de entorno\n'
     s += f'{sen.id.value}()\n'
+
+    temp_pos = Temp()
+    temp_return = Temp()
+
+    s += f'{temp_pos}=p+{new_env.getSymbolPosition("return")} // posicion de valor de retorno de {sen.id.value}\n'
+    s += f'{temp_return}=stack[int({temp_pos})] // valor de retorno de {sen.id.value}\n'
+    s += f'p=p-{new_base} // regreso de entorno\n'
+
     return s
 
 def trAccess(ex:Expression, env:Environment):
@@ -151,7 +161,7 @@ def trFunction(sen:Function, env:Environment):
   if sen.id.value in RESERVED_FUNCTIONS.keys():
     return SemanticError(sen, f"El id '{sen.id.value}' está reservado")
 
-  if env.id!='global':
+  if env.id!='main':
     return SemanticError(sen, 'Solo se pueden declarar funciones en el entorno global')
 
   if getFunction(sen.id.value):
@@ -161,10 +171,10 @@ def trFunction(sen:Function, env:Environment):
 
   s = f'func {sen.id.value}(){{\n'
 
-  newEnv = Environment(sen.id.value, env)
+  newEnv = Environment(sen.id.value)
 
   for parameter in sen.parameters:
-    newEnv.declareSymbol(parameter)
+    newEnv.declareSymbol(parameter.value)
 
   newEnv.declareSymbol('return')
 

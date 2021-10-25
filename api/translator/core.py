@@ -5,15 +5,18 @@ INITIAL_OUTPUT = '''package main
 import "fmt"
 var stack [1000]float64 // stack
 var heap [1000]float64  // heap
-var P, H int64          // pointers
+var p, h float64          // pointers
 
 '''
+
+STACK_TOP = 0
 
 output = INITIAL_OUTPUT
 errors = []
 temps = []
 
 envs = []
+functions = []
 
 label_counter = 1
 temp_counter = 1
@@ -21,60 +24,66 @@ temp_counter = 1
 def addTemp(temp):
   temps.append(temp)
 
+def addFunction(function):
+  functions.append(function)
+
 def reset():
-  global output, label_counter, temp_counter
+  global STACK_TOP, output, label_counter, temp_counter
+
+  STACK_TOP = 0
   output = INITIAL_OUTPUT
   label_counter = temp_counter = 1
 
   errors.clear()
   temps.clear()
   envs.clear()
-
+  functions.clear()
 
 def getOutput():
   return output
 
-def getTemps():
-  return 'var ' + ','.join(temps) + ' float64\n\n'
-
 def getErrors():
   return errors
 
+def getTemps():
+  return 'var ' + ','.join(temps) + ' float64\n\n'
+
+def getFunction(id):
+  for function in functions:
+    if function.id.value==id: return function
+
+def getEnv(id):
+  for env in envs:
+    if env.id==id: return env
+
 def SemanticError(sen, description):
   errors.append(Error(sen.ln, sen.col, 'Semántico', description))
+  return ''
 
 def ApplicationError(description):
   errors.append(Error(1, 1, 'Aplicación', description))
 
 class Environment():
-  def __init__(self, id = 'global', parent = None):
+  def __init__(self, id = 'global'):
     self.id = id
-    self.parent:Environment = parent
     self.symbols = {}
     envs.append(self)
 
-  def declareSymbol(self, id, value):
-    self.symbols[id] = value
+    self.base = STACK_TOP
+    self.length = 0
 
-  def getLocalSymbol(self, id):
+  def declareSymbol(self, id):
+    if id not in self.symbols.keys():
+      global STACK_TOP
+
+      self.symbols[id] = self.length
+
+      STACK_TOP += 1
+      self.length += 1
+
+  def getSymbolPosition(self, id):
     if id not in self.symbols.keys(): return None
     return self.symbols[id]
-
-  def getGlobalSymbol(self, id):
-    tempEnv = self
-    while tempEnv:
-      if tempEnv.getLocalSymbol(id):
-        return tempEnv.getLocalSymbol(id)
-      tempEnv = tempEnv.parent
-    return None
-
-  def getParentEnvById(self, id):
-    tempEnv = self
-    while tempEnv:
-      if tempEnv.getLocalSymbol(id):
-        return tempEnv
-      tempEnv = tempEnv.parent
-    return None
 
 class Label:
   def __init__(self):

@@ -5,7 +5,10 @@ from api.interpreter.main import interpret
 from api.translator.main import translate
 
 INPUT = r'''
-x = 3*5;
+x = 3;
+y = x*0;
+z = y-9000;
+print(z-x);
 '''
 
 LEXER = False

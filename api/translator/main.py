@@ -4,13 +4,13 @@ from api.analyzer.main import parse
 from api.symbols import Expression, Value, Assignment, Function, Struct, Call, If, Else, While, For, Return, Break, Continue
 from api.symbols import T_SENTENCE, EXECUTABLE_SENTENCE
 
-from .core import RESERVED_FUNCTIONS, Environment, SemanticError, addTemp, getOutput, getTemps, BINARY_OPERATIONS, UNARY_OPERATIONS
+from .core import RESERVED_FUNCTIONS, Environment, SemanticError, addFunction, addTemp, getEnv, getFunction, getOutput, getTemps, BINARY_OPERATIONS, UNARY_OPERATIONS
 from .core import reset, Label, Temp, ApplicationError
 # from .core import RESERVED_FUNCTIONS, BINARY_OPERATIONS, UNARY_OPERATIONS, BINARY_OPERATION_RESULTS, UNARY_OPERATION_RESULTS
 
 def translate(input):
   reset()
-  globalEnv = Environment()
+  mainEnv = Environment('main')
 
   res = parse(input)
   INS = res['ast']
@@ -19,11 +19,11 @@ def translate(input):
 
   try:
     NEW_INS = [ins for ins in INS if type(ins) is not Function]
-    func_output = '\n\n'.join(trFunction(ins, globalEnv) for ins in INS if type(ins) is Function)
-    ins_output = trInstructions(NEW_INS, globalEnv)
+    func_output = '\n\n'.join(trFunction(ins, mainEnv) for ins in INS if type(ins) is Function)
+    ins_output = trInstructions(NEW_INS, mainEnv)
 
     output += getTemps()
-    output += 'func main(){\nfmt.Println("running")\n'
+    output += 'func main(){\n'
     output += ins_output
     output += '}\n\n'
     output += func_output
@@ -50,7 +50,20 @@ def trExpression(ex:Expression, env:Environment):
   if ex.type=='chain': return trChain(ex, env)
   if ex.type=='range': return trRange(ex, env)
   if ex.type=='ternary': return trTernary(ex, env)
-  if ex.type=='id': return trId(ex, env)
+  if ex.type=='id':
+    if env.getSymbolPosition(ex.value) is None:
+      return SemanticError(ex, f"No se declaró '{ex.value}'")
+
+    pos_temp = Temp()
+    val_temp = Temp()
+
+    s = f'{pos_temp}=p+{env.getSymbolPosition(ex.value)} // posicion de variable {ex.value}\n'
+    s += f'{val_temp}=stack[int({pos_temp})] // valor de variable {ex.value}\n'
+
+    val_temp.output = s
+    return val_temp
+
+    # return trId(ex, env)
   if ex.type=='string': return trString(ex, env)
   if type(ex) is Value: return Temp(ex.value)
 
@@ -72,29 +85,37 @@ def trCall(sen:Call, env:Environment):
   values = []
 
   for expression in sen.expressions:
-    temp = trExpression(expression, env)
-    values.append(temp)
+    tempBase = trExpression(expression, env)
+    if not tempBase:
+      return SemanticError(sen, f"No se pudo realizar la llamda a '{sen.id}'")
+    values.append(tempBase)
 
   if sen.id.value in RESERVED_FUNCTIONS.keys():
+    for value in values:
+      s += value.output
     s += RESERVED_FUNCTIONS[sen.id.value](values)
     return s
 
-  function = env.getGlobalSymbol(sen.id.value)
-  if not function: return SemanticError(sen, "No se declaró '{}'".format(sen.id.value))
+  function = getFunction(sen.id.value)
+  if not function: return SemanticError(sen, f"No se declaró '{sen.id.value}'")
   if type(function) is Function:
     if len(values)!=len(function.parameters):
-      return SemanticError(sen, "La función '{}' recibe {} parámetros".format(sen.id.value, len(function.parameters)))
+      return SemanticError(sen, f"La función '{sen.id.value}' recibe {len(function.parameters)} parámetros")
 
-    newEnv = Environment(env.id+"$"+sen.id.value, env)
+    newEnv = getEnv(sen.id.value)
 
+    tempBase = Temp()
+    s += f'{tempBase}=p+{newEnv.base-env.base} // base de la nueva funcion\n'
     for i in range(len(function.parameters)):
-      newEnv.declareSymbol(function.parameters[i].value, values[i])
+      temp = Temp()
+      parameter = function.parameters[i]
 
-    functions.append(sen.id.value)
-    result = exInstructions(function.ins, newEnv)
-    functions.pop()
+      s += f'{temp}={tempBase}+{env.getSymbolPosition(parameter)} // posicion de parametro {parameter}\n'
+      s += values[i].output
+      s += f'stack[int({temp})] // asignacion de parametro {parameter}\n'
 
-  
+    s += f'{sen.id.value}()\n'
+    return s
 
 def trAccess(ex:Expression, env:Environment):
   s = ''
@@ -110,14 +131,20 @@ def trTernary(ex:Expression, env:Environment):
 
 def trAssignment(sen:Assignment, env:Environment):
   s = ''
-  if sen.ex:
-    result = trExpression(sen.ex, env)
-    s += result.output
-    s += f'{sen.id.value}={result.value}\n'
-  else:
-    s += f'{sen.id.value}=0\n'
+  env.declareSymbol(sen.id.value)
 
-  addTemp(sen.id.value)
+  if sen.ex:
+    pos_temp = Temp()
+    res_temp = trExpression(sen.ex, env)
+
+    s += f'{pos_temp}=p+{env.getSymbolPosition(sen.id.value)} // posicion de variable {sen.id.value}\n'
+    s += res_temp.output
+
+    s += f'stack[int({pos_temp})]={res_temp}'
+    # s += f'{sen.id.value}={result.value}\n'
+  # else:
+    # s += f'{sen.id.value}=0\n'
+
   return s
 
 def trFunction(sen:Function, env:Environment):
@@ -127,14 +154,20 @@ def trFunction(sen:Function, env:Environment):
   if env.id!='global':
     return SemanticError(sen, 'Solo se pueden declarar funciones en el entorno global')
 
-  if env.getLocalSymbol(sen.id.value):
+  if getFunction(sen.id.value):
     return SemanticError(sen, f"No se puede redeclarar '{sen.id.value}'")
 
-  env.declareSymbol(sen.id.value, sen)
+  addFunction(sen)
 
   s = f'func {sen.id.value}(){{\n'
 
   newEnv = Environment(sen.id.value, env)
+
+  for parameter in sen.parameters:
+    newEnv.declareSymbol(parameter)
+
+  newEnv.declareSymbol('return')
+
   s += trInstructions(sen.ins, newEnv)
 
   s += 'return\n}'
@@ -177,8 +210,8 @@ def execute(sen, env:Environment):
   if T is Assignment: return trAssignment(sen, env)
   # if T is Function: return trFunction(sen, env)
   # if T is Struct: return trStruct(sen, env)
-  # if T is Call: return trCall(sen, env)
+  if T is Call: return trCall(sen, env)
   if T is If: return trIf(sen, env)
   # if T is While: return trWhile(sen, env)
   # if T is For: return trFor(sen, env)
-  return '// {} not supported\n'.format(sen.type)
+  return f'***** {type(sen)} not supported\n'

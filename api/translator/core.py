@@ -1,17 +1,28 @@
 from copy import deepcopy
 from api.symbols import Error, Struct
 
-INITIAL_OUTPUT = '''package main
-import "fmt"
+def getHeaderOutput():
+  s = 'package main\n'
+
+  if fmt_was_used or math_was_used:
+    s += 'import (\n'
+    if fmt_was_used: s += '"fmt"\n'
+    if math_was_used: s += '"math"\n'
+    s += ')\n'
+
+  s += '''
 var stack [1000]float64 // stack
 var heap [1000]float64  // heap
-var p, h float64          // pointers
-
+var p,h float64         // pointers
 '''
+  return s
 
 STACK_TOP = 0
 
-output = INITIAL_OUTPUT
+output = ''
+fmt_was_used = False
+math_was_used = False
+
 errors = []
 temps = []
 
@@ -28,19 +39,18 @@ def addFunction(function):
   functions.append(function)
 
 def reset():
-  global STACK_TOP, output, label_counter, temp_counter
+  global fmt_was_used, math_was_used, STACK_TOP, output, label_counter, temp_counter
+
+  fmt_was_used = math_was_used = False
 
   STACK_TOP = 0
-  output = INITIAL_OUTPUT
+  output = ''
   label_counter = temp_counter = 1
 
   errors.clear()
   temps.clear()
   envs.clear()
   functions.clear()
-
-def getOutput():
-  return output
 
 def getErrors():
   return errors
@@ -53,10 +63,6 @@ def getFunction(id):
   for function in functions:
     if function.id.value==id: return function
 
-def getEnv(id):
-  for env in envs:
-    if env.id==id: return env
-
 def SemanticError(sen, description):
   errors.append(Error(sen.ln, sen.col, 'Semántico', description))
   return ''
@@ -64,27 +70,57 @@ def SemanticError(sen, description):
 def ApplicationError(description):
   errors.append(Error(1, 1, 'Aplicación', description))
 
+class Symbol():
+  def __init__(self, position, type):
+    self.position = position
+    self.type = type
+
+  def __str__(self):
+    return str(self.position)
+
 class Environment():
-  def __init__(self, id = 'global'):
+  def __init__(self, id = 'global', parent = None, TEST_MODE = False):
     self.id = id
+    self.parent:Environment = parent
+    self.TEST_MODE = TEST_MODE
     self.symbols = {}
     envs.append(self)
 
-    self.base = STACK_TOP
+    self.base = self.top = STACK_TOP
     self.length = 0
 
-  def declareSymbol(self, id):
-    if id not in self.symbols.keys():
-      global STACK_TOP
+  def declareSymbol(self, id, type = 'stack'):
+    if id in self.symbols.keys():
+      self.symbols[id].type = type
+    else:
+      self.symbols[id] = Symbol(self.length, type)
 
-      self.symbols[id] = self.length
-
-      STACK_TOP += 1
+      self.top += 1
       self.length += 1
 
-  def getSymbolPosition(self, id):
+      if not self.TEST_MODE:
+        global STACK_TOP
+        STACK_TOP += 1
+
+  def getLocalSymbol(self, id):
     if id not in self.symbols.keys(): return None
     return self.symbols[id]
+
+  def getGlobalSymbol(self, id):
+    tempEnv = self
+    while tempEnv:
+      if tempEnv.getLocalSymbol(id):
+        return tempEnv.getLocalSymbol(id)
+      tempEnv = tempEnv.parent
+    return None
+
+  def getParentEnvById(self, id):
+    tempEnv = self
+    while tempEnv:
+      if tempEnv.getLocalSymbol(id):
+        return tempEnv
+      tempEnv = tempEnv.parent
+    return None
 
 class Label:
   def __init__(self):
@@ -122,9 +158,13 @@ class Temp:
     return ''.join(str(tag) + ':\n' for tag in self.false_tags)
 
 def _print(temps):
+  global fmt_was_used
+  fmt_was_used = True
   return '\n'.join(f'fmt.Print({temp})' for temp in temps)+'\n'
 
 def _println(temps):
+  global fmt_was_used
+  fmt_was_used = True
   return '\n'.join(f'fmt.Println({temp})' for temp in temps)+'\n'
 
 def _log10(values):
@@ -372,9 +412,9 @@ def _division(l:Temp, r:Temp):
 
 def _modulo(l:Temp, r:Temp):
   t = Temp()
-
+  print(type(l), type(r))
   t.getOutput(l, r)
-  t.output += f'{t}={l}%{r}\n'
+  t.output += f'{t}=float64(int({l})%int({r}))\n'
   return t
 
 def _potencia(l:Temp, r:Temp):

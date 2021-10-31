@@ -6,11 +6,19 @@ from api.translator.main import translate
 
 INPUT = r'''
 
-x = 8;
-b(x);
+divisible(12, 5);
 
-function b(y)
-  print(y);
+# a = 10;
+# b = 9;
+# divisible(a, b);
+
+function divisible(x, y)
+  if x % y == 0
+    print(x);
+  # else
+    # print(50);
+    # println(x % y);
+  end;
 end;
 '''
 
@@ -29,7 +37,7 @@ if PARSER:
   print('=== PARSER ===')
   res = parse(INPUT)
   try:
-    print(json.dumps(res, indent=2))
+    print(json.dumps(res, indent=2, ensure_ascii=False))
   except:
     print(res)
 
@@ -59,6 +67,6 @@ if TRANSLATOR:
   os.system('go run ./test.go')
 
   try:
-    print(json.dumps(res['errors'], indent=2))
+    print(json.dumps(res['errors'], indent=2, ensure_ascii=False))
   except:
-    print(res['errors'])
+    print('\n', res['errors'])

@@ -17,6 +17,7 @@ class Function:
     self.id = id
     self.parameters = parameters
     self.ins:T_SENTENCE = ins
+    self.env = None
 
 class Struct:
   def __init__(self, ln, col, id, mutable, attributes):

@@ -580,7 +580,36 @@ def _potencia(l:Temp, r:Temp):
 
   t = Temp()
   t.setOutput(l, r)
-  t.output += f'{t}={l}^{r};\n'
+  t.type = 'float64'
+  limit = Temp()
+  i = Temp()
+
+  loop_label = Label()
+  true_label = Label()
+  false_label = Label()
+  true_label_limit = Label()
+  true_label_res = Label()
+  false_label_res = Label()
+
+  s = f'{t}=1; // first\n'
+  s += f'{limit}={r};\n'
+  s += f'{i}=0;\n'
+  s += f'if({r}<0){{goto {true_label_limit};}}\ngoto {loop_label};\n'
+  s += f'{true_label_limit}:\n'
+  s += f'{limit}={limit}*-1;\n'
+  s += f'{loop_label}:\n'
+  s += f'if({i}<{limit}){{goto {true_label};}}\ngoto {false_label};\n'
+  s += f'{true_label}:\n'
+  s += f'{t}={t}*{l};\n'
+  s += f'{i}={i}+1;\n'
+  s += f'goto {loop_label};\n'
+  s += f'{false_label}:\n'
+  s += f'if({r}<0){{goto {true_label_res};}}\ngoto {false_label_res};\n'
+  s += f'{true_label_res}:\n'
+  s += f'{t}=1/{t};\n'
+  s += f'{false_label_res}:\n'
+
+  t.output += s
   return t
 
 def _negacion(l:Temp):

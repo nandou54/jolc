@@ -5,8 +5,7 @@ from api.interpreter.main import interpret
 from api.translator.main import translate
 
 INPUT = r'''
-msg = "hola"^3;
-print(msg*" mundo!!", 8*4);
+print(1/0);
 '''
 
 LEXER = False

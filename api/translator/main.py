@@ -62,10 +62,10 @@ def process_functions(INS):
     addFunction(sen)
 
 def trInstructions(INS:T_SENTENCE, env:Environment):
-  return '\n'.join(
+  return '\n\n'.join(
     f'// ***** iniciando {type(ins).__name__} *****\n' +
     execute(ins, env) +
-    f'// ***** terminando {type(ins).__name__} *****\n\n'
+    f'// ***** terminando {type(ins).__name__} *****\n'
     for ins in INS)
 
 def trExpression(ex:Expression, env:Environment):

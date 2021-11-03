@@ -436,7 +436,7 @@ BINARY_OPERATION_RESULTS = {
   },
   'potencia':{
     'int64':{
-      'int64':'int64',
+      'int64':'float64',
       'float64':'float64'
     },
     'float64':{

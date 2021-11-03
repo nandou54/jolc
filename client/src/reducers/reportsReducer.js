@@ -1,7 +1,8 @@
 const defaultState = {
   ast: '',
   errors: [],
-  symbols: []
+  symbols: [],
+  c3d: ''
 }
 
 const reportsReducer = (state = defaultState, action) => {

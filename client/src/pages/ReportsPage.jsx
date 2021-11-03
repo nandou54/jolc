@@ -6,14 +6,14 @@ import { Graphviz } from 'graphviz-react'
 
 function ReportsPage() {
   const { ast, symbols, errors } = useSelector((state) => state.reports)
-  const { variables, functions, structs } = symbols
+  const { variables, functions, structs } = !!symbols && symbols
 
-  const existsVariables = !!variables.length
-  const existsFunctions = !!functions.length
-  const existsStructs = !!structs.length
+  const existsVariables = !!variables && !!variables.length
+  const existsFunctions = !!functions && !!functions.length
+  const existsStructs = !!structs && !!structs.length
 
   const existsAST = !!ast
-  const existsErrors = !!errors.length
+  const existsErrors = !!errors && !!errors.length
   const existsSymbols = existsVariables || existsFunctions || existsStructs
   const existsReports = existsAST || existsErrors || existsSymbols
 

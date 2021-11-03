@@ -1,5 +1,4 @@
-const defaultState = ''
-const editorReducer = (state = defaultState, action) => {
+const editorReducer = (state = '', action) => {
   switch (action.type) {
     case '@editor/update': {
       const newContent = action.payload

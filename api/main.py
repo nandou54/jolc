@@ -16,13 +16,15 @@ class InputData(BaseModel):
 app = FastAPI()
 
 origins = [
-  "http://localhost:3000"
+  'http://localhost:3000'
 ]
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_methods=["POST"]
+  CORSMiddleware,
+  allow_origins=origins,
+  allow_methods=['POST'],
+  allow_credentials=True,
+  allow_headers=['*']
 )
 
 mime_types = {
@@ -35,26 +37,30 @@ mime_types = {
   'svg':'image/svg+xml'
 }
 
-templates = Jinja2Templates(directory="dist")
+templates = Jinja2Templates(directory='dist')
 
-@app.post("/api/interpret")
+@app.post('/api/interpret')
 def analyze_input(input_data: InputData):
   return interpret(input_data.content)
 
-@app.post("/api/translate")
+@app.post('/api/translate')
 def analyze_input(input_data: InputData):
   return translate(input_data.content)
 
-@app.post("/api/optimize")
+@app.post('/api/optimize/eyehole')
 def analyze_input(input_data: InputData):
   return 'wip'
 
-@app.get("/static/{filename}")
+@app.post('/api/optimize/blocks')
+def analyze_input(input_data: InputData):
+  return 'wip'
+
+@app.get('/static/{filename}')
 async def serve_file(request: Request, filename):
   file_path ='dist/static/'+filename
 
   if not path.exists(file_path):
-    return {"error":"File not found"}
+    return {'error': 'File not found'}
 
   file_array = filename.split('.')
 
@@ -64,10 +70,10 @@ async def serve_file(request: Request, filename):
 
   return FileResponse(file_path, media_type=mime_types[extension])
 
-@app.get("/{rest_of_path:path}")
+@app.get('/{rest_of_path:path}')
 async def serve_app(request: Request, rest_of_path):
-  return templates.TemplateResponse("index.html", {"request": request})
+  return templates.TemplateResponse('index.html', {'request': request})
 
 @app.exception_handler(HTTPException)
 async def custom_http_exception_handler(request, exc):
-  return RedirectResponse("/")
+  return RedirectResponse('/')

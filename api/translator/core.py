@@ -2,18 +2,18 @@ from copy import deepcopy
 from api.symbols import Error, Struct
 
 def getHeaderOutput():
-  s = 'package main\n'
+  s = 'package main;\n'
 
   if fmt_was_used or math_was_used:
     s += 'import (\n'
     if fmt_was_used: s += '"fmt"\n'
     if math_was_used: s += '"math"\n'
-    s += ')\n'
+    s += ');\n'
 
   s += '''
-var stack [1000]float64 // stack
-var heap [1000]float64  // heap
-var p,h float64         // pointers
+var stack [1000]float64; // stack
+var heap [1000]float64;  // heap
+var p,h float64;         // pointers
 '''
   return s
 
@@ -52,12 +52,15 @@ def reset():
   envs.clear()
   functions.clear()
 
+def getOutput():
+  return output
+
 def getErrors():
   return errors
 
 def getTemps():
   if len(temps)==0: return '\n'
-  return 'var ' + ','.join(temps) + ' float64\n\n'
+  return 'var ' + ','.join(temps) + ' float64;\n\n'
 
 def getFunction(id):
   for function in functions:
@@ -70,57 +73,47 @@ def SemanticError(sen, description):
 def ApplicationError(description):
   errors.append(Error(1, 1, 'Aplicación', description))
 
-class Symbol():
-  def __init__(self, position, type):
-    self.position = position
-    self.type = type
-
-  def __str__(self):
-    return str(self.position)
-
 class Environment():
-  def __init__(self, id = 'global', parent = None, TEST_MODE = False):
+  def __init__(self, id = 'global', increment = True):
     self.id = id
-    self.parent:Environment = parent
-    self.TEST_MODE = TEST_MODE
+    self.increment = increment
     self.symbols = {}
+    self.escape_label = None
+    if not increment: self.escape_label = Label()
     envs.append(self)
 
     self.base = self.top = STACK_TOP
     self.length = 0
 
-  def declareSymbol(self, id, type = 'stack'):
+  def declareSymbol(self, id, type = 'int64'):
     if id in self.symbols.keys():
-      self.symbols[id].type = type
+      self.symbols[id].setType(type)
     else:
       self.symbols[id] = Symbol(self.length, type)
 
       self.top += 1
       self.length += 1
 
-      if not self.TEST_MODE:
+      if self.increment:
         global STACK_TOP
         STACK_TOP += 1
 
-  def getLocalSymbol(self, id):
+  def getSymbol(self, id):
     if id not in self.symbols.keys(): return None
     return self.symbols[id]
 
-  def getGlobalSymbol(self, id):
-    tempEnv = self
-    while tempEnv:
-      if tempEnv.getLocalSymbol(id):
-        return tempEnv.getLocalSymbol(id)
-      tempEnv = tempEnv.parent
-    return None
+class Symbol():
+  def __init__(self, position, type):
+    self.position = position
+    self.type = type
+    self.location = 'heap' if type in ['string'] else 'stack'
 
-  def getParentEnvById(self, id):
-    tempEnv = self
-    while tempEnv:
-      if tempEnv.getLocalSymbol(id):
-        return tempEnv
-      tempEnv = tempEnv.parent
-    return None
+  def __str__(self):
+    return str(self.position)
+
+  def setType(self, type):
+    self.type = type
+    self.location = 'heap' if type in ['string'] else 'stack'
 
 class Label:
   def __init__(self):
@@ -132,23 +125,26 @@ class Label:
     return self.value
 
 class Temp:
-  def __init__(self, value = None):
+  def __init__(self, value = None, type = None):
     if value != None:
-      self.value = str(value)
+      self.value = value
+      self.type = type
     else:
       global temp_counter, temps
       self.value = f't{temp_counter}'
+      self.type = type
       addTemp(self.value)
       temp_counter += 1
+
 
     self.output = ''
     self.true_tags = []
     self.false_tags = []
 
   def __str__(self):
-    return self.value
+    return str(self.value)
 
-  def getOutput(self, *args):
+  def setOutput(self, *args):
     for t in args: self.output += t.output
 
   def printTrueTags(self):
@@ -157,15 +153,72 @@ class Temp:
   def printFalseTags(self):
     return ''.join(str(tag) + ':\n' for tag in self.false_tags)
 
+format_types = {
+  'int64': '%d',
+  'float64': '%f',
+  'string': '%c',
+  'char': '%c',
+  'bool': '%t'
+}
+
 def _print(temps):
   global fmt_was_used
   fmt_was_used = True
-  return '\n'.join(f'fmt.Print({temp})' for temp in temps)+'\n'
+
+  s = ''
+  for temp in temps:
+    if temp.type == 'float64':
+      s += f'fmt.Printf("{format_types[temp.type]}", {temp});\n'
+    elif temp.type == 'string':
+      char_temp = Temp()
+      loop_label = Label()
+      true_label = Label()
+      false_label = Label()
+
+      s += f'{loop_label}:\n'
+      s += f'{char_temp}=heap[int({temp})];\n'
+      s += f'if({char_temp}!=34){{goto {true_label};}}\n'
+      s += f'goto {false_label};\n'
+      s += f'{true_label}:\n'
+      s += f'fmt.Printf("%c", int({char_temp}));\n'
+      s += f'{temp}={temp}+1;\n'
+      s += f'goto {loop_label};\n'
+      s += f'{false_label}:\n'
+    else:
+      s += f'fmt.Printf("{format_types[temp.type]}", int({temp}));\n'
+
+  return s
 
 def _println(temps):
   global fmt_was_used
   fmt_was_used = True
-  return '\n'.join(f'fmt.Println({temp})' for temp in temps)+'\n'
+
+  s = ''
+
+  for temp in temps:
+    print(temp.type)
+    if temp.type == 'float64':
+      s += f'fmt.Printf("{format_types[temp.type]}", {temp});\n'
+    elif temp.type == 'string':
+      char_temp = Temp()
+      loop_label = Label()
+      true_label = Label()
+      false_label = Label()
+
+      s += f'{loop_label}:\n'
+      s += f'{char_temp}=heap[int({temp})];\n'
+      s += f'if({char_temp}!=34){{goto {true_label};}}\n'
+      s += f'goto {false_label};\n'
+      s += f'{true_label}:\n'
+      s += f'fmt.Printf("%c", int({char_temp}));\n'
+      s += f'{temp}={temp}+1;\n'
+      s += f'goto {loop_label};\n'
+      s += f'{false_label}:\n'
+    else:
+      s += f'fmt.Printf("{format_types[temp.type]}", int({temp}));\n'
+    s += 'fmt.Printf("%c", 10); // nueva linea\n'
+
+  return s
 
 def _log10(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'log10' recibe un parámetro")
@@ -385,50 +438,156 @@ RESERVED_FUNCTIONS = {
 def _suma(l:Temp, r:Temp):
   t = Temp()
 
-  t.getOutput(l, r)
-  t.output += f'{t}={l}+{r}\n'
+  t.setOutput(l, r)
+  t.output += f'{t}={l}+{r};\n'
   return t
 
 def _resta(l:Temp, r:Temp):
   t = Temp()
 
-  t.getOutput(l, r)
-  t.output += f'{t}={l}-{r}\n'
+  t.setOutput(l, r)
+  t.output += f'{t}={l}-{r};\n'
   return t
 
 def _multiplicacion(l:Temp, r:Temp):
-  t = Temp()
+  if l.type=='string':
+    res_temp = Temp(None, 'string')
+    res_temp.setOutput(l, r)
+    char_temp = Temp()
 
-  t.getOutput(l, r)
-  t.output += f'{t}={l}*{r}\n'
+    s = f'{res_temp}=h; // inicio de suma de string\n'
+
+    for temp in [l, r]:
+      loop_label = Label()
+      true_label = Label()
+      false_label = Label()
+
+      s += f'{loop_label}:\n'
+      s += f'{char_temp}=heap[int({temp})];\n'
+      s += f'if({char_temp}!=34){{goto {true_label};}}\n'
+      s += f'goto {false_label};\n'
+      s += f'{true_label}:\n'
+      s += f'heap[int(h)]={char_temp};\n'
+      s += 'h=h+1;\n'
+      s += f'{temp}={temp}+1;\n'
+      s += f'goto {loop_label};\n'
+      s += f'{false_label}:\n'
+
+    s += 'heap[int(h)]=34; // fin de suma de string\n'
+    s += 'h=h+1;\n'
+
+    res_temp.output += s
+    return res_temp
+
+  t = Temp()
+  t.setOutput(l, r)
+  t.output += f'{t}={l}*{r};\n'
   return t
 
 def _division(l:Temp, r:Temp):
   t = Temp()
+  t.setOutput(l, r)
 
-  t.getOutput(l, r)
-  t.output += f'{t}={l}/{r}\n'
+  lt = Label()
+  lf = Label()
+
+  t.output += f'''if {t}!=0 {{goto {lt};}}
+fmt.Printf("%c", 77);  //M
+fmt.Printf("%c", 97);  //a
+fmt.Printf("%c", 116); //t
+fmt.Printf("%c", 104); //h
+fmt.Printf("%c", 69);  //E
+fmt.Printf("%c", 114); //r
+fmt.Printf("%c", 114); //r
+fmt.Printf("%c", 111); //o
+fmt.Printf("%c", 114); //r
+{t}=0
+goto {lf};
+{lt}:
+{t}={l}/{r};
+{lf}:
+'''
   return t
 
 def _modulo(l:Temp, r:Temp):
   t = Temp()
-  print(type(l), type(r))
-  t.getOutput(l, r)
-  t.output += f'{t}=float64(int({l})%int({r}))\n'
+  t.setOutput(l, r)
+
+  lt = Label()
+  lf = Label()
+
+  t.output += f'''if {t}!=0 {{goto {lt};}}
+fmt.Printf("%c", 77);  //M
+fmt.Printf("%c", 97);  //a
+fmt.Printf("%c", 116); //t
+fmt.Printf("%c", 104); //h
+fmt.Printf("%c", 69);  //E
+fmt.Printf("%c", 114); //r
+fmt.Printf("%c", 114); //r
+fmt.Printf("%c", 111); //o
+fmt.Printf("%c", 114); //r
+{t}=0;
+goto {lf};
+{lt}:
+{t}=float64(int({l})%int({r}));
+{lf}:
+'''
   return t
 
 def _potencia(l:Temp, r:Temp):
-  t = Temp()
+  if l.type=='string':
+    res_temp = Temp(None, 'string')
+    res_temp.setOutput(l, r)
+    char_temp = Temp()
+    i = Temp()
+    j = Temp()
 
-  t.getOutput(l, r)
-  t.output += f'{t}={l}^{r}\n'
+    s = f'{res_temp}=h; // inicio de multiplicacion de string\n'
+
+    loop_label_i = Label()
+    true_label_i = Label()
+    false_label_i = Label()
+    loop_label_j = Label()
+    true_label_j = Label()
+    false_label_j = Label()
+
+    s += f'{i}=0;\n'
+    s += f'{loop_label_i}:\n'
+    s += f'if({i}<{r}){{goto {true_label_i};}}\ngoto {false_label_i};\n'
+
+    s += f'{true_label_i}:\n'
+    s += f'{j}={l};\n'
+    s += f'{loop_label_j}:\n'
+    s += f'{char_temp}=heap[int({j})];\n'
+    s += f'if({char_temp}!=34){{goto {true_label_j};}}\n'
+    s += f'goto {false_label_j};\n'
+    s += f'{true_label_j}:\n'
+    s += f'heap[int(h)]={char_temp};\n'
+    s += 'h=h+1;\n'
+    s += f'{j}={j}+1;\n'
+    s += f'goto {loop_label_j};\n'
+    s += f'{false_label_j}:\n'
+
+    s += f'{i}={i}+1;\n'
+    s += f'goto {loop_label_i};\n'
+    s += f'{false_label_i}:\n'
+
+    s += 'heap[int(h)]=34; // fin de multiplicacion de string\n'
+    s += 'h=h+1;\n'
+
+    res_temp.output += s
+    return res_temp
+
+  t = Temp()
+  t.setOutput(l, r)
+  t.output += f'{t}={l}^{r};\n'
   return t
 
 def _negacion(l:Temp):
   t = Temp()
 
-  t.getOutput(l)
-  t.output += f'{t}=-{l}\n'
+  t.setOutput(l)
+  t.output += f'{t}=-{l};\n'
   return t
 
 def _menor(l:Temp, r:Temp):
@@ -439,8 +598,8 @@ def _menor(l:Temp, r:Temp):
   t.true_tags.append(true_tag)
   t.false_tags.append(false_tag)
 
-  t.getOutput(l, r)
-  t.output += f'if ({l}<{r}){{goto {true_tag}}}\ngoto {false_tag}\n'
+  t.setOutput(l, r)
+  t.output += f'if ({l}<{r}){{goto {true_tag};}}\ngoto {false_tag};\n'
   return t
 
 def _menor_igual(l:Temp, r:Temp):
@@ -451,8 +610,8 @@ def _menor_igual(l:Temp, r:Temp):
   t.true_tags.append(true_tag)
   t.false_tags.append(false_tag)
 
-  t.getOutput(l, r)
-  t.output += f'if ({l}<={r}){{goto {true_tag}}}\ngoto {false_tag}\n'
+  t.setOutput(l, r)
+  t.output += f'if ({l}<={r}){{goto {true_tag};}}\ngoto {false_tag};\n'
   return t
 
 def _mayor(l:Temp, r:Temp):
@@ -463,8 +622,8 @@ def _mayor(l:Temp, r:Temp):
   t.true_tags.append(true_tag)
   t.false_tags.append(false_tag)
 
-  t.getOutput(l, r)
-  t.output += f'if ({l}>{r}){{goto {true_tag}}}\ngoto {false_tag}\n'
+  t.setOutput(l, r)
+  t.output += f'if ({l}>{r}){{goto {true_tag};}}\ngoto {false_tag};\n'
   return t
 
 def _mayor_igual(l:Temp, r:Temp):
@@ -475,8 +634,8 @@ def _mayor_igual(l:Temp, r:Temp):
   t.true_tags.append(true_tag)
   t.false_tags.append(false_tag)
 
-  t.getOutput(l, r)
-  t.output += f'if ({l}>={r}){{goto {true_tag}}}\ngoto {false_tag}\n'
+  t.setOutput(l, r)
+  t.output += f'if ({l}>={r}){{goto {true_tag};}}\ngoto {false_tag};\n'
   return t
 
 def _igualacion(l:Temp, r:Temp):
@@ -487,8 +646,8 @@ def _igualacion(l:Temp, r:Temp):
   t.true_tags.append(true_tag)
   t.false_tags.append(false_tag)
 
-  t.getOutput(l, r)
-  t.output += f'if ({l}=={r}){{goto {true_tag}}}\ngoto {false_tag}\n'
+  t.setOutput(l, r)
+  t.output += f'if ({l}=={r}){{goto {true_tag};}}\ngoto {false_tag};\n'
   return t
 
 def _diferenciacion(l:Temp, r:Temp):
@@ -499,30 +658,30 @@ def _diferenciacion(l:Temp, r:Temp):
   t.true_tags.append(true_tag)
   t.false_tags.append(false_tag)
 
-  t.getOutput(l, r)
-  t.output += f'if ({l}!={r}){{goto {true_tag}}}\ngoto {false_tag}\n'
+  t.setOutput(l, r)
+  t.output += f'if ({l}!={r}){{goto {true_tag};}}\ngoto {false_tag};\n'
   return t
 
 def _or(l:Temp, r:Temp):
   t = Temp('')
-  t.getOutput(l)
+  t.setOutput(l)
 
   t.true_tags = l.true_tags + r.true_tags
   t.false_tags = r.false_tags
 
   t.output += l.printFalseTags()
-  t.getOutput(r)
+  t.setOutput(r)
   return t
 
 def _and(l:Temp, r:Temp):
   t = Temp('')
-  t.getOutput(l)
+  t.setOutput(l)
 
   t.true_tags = r.true_tags
   t.false_tags = l.false_tags + r.false_tags
 
   t.output += l.printTrueTags()
-  t.getOutput(r)
+  t.setOutput(r)
   return t
 
 def _not(l:Temp):

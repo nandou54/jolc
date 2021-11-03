@@ -7,12 +7,6 @@ from api.symbols import operations
 INPUT = ''
 errors = []
 
-def LexicalError(ln, col, description):
-  return Error(ln, col, 'Léxico', description)
-
-def SyntacticError(ln, col, description):
-  return Error(ln, col, 'Sintáctico', description)
-
 def getColumn(t):
   global INPUT
   line_start = INPUT.rfind('\n', 0, t.lexpos)+1
@@ -23,37 +17,36 @@ def parse(input):
   global errors
 
   INPUT = input
-  errors = []
   lexer.lineno = 1
 
   ast = parser.parse(input)
 
   if ast is None: ast = []
-  return {'ast':ast, 'errors':errors, 'output':'', 'symbols':[]}
+  return {'ast': ast, 'output': '', 'symbols': []}
 
 reserved = (
-  'Nothing',
-  'Int64',
-  'Float64',
-  'Bool',
-  'Char',
-  'String',
-  'struct',
-  'local',
-  'global',
-  'function',
-  'end',
-  'if',
-  'elseif',
-  'else',
-  'while',
-  'for',
-  'break',
-  'continue',
+  'package',
+  'import',
+  'var',
+  'float64',
+  'int',
+  'func',
   'return',
-  'mutable',
-  'in'
 )
+
+'''
+package main
+import (
+"fmt"
+)
+var stack [1000]float64 // stack
+var heap [1000]float64 // heap
+var p,h float64 // pointers
+func main(){
+fmt.Print(2)
+return
+}
+'''
 
 tokens = (
   'id',
@@ -99,10 +92,8 @@ states = (
 
 # Lexemas ignorados
 t_ignore                       =  ' \t'
-t_ignore_comentario            = r'[#].*'
-t_ignore_comentario_multilinea = r'[#]=([^=]|[\r\n]|(=+([^#])))*=+[#]'
-t_string_ignore = ""
-t_expresion_ignore = t_ignore
+t_ignore_comentario            = r'//.*'
+t_ignore_comentario_multilinea = r'/\*([\s\S]*?)\*/\s*'
 
 t_parA           = r'\('
 t_parB           = r'\)'

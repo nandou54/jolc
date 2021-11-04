@@ -52,6 +52,14 @@ def reset():
   envs.clear()
   functions.clear()
 
+def setMath():
+  global math_was_used
+  math_was_used = True
+
+def setFmt():
+  global fmt_was_used
+  fmt_was_used = True
+
 def getOutput():
   return output
 
@@ -67,7 +75,10 @@ def getFunction(id):
     if function.id.value==id: return function
 
 def SemanticError(sen, description):
-  errors.append(Error(sen.ln, sen.col, 'Semántico', description))
+  if hasattr(sen, 'ln'):
+    errors.append(Error(sen.ln, sen.col, 'Semántico', description))
+  else:
+    errors.append(Error(0, 0, 'Semántico', description))
   return ''
 
 def ApplicationError(description):
@@ -162,10 +173,9 @@ format_types = {
 }
 
 def _print(temps):
-  global fmt_was_used
-  fmt_was_used = True
-
+  setFmt()
   s = ''
+
   for temp in temps:
     if temp.type == 'float64':
       s += f'fmt.Printf("{format_types[temp.type]}", {temp});\n'
@@ -187,16 +197,15 @@ def _print(temps):
     else:
       s += f'fmt.Printf("{format_types[temp.type]}", int({temp}));\n'
 
-  return s
+  t = Temp('')
+  t.output = s
+  return t
 
 def _println(temps):
-  global fmt_was_used
-  fmt_was_used = True
-
+  setFmt()
   s = ''
 
   for temp in temps:
-    print(temp.type)
     if temp.type == 'float64':
       s += f'fmt.Printf("{format_types[temp.type]}", {temp});\n'
     elif temp.type == 'string':
@@ -216,21 +225,24 @@ def _println(temps):
       s += f'{false_label}:\n'
     else:
       s += f'fmt.Printf("{format_types[temp.type]}", int({temp}));\n'
-    s += 'fmt.Printf("%c", 10); // nueva linea\n'
+  s += 'fmt.Printf("%c", 10); // nueva linea\n'
 
-  return s
+  t = Temp('')
+  t.output = s
+  return t
 
 def _log10(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'log10' recibe un parámetro")
 
-  ex = values[0]
-  if ex.type not in ['int64', 'float64']:
-    return SemanticError(ex, "La función nativa 'log10' recibe un valor numérico")
+  t = values[0]
+  if t.type not in ['int64', 'float64']:
+    return SemanticError(t, "La función nativa 'log10' recibe un valor numérico")
 
-  newValue = deepcopy(ex)
-  newValue.type = 'float64'
-  # newValue.value = log10(newValue.value)
-  return newValue
+  setMath()
+
+  t_result = Temp(None, 'float64')
+  t_result.output = f'{t_result}=math.Log10({t});\n'
+  return t_result
 
 def _log(values):
   if len(values)!=2: return SemanticError(values[0], "La función nativa 'log' recibe dos parámetros")
@@ -239,77 +251,112 @@ def _log(values):
   if base.type not in ['int64', 'float64'] or ex.type not in ['int64', 'float64']:
     return SemanticError(ex, "La función nativa 'log' recibe dos valores numéricos")
 
-  newValue = deepcopy(ex)
-  newValue.type = 'float64'
-  # newValue.value = log(newValue.value, base.value)
-  return newValue
+  setMath()
+
+  t_ex = Temp(None, 'float64')
+  t_base = Temp(None, 'float64')
+  t_result = Temp(None, 'float64')
+
+
+  t_result.output = f'{t_ex}=math.Log10({ex});\n'
+  t_result.output += f'{t_base}=math.Log10({base});\n'
+  t_result.output += f'{t_result}={t_ex}/{t_base};\n'
+  return t_result
 
 def _sin(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'sin' recibe un parámetro")
 
-  ex = values[0]
-  if ex.type not in ['int64', 'float64']:
-    return SemanticError(ex, "La función nativa 'sin' recibe un valor numérico")
+  t = values[0]
+  if t.type not in ['int64', 'float64']:
+    return SemanticError(t, "La función nativa 'sin' recibe un valor numérico")
 
-  newValue = deepcopy(ex)
-  newValue.type = 'float64'
-  # newValue.value = sin(newValue.value)
-  return newValue
+  setMath()
+
+  t_result = Temp(None, 'float64')
+  t_result.output = f'{t_result}=math.Sin({t});\n'
+  return t_result
 
 def _cos(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'cos' recibe un parámetro")
 
-  ex = values[0]
-  if ex.type not in ['int64', 'float64']:
-    return SemanticError(ex, "La función nativa 'cos' recibe un valor numérico")
+  t = values[0]
+  if t.type not in ['int64', 'float64']:
+    return SemanticError(t, "La función nativa 'cos' recibe un valor numérico")
 
-  newValue = deepcopy(ex)
-  newValue.type = 'float64'
-  # newValue.value = cos(newValue.value)
-  return newValue
+  setMath()
+
+  t_result = Temp(None, 'float64')
+  t_result.output = f'{t_result}=math.Cos({t});\n'
+  return t_result
 
 def _tan(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'tan' recibe un parámetro")
 
-  ex = values[0]
-  if ex.type not in ['int64', 'float64']:
-    return SemanticError(ex, "La función nativa 'tan' recibe un valor numérico")
+  t = values[0]
+  if t.type not in ['int64', 'float64']:
+    return SemanticError(t, "La función nativa 'tan' recibe un valor numérico")
 
-  newValue = deepcopy(ex)
-  newValue.type = 'float64'
-  # newValue.value = tan(newValue.value)
-  return newValue
+  setMath()
+
+  t_result = Temp(None, 'float64')
+  t_result.output = f'{t_result}=math.Tan({t});\n'
+  return t_result
 
 def _sqrt(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'sqrt' recibe un parámetro")
 
-  ex = values[0]
-  if ex.type not in ['int64', 'float64']:
-    return SemanticError(ex, "La función nativa 'sqrt' recibe un valor numérico")
+  t = values[0]
+  if t.type not in ['int64', 'float64']:
+    return SemanticError(t, "La función nativa 'sqrt' recibe un valor numérico")
 
-  newValue = deepcopy(ex)
-  newValue.type = 'float64'
-  # newValue.value = sqrt(newValue.value)
-  return newValue
+  setMath()
+
+  t_result = Temp(None, 'float64')
+  t_result.output = f'{t_result}=math.Sqrt({t});\n'
+  return t_result
 
 def _parse(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'typeof' recibe un parámetro")
 
-  ex = values[0]
-  if ex.type!='string':
-    return SemanticError(ex, "La función nativa 'parse' recibe un valor string")
+  t = values[0]
+  if t.type!='string':
+    return SemanticError(t, "La función nativa 'parse' recibe un valor string")
 
-  newValue = deepcopy(ex)
-  try:
-    newValue.value = int(newValue.value)
-    newValue.type = 'int64'
-  except ValueError:
-    try:
-      newValue.value = float(newValue.value)
-      newValue.type = 'float64'
-    except ValueError: return SemanticError(ex, "No se pudo parsear el string dado")
+  setFmt()
 
-  return newValue
+  t_result = Temp(None, 'int64')
+  char_temp = Temp()
+  loop_label = Label()
+  true_label = Label()
+  false_label = Label()
+  true_label_num = Label()
+  true_label_num2 = Label()
+  false_label_num = Label()
+
+  s = f'{loop_label}:\n'
+  s += f'{char_temp}=heap[int({t})];\n'
+  s += f'if({char_temp}!=34){{goto {true_label};}}\n'
+  s += f'goto {false_label};\n'
+  s += f'{true_label}:\n'
+  s += f'if({char_temp}>=48){{goto {true_label_num};}}\ngoto {false_label_num};\n'
+  s += f'{true_label_num}:\n'
+  s += f'if({char_temp}<=57){{goto {true_label_num2};}}\ngoto {false_label_num};\n'
+  s += f'{true_label_num2}:\n'
+  s += f'{char_temp}={char_temp}-48;\n'
+  s += f'{t_result}={t_result}*10;\n'
+  s += f'{t_result}={t_result}+{char_temp};\n'
+  s += f'{t}={t}+1;\n'
+  s += f'goto {loop_label};\n'
+  s += f'{false_label_num}:\n'
+  s += 'fmt.Printf("%c", 69);\n'
+  s += 'fmt.Printf("%c", 114);\n'
+  s += 'fmt.Printf("%c", 114);\n'
+  s += 'fmt.Printf("%c", 111);\n'
+  s += 'fmt.Printf("%c", 114);\n'
+  s += f'{false_label}:\n'
+
+  t_result.output = s
+  return t_result
 
 def _trunc(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'trunc' recibe un parámetro")
@@ -380,10 +427,19 @@ def _typeof(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'typeof' recibe un parámetro")
 
   ex = values[0]
-  value = deepcopy(ex)
-  value.value = value.type
-  value.type = 'string'
-  return value
+
+  t = Temp(None, 'string')
+
+  s = f'{t}=h;\n'
+  for c in ex.type:
+    s += f'heap[int(h)]={ord(c)};\n'
+    s += 'h=h+1;\n'
+
+  s += 'heap[int(h)]=34;\n'
+  s += 'h=h+1;\n'
+
+  t.output = s
+  return t
 
 def _push(values):
   if len(values)!=2: return SemanticError(values[0], "La función nativa 'push' recibe dos parámetros")
@@ -409,10 +465,28 @@ def _length(values):
   if ex.type not in ['string', 'array']:
     return SemanticError(ex, "La función nativa 'length' recibe un string o un array")
 
-  newValue = deepcopy(ex)
-  newValue.type = 'int64'
-  newValue.value = len(ex.value)
-  return newValue
+  if ex.type=='string':
+    t = Temp(None, 'string')
+    t_result = Temp(None, 'int64')
+
+    char_temp = Temp()
+    loop_label = Label()
+    true_label = Label()
+    false_label = Label()
+
+    s = f'{t}={ex};\n'
+    s += f'{loop_label}:\n'
+    s += f'{char_temp}=heap[int({t})];\n'
+    s += f'if({char_temp}!=34){{goto {true_label};}}\n'
+    s += f'goto {false_label};\n'
+    s += f'{true_label}:\n'
+    s += f'{t_result}={t_result}+1;\n'
+    s += f'{t}={t}+1;\n'
+    s += f'goto {loop_label};\n'
+    s += f'{false_label}:\n'
+
+    t_result.output = s
+    return t_result
 
 RESERVED_FUNCTIONS = {
   'print': _print,
@@ -485,6 +559,8 @@ def _multiplicacion(l:Temp, r:Temp):
   return t
 
 def _division(l:Temp, r:Temp):
+  setFmt()
+
   t = Temp()
   t.setOutput(l, r)
 
@@ -510,6 +586,8 @@ goto {lf};
   return t
 
 def _modulo(l:Temp, r:Temp):
+  setFmt()
+
   t = Temp()
   t.setOutput(l, r)
 

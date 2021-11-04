@@ -5,7 +5,8 @@ from api.interpreter.main import interpret
 from api.translator.main import translate
 
 INPUT = r'''
-print(1/0);
+s = length("quepex bro");
+print(s);
 '''
 
 LEXER = False

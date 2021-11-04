@@ -62,7 +62,7 @@ def process_functions(INS):
     addFunction(sen)
 
 def trInstructions(INS:T_SENTENCE, env:Environment):
-  return '\n\n'.join(
+  return '\n'.join(
     f'// ***** iniciando {type(ins).__name__} *****\n' +
     execute(ins, env) +
     f'// ***** terminando {type(ins).__name__} *****\n'
@@ -108,26 +108,26 @@ def trExpression(ex:Expression, env:Environment):
     val_temp.output += f'h=h+1;\n'
     return val_temp
   if ex.type=='char': return Temp(ord(ex.value), ex.type)
-
   if type(ex) is Value: return Temp(ex.value, ex.type)
 
-  left_temp = trExpression(ex.left, env) if ex.left else None
-  right_temp = trExpression(ex.right, env) if ex.right else None
+  l = trExpression(ex.left, env) if ex.left else None
+  r = trExpression(ex.right, env) if ex.right else None
 
-  if not left_temp: return SemanticError(ex, "No se pudo realizar la operación '{}'".format(ex.type))
+  if not l: return SemanticError(ex, "No se pudo realizar la operación '{}'".format(ex.type))
 
   if ex.unary:
-    try: returnType = UNARY_OPERATION_RESULTS[ex.type][left_temp.type]
-    except: return SemanticError(ex, "No se pudo aplicar '{}' a '{}' y '{}'".format(ex.type, left_temp.type, right_temp.type))
+    try: returnType = UNARY_OPERATION_RESULTS[ex.type][l.type]
+    except: return SemanticError(ex, "No se pudo aplicar '{}' a '{}' y '{}'".format(ex.type, l.type, r.type))
   else:
-    if not right_temp: return SemanticError(ex, "No se pudo realizar la operación '{}'".format(ex.type))
+    if not r: return SemanticError(ex, "No se pudo realizar la operación '{}'".format(ex.type))
+    if ex.type in ['igualacion', 'diferenciacion']: returnType = 'bool'
     else:
-      try: returnType = BINARY_OPERATION_RESULTS[ex.type][left_temp.type][right_temp.type]
-      except: return SemanticError(ex, "No se pudo aplicar '{}' a '{}' y '{}'".format(ex.type, left_temp.type, right_temp.type))
+      try: returnType = BINARY_OPERATION_RESULTS[ex.type][l.type][r.type]
+      except: return SemanticError(ex, "No se pudo aplicar '{}' a '{}' y '{}'".format(ex.type, l.type, r.type))
 
-  result_temp = (UNARY_OPERATIONS[ex.type](left_temp)
+  result_temp = (UNARY_OPERATIONS[ex.type](l)
     if ex.unary
-    else BINARY_OPERATIONS[ex.type](left_temp, right_temp))
+    else BINARY_OPERATIONS[ex.type](l, r))
   result_temp.type = returnType
   return result_temp
 
@@ -146,8 +146,9 @@ def trCall(sen:Call, env:Environment):
 
   if sen.id.value in RESERVED_FUNCTIONS.keys():
     for value in values: s += value.output
-    s += RESERVED_FUNCTIONS[sen.id.value](values)
-    return s
+    t = RESERVED_FUNCTIONS[sen.id.value](values)
+    t.output = s+t.output
+    return t
 
   function = getFunction(sen.id.value)
 
@@ -205,13 +206,13 @@ def trAssignment(sen:Assignment, env:Environment):
 
   if not sen.ex: return s
 
+  pos_temp = Temp()
   res_temp = trExpression(sen.ex, env)
   if not res_temp: return SemanticError(sen, 'No se pudo realizar la asignación')
   if sen.type and sen.type!=res_temp.type: return SemanticError(sen, f'No se puede asignar un valor {res_temp.type} a una variable {sen.type}')
 
   env.declareSymbol(sen.id.value, res_temp.type)
 
-  pos_temp = Temp()
   s += f'{pos_temp}=p+{env.getSymbol(sen.id.value)}; // posicion de variable {sen.id.value}\n'
   s += res_temp.output
   s += f'stack[int({pos_temp})]={res_temp}; // asignacion de variable {sen.id.value}\n'
@@ -229,6 +230,7 @@ def trFunction(sen:Function, env:Environment):
   newEnv = getFunction(sen.id.value).env
 
   s += trInstructions(sen.ins, newEnv)
+  s += f'goto {newEnv.escape_label}; // goto para evitar error de go\n'
   s += f'{newEnv.escape_label}: // etiqueta de retorno\n'
   s += 'return;\n}'
   return s
@@ -292,12 +294,13 @@ def trFor(sen:For, env:Environment):
   s = ''
 
 def execute(sen, env:Environment):
-  T = type(sen)
-  if T is Assignment: return trAssignment(sen, env)
-  # if T is Struct: return trStruct(sen, env)
-  if T is Call: return trCall(sen, env)
-  if T is Return: return trReturn(sen, env)
-  if T is If: return trIf(sen, env)
-  if T is While: return trWhile(sen, env)
-  # if T is For: return trFor(sen, env)
-  print (f'***** {type(sen)} not supported\n')
+  try:
+    T = type(sen)
+    if T is Assignment: return trAssignment(sen, env)
+    # if T is Struct: return trStruct(sen, env)
+    if T is Call: return trCall(sen, env).output
+    if T is Return: return trReturn(sen, env)
+    if T is If: return trIf(sen, env)
+    if T is While: return trWhile(sen, env)
+    # if T is For: return trFor(sen, env)
+  except: SemanticError(sen, f'Error al ejecutar {T.__name__}')

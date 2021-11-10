@@ -22,9 +22,15 @@ def translate(input):
     FUNC_INS = [ins for ins in INS if type(ins) is Function]
     NEW_INS = [ins for ins in INS if type(ins) is not Function]
 
-    process_functions(FUNC_INS)
-    func_output = '\n\n'.join(trFunction(ins, mainEnv) for ins in FUNC_INS)
+    for sen in NEW_INS:
+      if type(sen) is Assignment or type(sen) is For:
+        mainEnv.declareSymbol(sen.id.value)
+      if hasattr(sen, 'ins'):
+        get_assignments(sen.ins, mainEnv)
 
+    process_functions(FUNC_INS)
+
+    func_output = '\n\n'.join(trFunction(ins, mainEnv) for ins in FUNC_INS)
     ins_output = trInstructions(NEW_INS, mainEnv)
 
     output += getHeaderOutput()
@@ -42,21 +48,21 @@ def translate(input):
   res['errors'] += errors
   return res
 
-def process_functions(INS):
-  def get_assignments(INS):
-    for sen in INS:
-      if type(sen) is Assignment:
-        newEnv.declareSymbol(sen.id.value)
-      elif hasattr(sen, 'ins'):
-        get_assignments(sen.ins)
+def get_assignments(INS, env:Environment):
+  for sen in INS:
+    if type(sen) is Assignment or type(sen) is For:
+      env.declareSymbol(sen.id.value)
+    if hasattr(sen, 'ins'):
+      get_assignments(sen.ins)
 
+def process_functions(INS):
   for sen in INS:
     newEnv = Environment(sen.id.value, False)
 
     for parameter in sen.parameters:
       newEnv.declareSymbol(parameter.value)
 
-    get_assignments(sen.ins)
+    get_assignments(sen.ins, newEnv)
     newEnv.declareSymbol('return')
     sen.env = newEnv
     addFunction(sen)
@@ -78,7 +84,7 @@ def trExpression(ex:Expression, env:Environment):
     # return ex
   # if ex.type=='access': return trAccess(ex, env)
   # if ex.type=='chain': return trChain(ex, env)
-  # if ex.type=='range': return trRange(ex, env)
+  if ex.type=='range': return trRange(ex, env)
   # if ex.type=='ternary': return trTernary(ex, env)
   if ex.type=='id':
     if env.getSymbol(ex.value) is None:
@@ -195,7 +201,17 @@ def trChain(ex:Expression, output, assignment = False):
   s = ''
 
 def trRange(ex:Expression, env:Environment):
-  s = ''
+  if not ex.left: return ex
+
+  l = trExpression(ex.left, env)
+  r = trExpression(ex.right, env)
+
+  if l.type!='int64' or r.type!='int64': return SemanticError(ex, "Se esperaba un int64 en el rango")
+  if l.value>r.value: return SemanticError(ex, "El rango no es válido")
+
+  t = Temp({"l": l, "r": r}, 'range')
+  t.setOutput(l, r)
+  return t
 
 def trTernary(ex:Expression, env:Environment):
   s = ''
@@ -275,12 +291,18 @@ def trIf(sen:If, env:Environment):
   return s
 
 def trWhile(sen:While, env:Environment):
-  s = ''
+  condition = trExpression(sen.ex, env)
 
+  if not condition:
+    return SemanticError(sen, 'No se pudo ejecutar la sentencia while')
+
+  if condition.type!='bool':
+    return SemanticError(sen, 'Se esperaba una condición en la sentencia while')
+
+  s = ''
   loop_label = Label()
   s += f'{loop_label}:\n'
 
-  condition = trExpression(sen.ex, env)
   s += condition.output
   s += condition.printTrueTags()
 
@@ -291,7 +313,40 @@ def trWhile(sen:While, env:Environment):
   return s
 
 def trFor(sen:For, env:Environment):
-  s = ''
+  ex = trExpression(sen.ex, env)
+  if not ex: return SemanticError(sen, 'No se pudo ejecutar la sentencia for')
+  if ex.type not in ['string', 'array', 'range']: return SemanticError(sen, "No se puede iterar sobre un valor {}".format(ex.type))
+
+  loop_label = Label()
+  true_label = Label()
+  false_label = Label()
+  i = Temp()
+  char = Temp()
+  val = Temp()
+
+  symbol = env.getSymbol(sen.id.value)
+  symbol.type = 'string'
+
+  s = ex.output
+  s += f'{i}={ex};\n'
+  s += f'{loop_label}:\n'
+
+  if ex.type=='string':
+    s += f'{char}=heap[int({i})];\n'
+    s += f'if({char}!=34){{goto {true_label};}}\ngoto {false_label};\n'
+    s += f'{true_label}:\n'
+    s += f'{val}=p+{symbol};\n'
+    s += f'stack[int({val})]=h;\n'
+    s += f'heap[int(h)]={char};\n'
+    s += 'h=h+1;\n'
+    s += 'heap[int(h)]=34;\n'
+    s += 'h=h+1;\n'
+    s += trInstructions(sen.ins, env)
+    s += f'{i}={i}+1;\n'
+    s += f'goto {loop_label};\n'
+    s += f'{false_label}:\n'
+
+  return s
 
 def execute(sen, env:Environment):
   try:
@@ -302,5 +357,5 @@ def execute(sen, env:Environment):
     if T is Return: return trReturn(sen, env)
     if T is If: return trIf(sen, env)
     if T is While: return trWhile(sen, env)
-    # if T is For: return trFor(sen, env)
+    if T is For: return trFor(sen, env)
   except: SemanticError(sen, f'Error al ejecutar {T.__name__}')

@@ -3,16 +3,20 @@ import os
 from api.analyzer.main import lexer, parse
 from api.interpreter.main import interpret
 from api.translator.main import translate
+from api.optimizer.eyehole import optimize as optimize_eyehole
+from api.optimizer.blocks import optimize as optimize_blocks
 
 INPUT = r'''
-s = length("quepex bro");
-print(s);
+x=5;
+print(x+x);
 '''
 
 LEXER = False
 PARSER = False
 INTERPRETER = False
-TRANSLATOR = True
+TRANSLATOR = False
+OPTIMIZER_EYEHOLE = True
+OPTIMIZER_BLOCKS = False
 
 if LEXER:
   print('=== LEXER ===')
@@ -41,15 +45,11 @@ if INTERPRETER:
 if TRANSLATOR:
   print('=== TRANSLATOR ===')
   res = translate(INPUT)
+  output = res['output']
 
   with open('./test.go', 'w') as file:
-    file.write(res['output'])
-  print(res['output'])
-
-  # os.system('go fmt ./test.go')
-
-  # with open('./test.go', 'r') as file:
-  #   print(file.read())
+    file.write(output)
+  print(output)
 
   print('= GO OUTPUT =')
   os.system('go run ./test.go')
@@ -58,3 +58,17 @@ if TRANSLATOR:
     print(json.dumps(res['errors'], indent=2, ensure_ascii=False))
   except:
     print(res['errors'])
+
+if OPTIMIZER_EYEHOLE:
+  print('=== OPTIMIZER BY EYEHOLE ===')
+
+  with open('./test.go', 'r') as file:
+    content = file.read()
+    res = optimize_eyehole(content)
+
+if OPTIMIZER_BLOCKS:
+  print('=== OPTIMIZER BY BLOCKS ===')
+
+  with open('./test.go', 'r') as file:
+    content = file.read()
+    res = optimize_blocks(content)

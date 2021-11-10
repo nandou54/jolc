@@ -1,8 +1,7 @@
 from api.ply.yacc import yacc
 from api.ply.lex import lex
 
-from api.symbols import Assignment, Expression, Value, Function, Struct, Attribute, Call, If, Else, While, For, Break, Continue, Return, Error
-from api.symbols import operations
+from api.optimizer.symbols import Assignment, Call, Expression, Function, Goto, Id, If, Library, Number, Return, String, Tag, Wrapper, operations
 
 INPUT = ''
 errors = []
@@ -16,56 +15,39 @@ def parse(input):
   global INPUT
   global errors
 
+  for _ in range(10):
+    index = input.find('\n')
+    input = input[index+1:]
+
   INPUT = input
-  lexer.lineno = 1
+  lexer.lineno = 10
 
   ast = parser.parse(input)
 
   if ast is None: ast = []
-  return {'ast': ast, 'output': '', 'symbols': []}
+  return {'ast': ast, 'output': '', 'reports': []}
 
 reserved = (
-  'package',
-  'import',
-  'var',
-  'float64',
-  'int',
   'func',
   'return',
+  'goto',
+  'if'
 )
-
-'''
-package main
-import (
-"fmt"
-)
-var stack [1000]float64 // stack
-var heap [1000]float64 // heap
-var p,h float64 // pointers
-func main(){
-fmt.Print(2)
-return
-}
-'''
 
 tokens = (
-  'id',
   'parA',
   'parB',
   'corA',
   'corB',
   'llaveA',
   'llaveB',
-  'int64',
-  'float64',
-  'bool',
-  'char',
+  'id',
+  'number',
   'string',
   'mas',
   'menos',
   'asterisco',
   'barra',
-  'caret',
   'modulo',
   'igual',
   'mayor',
@@ -74,21 +56,11 @@ tokens = (
   'menor_igual',
   'igualacion',
   'diferenciacion',
-  'or',
-  'and',
-  'not',
   'punto',
   'coma',
-  'dospuntos',
-  'tipo',
-  'interrog',
-  'puntoycoma'
+  'puntoycoma',
+  'dospuntos'
 ) + reserved
-
-states = (
-  ('string','exclusive'),
-  ('expresion','inclusive')
-)
 
 # Lexemas ignorados
 t_ignore                       =  ' \t'
@@ -99,11 +71,12 @@ t_parA           = r'\('
 t_parB           = r'\)'
 t_corA           = r'\['
 t_corB           = r'\]'
+t_llaveA           = r'{'
+t_llaveB           = r'}'
 t_mas            = r'\+'
 t_menos          = r'-'
 t_asterisco      = r'\*'
 t_barra          = r'/'
-t_caret          = r'\^'
 t_modulo         = r'%'
 t_mayor_igual    = r'>='
 t_mayor          = r'>'
@@ -111,96 +84,32 @@ t_menor_igual    = r'<='
 t_menor          = r'<'
 t_igualacion     = r'=='
 t_diferenciacion = r'!='
-t_or             = r'\|\|'
-t_and            = r'&&'
-t_not            = r'!'
 t_punto          = r'\.'
 t_coma           = r','
 t_igual          = r'='
-t_tipo           = r'::'
-t_interrog       = r'\?'
-t_dospuntos      = r':'
 t_puntoycoma     = r';'
+t_dospuntos      = r':'
 
-def t_begin_string(t):
-  r'"'
-  t.lexer.push_state('string')
-  t.lexer.nothingRecognized = True
-
-def t_string_string(t):
-  r'[^"\n{]+'
-  value, valueType = t.value, 'string'
-  t.value = Value(t.lineno, getColumn(t), value, valueType)
-  t.lexer.nothingRecognized = False
+def t_id(t):
+  r'[a-zA-Z_][a-zA-Z_0-9!]*'
+  if t.value in reserved: t.type = t.value
   return t
 
-def t_string_llaveA(t):
-  r'\{'
-  t.lexer.nothingRecognized = False
-  t.lexer.push_state('expresion')
-  return t
-
-def t_string_end(t):
-  r'"'
-  t.lexer.pop_state()
-
-  if t.lexer.nothingRecognized:
-    value, valueType = '', 'string'
-    t.value = Value(t.lineno, getColumn(t), value, valueType)
-    t.type = valueType
-    return t
-
-
-def t_expresion_llaveB(t):
-  r'\}'
-  t.lexer.pop_state()
-  return t
-
-def t_float64(t):
-  r'\d+\.\d+'
-  value, valueType = 0, 'float64'
+def t_number(t):
+  r'\d+(\.\d+)?'
+  value = 0
 
   try:
     value = float(t.value)
   except ValueError:
     print("Float64 value too big: %d", t.value)
 
-  t.value = Value(t.lineno, getColumn(t), value, valueType)
+  t.value = Number(t.lineno, getColumn(t), value)
   return t
 
-def t_int64(t):
-  r'\d+'
-  value, valueType = 0, 'int64'
-
-  try:
-    value = int(t.value)
-  except ValueError:
-    print("Int64 value too big: %d", t.value)
-
-  t.value = Value(t.lineno, getColumn(t), value, valueType)
-  return t
-
-def t_bool(t):
-  r'(true)|(false)'
-  value, valueType = t.value=='true', 'bool'
-  t.value = Value(t.lineno, getColumn(t), value, valueType)
-  return t
-
-def t_char(t):
-  r"'[^'\n]'"
-  value, valueType = t.value[1], 'char'
-  t.value = Value(t.lineno, getColumn(t), value, valueType)
-  return t
-
-def t_Nothing(t):
-  r'nothing'
-  t.value = Value(t.lineno, getColumn(t), None, 'nothing')
-  return t
-
-def t_id(t):
-  r'[a-zA-Z_][a-zA-Z_0-9!]*'
-  if t.value in reserved: t.type = t.value
-  else: t.value = Value(t.lineno, getColumn(t), t.value, 'id')
+def t_string(t):
+  r'".*"'
+  t.value = String(t.lineno, getColumn(t), t.value)
   return t
 
 def t_newline(t):
@@ -208,213 +117,68 @@ def t_newline(t):
   t.lexer.lineno+=len(t.value)
 
 def t_error(t):
-  error = LexicalError(t.lineno, getColumn(t), "No se pudo reconocer el lexema '%s'" % t.value)
-  errors.append(error)
+  # error = LexicalError(t.lineno, getColumn(t), "No se pudo reconocer el lexema '%s'" % t.value)
+  # errors.append(error)
+  print('no reconocido: ', t.value)
   t.lexer.skip(1)
-
-t_string_error = t_error
-t_expresion_error = t_error
 
 # Precedencia de menos a más
 precedence = (
-  ('left','op_rango'),
-  ('right','op_ternaria'),
-  ('left','or'),
-  ('left','and'),
   ('left','igualacion','diferenciacion'),
   ('left','menor','menor_igual','mayor','mayor_igual'),
   ('left','mas','menos'),
   ('left','asterisco','barra','modulo'),
-  ('right','caret'),
-  ('right','op_negacion','not'),
-  ('left','op_llamada'),
-  ('left','op_acceso'),
+  ('right','op_negacion'),
   ('nonassoc','op_agrupacion')
 )
 
 # Producciones
-def p_INS(p):
+def p_FUNCTIONS(p):
   '''
-  INS : INS I puntoycoma
-      | I puntoycoma
+  FUNCTIONS : FUNCTIONS F
+            | F
   '''
-  if len(p)==4:
+  if len(p)==3:
     p[0] = p[1]
     p[0].append(p[2])
   else:
     p[0] = [p[1]]
 
-def p_INS_error(p):
+def p_F(p):
   '''
-  INS : INS error puntoycoma
-      | error puntoycoma
+  F : func id parA parB llaveA INS llaveB
   '''
-  p[0] = p[1] if len(p)==4 else []
+  id, INS = p[2], p[6]
 
-def p_I(p):
-  '''
-  I : ASIGNACION
-    | FUNCION
-    | STRUCT
-    | LLAMADA
-    | IF
-    | WHILE
-    | FOR
-    | BREAK
-    | CONTINUE
-    | RETURN
-  '''
-  p[0] = p[1]
+  function = Function(p.lexer.lineno, getColumn(p.lexer), id, INS)
 
-def p_BLOQUE(p):
-  '''
-  BLOQUE  : INS end
-  '''
-  p[0] = p[1]
+  for ins in INS:
+    ins.owner = function
 
-def p_BLOQUE_ABIERTO(p):
-  '''
-  BLOQUE_ABIERTO  : INS
-  '''
-  p[0] = p[1]
+  p[0] = function
 
-def p_TIPO(p):
+def p_INS(p):
   '''
-  TIPO  : Int64
-        | Float64
-        | Bool
-        | Char
-        | String
-  '''
-  p[0] = p[1].lower()
-
-def p_SCOPE(p):
-  '''
-  SCOPE : local
-        | global
-  '''
-  p[0] = p[1]
-
-def p_ASIGNACION(p):
-  '''
-  ASIGNACION  : ID igual ASIGNACION_VALOR
-              | SCOPE id igual ASIGNACION_VALOR
-              | SCOPE id
-  '''
-  id, expression, scope, type = None, None, None, None
-
-  if len(p)==4:
-    id = p[1]
-    expression = p[3]['expression']
-    type = p[3]['type']
-  else:
-    scope = p[1]
-    id = p[2]
-    if len(p)==5:
-      expression = p[4]['expression']
-      type = p[4]['type']
-
-  p[0] = Assignment(p.lexer.lineno, getColumn(p.lexer), id, expression, scope, type)
-
-def p_ASIGNACION_VALOR(p):
-  '''
-  ASIGNACION_VALOR  : E
-                    | E tipo TIPO
-  '''
-  expression, type = p[1], None
-  if len(p)==4: type = p[3]
-
-  p[0] = {'expression':expression, 'type':type}
-
-def p_ID(p):
-  '''
-  ID  : ID punto id
-      | ID corA E corB
-      | id
-  '''
-  if len(p)>2:
-    l, r = p[1], p[3]
-    type = 'chain' if p[2]=='.' else 'access'
-
-    expression = Expression(p.lexer.lineno, getColumn(p.lexer), False, type, l, r)
-    p[0] = expression
-  else: p[0] = p[1]
-
-def p_FUNCION(p):
-  '''
-  FUNCION : function id parA PAR parB BLOQUE
-          | function id parA parB BLOQUE
-  '''
-  id, parameters, instructions = p[2], [], p[5]
-
-  if len(p)==7:
-    parameters = p[4]
-    instructions = p[6]
-
-  p[0] = Function(p.lexer.lineno, getColumn(p.lexer), id, parameters, instructions)
-
-def p_PAR(p):
-  '''
-  PAR : PAR coma P
-      | P
-  '''
-  if len(p)==4:
-    p[0] = p[1]
-    p[0].append(p[3])
-  else: p[0] = [p[1]]
-
-def p_P(p):
-  '''
-  P : id
-    | id tipo TIPO
-  '''
-  p[0] = p[1]
-
-def p_STRUCT(p):
-  '''
-  STRUCT  : struct id ATR end
-          | mutable struct id ATR end
-  '''
-  mutable, id, attributes = False, p[2], p[3]
-
-  if len(p)==6:
-    mutable = True
-    id = p[3]
-    attributes = p[4]
-
-  p[0] = Struct(p.lexer.lineno, getColumn(p.lexer), id, mutable, attributes)
-
-def p_ATR(p):
-  '''
-  ATR : ATR A
-      | A
+  INS : INS I
+      | I
   '''
   if len(p)==3:
     p[0] = p[1]
     p[0].append(p[2])
-  else: p[0] = [p[1]]
+  else:
+    p[0] = [p[1]]
 
-def p_A(p):
+def p_I(p):
   '''
-  A : id tipo TIPO puntoycoma
-    | id puntoycoma
+  I : ASIGNACION puntoycoma
+    | ETIQUETA
+    | GOTO puntoycoma
+    | IF
+    | LLAMADA puntoycoma
+    | RETURN puntoycoma
+    | LIBRARY puntoycoma
   '''
-  id, tipo = p[1], None
-
-  if len(p)==5:
-    tipo = p[3]
-
-  p[0] = Attribute(p.lexer.lineno, getColumn(p.lexer), id, tipo)
-
-def p_EXP(p):
-  '''
-  EXP : EXP coma E
-      | E
-  '''
-  if len(p)==4:
-    p[0] = p[1]
-    p[0].append(p[3])
-  else: p[0] = [p[1]]
+  p[0] = p[1]
 
 def p_E(p):
   '''
@@ -422,30 +186,19 @@ def p_E(p):
     | E menos E
     | E asterisco E
     | E barra E
-    | E caret E
     | E modulo E
-    | menos E                     %prec op_negacion
+    | menos E                   %prec op_negacion
     | E mayor E
     | E menor E
     | E mayor_igual E
     | E menor_igual E
     | E igualacion E
     | E diferenciacion E
-    | E or E
-    | E and E
-    | not E
-    | E interrog E dospuntos E  %prec op_ternaria
-    | ID                        %prec op_acceso
     | parA E parB               %prec op_agrupacion
-    | LLAMADA                   %prec op_llamada
-    | RANGO                     %prec op_rango
-    | ARREGLO
-    | int64
-    | float64
-    | bool
-    | char
-    | STRING
-    | Nothing
+    | LIBRARY
+    | number
+    | ID
+    | string
   '''
   if len(p)==2:
     p[0] = p[1]
@@ -455,150 +208,111 @@ def p_E(p):
     p[0] = p[2]
     return
 
-  unary, l, r, expressionType = False, None, None, None
+  unary, l, r, type = False, None, None, None
 
-  if len(p)==6:
-    unary = p[1]
-    l = p[3]
-    r = p[5]
-    expressionType = 'ternary'
-  elif len(p)==4:
+  if len(p)==4:
     l = p[1]
     r = p[3]
-    expressionType = operations[p[2]]
+    type = operations[p[2]]
   else:
     unary = True
     l = p[2]
-    expressionType = 'negacion' if p[1]=='-' else 'not'
+    type = 'negacion'
 
-  p[0] = Expression(p.lexer.lineno, getColumn(p.lexer), unary, expressionType, l, r)
+  p[0] = Expression(p.lexer.lineno, getColumn(p.lexer), unary, type, l, r)
 
-def p_STRING(p):
+def p_ASIGNACION(p):
   '''
-  STRING  : STRING S
-          | S
+  ASIGNACION : ID igual E
   '''
-  if len(p)==3:
-    p[0] = p[1]
-    p[0].value.append(p[2])
-  else:
-    value = Value(p.lexer.lineno, getColumn(p.lexer), [p[1]], 'string')
-    p[0] = value
+  id, expression = p[1], p[3]
+  p[0] = Assignment(p.lexer.lineno, getColumn(p.lexer), id, expression)
 
-def p_S(p):
+def p_ID(p):
   '''
-  S : string
-    | llaveA E llaveB
+  ID  : id
+      | id corA ID corB
+      | id parA ID parB
   '''
-  p[0] = p[1] if len(p)==2 else p[2]
+  if len(p)==2:
+    p[0] = Id(p.lexer.lineno, getColumn(p.lexer), p[1])
+    return
 
-def p_ARREGLO(p):
+  id, type = p[1], 'access' if p[2]=='[' else 'call'
+
+  wrapper = Wrapper(p.lexer.lineno, getColumn(p.lexer), id, type)
+  p[0] = p[3]
+  p[0].wrappers.append(wrapper)
+
+def p_ETIQUETA(p):
   '''
-  ARREGLO : corA EXP corB
-          | corA corB
+  ETIQUETA : id dospuntos
   '''
-  value = []
-  if len(p)==4: value = p[2]
-  p[0] = Value(p.lexer.lineno, getColumn(p.lexer), value, 'array')
+  id = p[1]
+  p[0] = Tag(p.lexer.lineno, getColumn(p.lexer), id)
+
+def p_GOTO(p):
+  '''
+  GOTO : goto id
+  '''
+  tag = p[2]
+  p[0] = Goto(p.lexer.lineno, getColumn(p.lexer), tag)
 
 def p_LLAMADA(p):
   '''
-  LLAMADA : id parA EXP parB
-          | id parA parB
+  LLAMADA : id parA parB
   '''
-  id, expressions = p[1], []
-
-  if len(p)==5:
-    expressions = p[3]
-
-  p[0] = Call(p.lexer.lineno, getColumn(p.lexer), id, expressions)
+  id = p[1]
+  p[0] = Call(p.lexer.lineno, getColumn(p.lexer), id)
 
 def p_IF(p):
   '''
-  IF  : if E BLOQUE
-      | if E BLOQUE_ABIERTO ELSE
-      | if E BLOQUE_ABIERTO ELSEIF
+  IF : if parA E parB llaveA GOTO llaveB
   '''
-  expression, instructions, elseif = p[2], p[3], None
-
-  if len(p)==5:
-    elseif = p[4]
-
-  p[0] = If(p.lexer.lineno, getColumn(p.lexer), expression, instructions, elseif)
-
-def p_ELSEIF(p):
-  '''
-  ELSEIF  : elseif E BLOQUE
-          | elseif E BLOQUE_ABIERTO ELSEIF
-          | elseif E BLOQUE_ABIERTO ELSE
-  '''
-  expression, instructions, elseif = p[2], p[3], None
-
-  if len(p)==5:
-    elseif = p[4]
-
-  p[0] = If(p.lexer.lineno, getColumn(p.lexer), expression, instructions, elseif)
-
-def p_ELSE(p):
-  '''
-  ELSE : else BLOQUE
-  '''
-  instructions = p[2]
-  p[0] = Else(p.lexer.lineno, getColumn(p.lexer), instructions)
-
-def p_WHILE(p):
-  '''
-  WHILE : while E BLOQUE
-  '''
-  expression, instructions = p[2], p[3]
-  p[0] = While(p.lexer.lineno, getColumn(p.lexer), expression, instructions)
-
-def p_FOR(p):
-  '''
-  FOR : for id in E BLOQUE
-  '''
-  id, expression, instructions = p[2], p[4], p[5]
-  p[0] = For(p.lexer.lineno, getColumn(p.lexer), id, expression, instructions)
-
-def p_RANGO(p):
-  '''
-  RANGO : E dospuntos E
-        | dospuntos
-  '''
-  izq, der = None, None
-  if len(p)==4:
-    izq, der = p[1], p[3]
-  p[0] = Expression(p.lexer.lineno, getColumn(p.lexer), False, 'range', izq, der)
-
-def p_BREAK(p):
-  '''
-  BREAK : break
-  '''
-  p[0] = Break(p.lexer.lineno, getColumn(p.lexer))
-
-def p_CONTINUE(p):
-  '''
-  CONTINUE : continue
-  '''
-  p[0] = Continue(p.lexer.lineno, getColumn(p.lexer))
+  expression, goto = p[3], p[6]
+  p[0] = If(p.lexer.lineno, getColumn(p.lexer), expression, goto)
 
 def p_RETURN(p):
   '''
-  RETURN  : return E
-          | return
+  RETURN : return
   '''
-  expression = p[2] if len(p)==3 else None
-  p[0] = Return(p.lexer.lineno, getColumn(p.lexer), expression)
+  p[0] = Return(p.lexer.lineno, getColumn(p.lexer))
+
+def p_LIBRERIA(p):
+  '''
+  LIBRARY : id punto id parA PARS parB
+  '''
+  parameters = ','.join(p[5])
+  lexeme = f'{p[1]}.{p[3]}({parameters})'
+  p[0] = Library(p.lexer.lineno, getColumn(p.lexer), lexeme)
+
+def p_PARS(p):
+  '''
+  PARS  : PARS coma P
+        | P
+  '''
+  if len(p)==4:
+    p[0] = p[1]
+    p[0].append(p[3])
+  else:
+    p[0] = [p[1]]
+
+def p_P(p):
+  '''
+  P : E
+  '''
+  ex = str(p[1])
+  p[0] = ex
 
 def p_error(p):
   if p:
     if type(p.value) in [str, int, float, bool]: msg = "Sintaxis no válida cerca de '{}' ({})" .format(p.value, p.type)
     else: msg = "Sintáxis no válida en {}".format(p.type)
-    error = SyntacticError(p.lineno, getColumn(p), msg)
-  else:
-    error = SyntacticError(0, 0, "Ninguna instrucción válida")
+    # error = SyntacticError(p.lineno, getColumn(p), msg)
+  # else:
+    # error = SyntacticError(0, 0, "Ninguna instrucción válida")
 
-  errors.append(error)
+  # errors.append(error)
 
 lexer = lex()
 parser = yacc()

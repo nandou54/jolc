@@ -100,7 +100,7 @@ def t_number(t):
   value = 0
 
   try:
-    value = float(t.value)
+    value = float(t.value) if '.' in t.value else int(t.value)
   except ValueError:
     print("Float64 value too big: %d", t.value)
 
@@ -267,7 +267,7 @@ def p_LLAMADA(p):
 
 def p_IF(p):
   '''
-  IF : if parA E parB llaveA GOTO llaveB
+  IF : if parA E parB llaveA GOTO puntoycoma llaveB
   '''
   expression, goto = p[3], p[6]
   p[0] = If(p.lexer.lineno, getColumn(p.lexer), expression, goto)
@@ -308,6 +308,7 @@ def p_error(p):
   if p:
     if type(p.value) in [str, int, float, bool]: msg = "Sintaxis no válida cerca de '{}' ({})" .format(p.value, p.type)
     else: msg = "Sintáxis no válida en {}".format(p.type)
+    print(msg)
     # error = SyntacticError(p.lineno, getColumn(p), msg)
   # else:
     # error = SyntacticError(0, 0, "Ninguna instrucción válida")

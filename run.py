@@ -65,6 +65,7 @@ if OPTIMIZER_EYEHOLE:
   with open('./test.go', 'r') as file:
     content = file.read()
     res = optimize_eyehole(content)
+    print(json.dumps(res, indent=2, ensure_ascii=False))
 
 if OPTIMIZER_BLOCKS:
   print('=== OPTIMIZER BY BLOCKS ===')
@@ -72,3 +73,4 @@ if OPTIMIZER_BLOCKS:
   with open('./test.go', 'r') as file:
     content = file.read()
     res = optimize_blocks(content)
+    print(json.dumps(res, indent=2, ensure_ascii=False))

@@ -5,6 +5,13 @@ class Function:
     self.id = id
     self.ins = ins
 
+  def __str__(self):
+    instructions = '\n'.join(str(i) for i in self.ins)
+    return f'''func {self.id}(){{
+      {instructions}
+      }}
+      '''
+
 class Expression:
   def __init__(self, ln, col, unary, type, left, right):
     self.ln = ln
@@ -157,4 +164,13 @@ operators = {
   'mayor_igual':'>=',
   'igualacion':'==',
   'diferenciacion':'!='
+}
+
+inverse_operators = {
+  'menor':'mayor_igual',
+  'menor_igual':'mayor',
+  'mayor':'menor_igual',
+  'mayor_igual':'menor',
+  'igualacion':'diferenciacion',
+  'diferenciacion':'igualacion'
 }

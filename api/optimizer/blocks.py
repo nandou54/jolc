@@ -2,7 +2,6 @@ from copy import deepcopy
 from api.optimizer.analyzer import parse
 from api.optimizer.core import Block, addReport, reset, reports
 from api.optimizer.symbols import Assignment, Expression, Goto, Id, If, Number, Tag, inverse_operators
-from api.symbols import Function
 
 def optimize(input):
   global reports
@@ -66,4 +65,16 @@ def getBlocks(INS):
 
   return blocks
 
-optimization_functions = []
+def optimize_common_subexpressions(ins):
+  print(ins)
+
+def optimize_copies_propagation(ins):
+  print(ins)
+
+def optimize_dead_code(ins):
+  print(ins)
+
+def optimize_constants_propagation(ins):
+  print(ins)
+
+optimization_functions = [optimize_common_subexpressions, optimize_copies_propagation, optimize_dead_code, optimize_constants_propagation]

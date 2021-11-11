@@ -16,9 +16,9 @@ Content-Type: application/json
 
 ###
 
-POST http://127.0.0.1:8000/api/optimize
+POST http://127.0.0.1:8000/api/optimize/eyehole
 Content-Type: application/json
 
 {
-  "content":"print(2+2);"
+  "content":"print(2);"
 }

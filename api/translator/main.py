@@ -46,7 +46,7 @@ def translate(input):
 
   res['output'] = output
   res['errors'] += errors
-  return res
+  return {'output': output, 'errors': res['errors'], 'symbols': []}
 
 def get_assignments(INS, env:Environment):
   for sen in INS:

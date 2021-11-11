@@ -8,9 +8,8 @@ class Function:
   def __str__(self):
     instructions = '\n'.join(str(i) for i in self.ins)
     return f'''func {self.id}(){{
-      {instructions}
-      }}
-      '''
+{instructions}
+}}'''
 
 class Expression:
   def __init__(self, ln, col, unary, type, left, right):
@@ -53,7 +52,7 @@ class Id:
   def __str__(self):
     s = self.value
     for w in self.wrappers:
-      s = w.id + f'({s})' if w.type=='call' else f'[{s}]'
+      s = w.id + (f'({s})' if w.type=='call' else f'[{s}]')
     return s
 
 class Wrapper:

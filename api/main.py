@@ -9,6 +9,7 @@ from starlette.exceptions import HTTPException
 
 from api.interpreter.main import interpret
 from api.translator.main import translate
+from api.optimizer.eyehole import optimize as optimize_eyehole
 
 class InputData(BaseModel):
   content: str
@@ -49,7 +50,7 @@ def analyze_input(input_data: InputData):
 
 @app.post('/api/optimize/eyehole')
 def analyze_input(input_data: InputData):
-  return 'wip'
+  return optimize_eyehole(input_data.content)
 
 @app.post('/api/optimize/blocks')
 def analyze_input(input_data: InputData):

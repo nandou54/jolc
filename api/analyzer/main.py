@@ -26,7 +26,7 @@ def parse(input):
   errors = []
   lexer.lineno = 1
 
-  ast = parser.parse(input)
+  ast = parser.parse(input, lexer)
 
   if ast is None: ast = []
   return {'ast':ast, 'errors':errors, 'output':'', 'symbols':[]}

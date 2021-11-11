@@ -7,14 +7,17 @@ from api.optimizer.eyehole import optimize as optimize_eyehole
 from api.optimizer.blocks import optimize as optimize_blocks
 
 INPUT = r'''
-x=5;
-print(x+x);
+function mult(a, b)
+  return a*b;
+end;
+
+print(mult(5,5));
 '''
 
 LEXER = False
 PARSER = False
 INTERPRETER = False
-TRANSLATOR = False
+TRANSLATOR = True
 OPTIMIZER_EYEHOLE = True
 OPTIMIZER_BLOCKS = False
 
@@ -62,15 +65,27 @@ if TRANSLATOR:
 if OPTIMIZER_EYEHOLE:
   print('=== OPTIMIZER BY EYEHOLE ===')
 
+  res = {}
   with open('./test.go', 'r') as file:
     content = file.read()
     res = optimize_eyehole(content)
     print(json.dumps(res, indent=2, ensure_ascii=False))
 
+  with open('./test.go', 'w') as file:
+    file.write(res['output'])
+
 if OPTIMIZER_BLOCKS:
   print('=== OPTIMIZER BY BLOCKS ===')
 
+  res = {}
   with open('./test.go', 'r') as file:
     content = file.read()
     res = optimize_blocks(content)
     print(json.dumps(res, indent=2, ensure_ascii=False))
+
+  with open('./test.go', 'w') as file:
+    file.write(res['output'])
+
+  print('= GO OUTPUT =')
+  os.system('go run ./test.go')
+  print()

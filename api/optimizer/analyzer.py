@@ -15,14 +15,10 @@ def parse(input):
   global INPUT
   global errors
 
-  for _ in range(10):
-    index = input.find('\n')
-    input = input[index+1:]
-
   INPUT = input
   lexer.lineno = 10
 
-  ast = parser.parse(input)
+  ast = parser.parse(input, lexer)
 
   if ast is None: ast = []
   return {'ast': ast, 'output': '', 'reports': []}

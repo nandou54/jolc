@@ -1,35 +1,28 @@
 from copy import deepcopy
 from api.optimizer.analyzer import parse
+from api.optimizer.core import addReport, reset, reports
 from api.optimizer.symbols import Assignment, Expression, Goto, Id, If, Number, Tag, inverse_operators
-
-def reset():
-  global optimizations
-  optimizations = 0
-
-  reports.clear()
-
-def Report(ln, type, rule, original, optimized):
-  return [ln, type, rule, original, optimized]
-
-def addReport(ln, type, rule, original, optimized):
-  reports.append(Report(ln, type, rule, original, optimized))
-
-optimizations = 0
-reports = []
 
 def optimize(input):
   global reports
   reset()
 
+  header = ''
+  for _ in range(10):
+    index = input.find('\n')
+    header += input[:index+1]
+    input = input[index+1:]
+
+  header += '\n'
   res = parse(input)
-  INS = []
-  for function in res['ast']:
-    INS += function.ins
+  functions = res['ast']
 
-  for optimizer in optimization_functions:
-    optimizer(INS)
+  for function in functions:
+    for optimizer in optimization_functions:
+      optimizer(function.ins)
 
-  return reports
+  output = header + str('\n\n'.join(str(function) for function in functions))
+  return {'output': output, 'reports': reports}
 
 def optimize_redundant_instructions(INS: list):
   INS_COPY = INS.copy()
@@ -121,13 +114,8 @@ def optimize_control_flow(INS: list):
 
   INS_COPY = INS.copy()
   for ins in INS_COPY:
-    if type(ins) not in [Goto, If]: continue
+    if type(ins) is not Goto: continue
     if ins.deleted: continue
-
-    rule = 4
-    if type(ins) is If:
-      rule = 5
-      ins = ins.goto
 
     index = INS_COPY.index(ins)
     INS2 = INS_COPY[index+1:]
@@ -147,12 +135,44 @@ def optimize_control_flow(INS: list):
     if type(goto) is not Goto: continue
 
     original_ins = deepcopy(ins)
+
     ins.tag = goto.tag
 
     original = '\n'.join(str(i) for i in [original_ins, '...', target_tag, goto])
     optimized = '\n'.join(str(i) for i in [ins, '...', target_tag, goto])
 
-    addReport(ins.ln, 'Mirilla', f'Optimizaciones de flujo de control R{rule}', original, optimized)
+    addReport(ins.ln, 'Mirilla', 'Optimizaciones de flujo de control R4', original, optimized)
+
+  INS_COPY = INS.copy()
+  for ins in INS_COPY:
+    if type(ins) is not If: continue
+    if ins.deleted: continue
+
+    index = INS_COPY.index(ins)
+    INS2 = INS_COPY[index+1:]
+    target_tag = None
+
+    for ins2 in INS2:
+      if type(ins2) is Tag and ins.goto.tag == ins2.id:
+        target_tag = ins2
+        break
+
+    if not target_tag: continue
+    tag_index = INS.index(target_tag)
+
+    if tag_index+1 >= len(INS): continue
+
+    goto = INS[tag_index+1]
+    if type(goto) is not Goto: continue
+
+    original_ins = deepcopy(ins)
+
+    ins.goto.tag = goto.tag
+
+    original = '\n'.join(str(i) for i in [original_ins, '...', target_tag, goto])
+    optimized = '\n'.join(str(i) for i in [ins, '...', target_tag, goto])
+
+    addReport(ins.ln, 'Mirilla', 'Optimizaciones de flujo de control R4', original, optimized)
 
 def optimize_algebraic_expressions(INS: list):
   INS_COPY = INS.copy()

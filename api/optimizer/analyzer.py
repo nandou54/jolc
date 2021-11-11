@@ -87,7 +87,7 @@ t_puntoycoma     = r';'
 t_dospuntos      = r':'
 
 def t_id(t):
-  r'[a-zA-Z_][a-zA-Z_0-9!]*'
+  r'[a-zA-Z_][a-zA-Z_0-9]*'
   if t.value in reserved: t.type = t.value
   return t
 

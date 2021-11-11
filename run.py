@@ -17,9 +17,9 @@ print(mult(5,5));
 LEXER = False
 PARSER = False
 INTERPRETER = False
-TRANSLATOR = True
-OPTIMIZER_EYEHOLE = True
-OPTIMIZER_BLOCKS = False
+TRANSLATOR = False
+OPTIMIZER_EYEHOLE = False
+OPTIMIZER_BLOCKS = True
 
 if LEXER:
   print('=== LEXER ===')
@@ -83,8 +83,8 @@ if OPTIMIZER_BLOCKS:
     res = optimize_blocks(content)
     print(json.dumps(res, indent=2, ensure_ascii=False))
 
-  with open('./test.go', 'w') as file:
-    file.write(res['output'])
+  # with open('./test.go', 'w') as file:
+  #   file.write(res['output'])
 
   print('= GO OUTPUT =')
   os.system('go run ./test.go')

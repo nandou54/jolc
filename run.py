@@ -7,18 +7,18 @@ from api.optimizer.eyehole import optimize as optimize_eyehole
 from api.optimizer.blocks import optimize as optimize_blocks
 
 INPUT = r'''
-function sum(a, b)
-  return a+b;
+x=0;
+while x<5
+  x=x+1;
+  print(x);
 end;
-
-print(sum(5, "a"));
 '''
 
 LEXER = False
 PARSER = False
 INTERPRETER = False
-TRANSLATOR = True
-OPTIMIZER_EYEHOLE = False
+TRANSLATOR = False
+OPTIMIZER_EYEHOLE = True
 OPTIMIZER_BLOCKS = False
 
 if LEXER:
@@ -57,10 +57,6 @@ if TRANSLATOR:
   print(json.dumps(res['errors'], indent=2, ensure_ascii=False))
   # print(json.dumps(res['symbols'], indent=2, ensure_ascii=False))
 
-  print('=== GO OUTPUT ===')
-  os.system('go run ./test.go')
-  print()
-
 if OPTIMIZER_EYEHOLE:
   print('=== OPTIMIZER BY EYEHOLE ===')
 
@@ -73,10 +69,6 @@ if OPTIMIZER_EYEHOLE:
 
   with open('./test.go', 'w') as file:
     file.write(res['output'])
-
-  print('= GO OUTPUT =')
-  os.system('go run ./test.go')
-  print()
 
 if OPTIMIZER_BLOCKS:
   print('=== OPTIMIZER BY BLOCKS ===')
@@ -91,6 +83,7 @@ if OPTIMIZER_BLOCKS:
   with open('./test.go', 'w') as file:
     file.write(res['output'])
 
-  # print('= GO OUTPUT =')
-  # os.system('go run ./test.go')
-  # print()
+if TRANSLATOR or OPTIMIZER_BLOCKS or OPTIMIZER_EYEHOLE:
+  print('= GO OUTPUT =')
+  os.system('go run ./test.go')
+  print()

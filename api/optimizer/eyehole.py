@@ -28,6 +28,9 @@ def optimize(input):
       if eyehole_length > len(INS): break
       eyehole_length += 20
 
+  for function in functions:
+    function.ins = [ins for ins in INS if ins.owner == function.id]
+
   output = header + str('\n\n'.join(str(function) for function in functions))
   return {'output': output, 'reports': reports}
 
@@ -37,6 +40,7 @@ def optimize_redundant_instructions(INS, eyehole_length):
     if type(ins) is not Assignment: continue
     if ins.deleted: continue
     if type(ins.ex) is not Id: continue
+    if ins.id.wrappers or ins.ex.wrappers: continue
 
     index = INS_COPY.index(ins)
     INS2 = INS_COPY[index+1:]
@@ -45,6 +49,8 @@ def optimize_redundant_instructions(INS, eyehole_length):
       if type(ins2) is Tag: break
       if type(ins2) is not Assignment: continue
       if type(ins2.ex) is not Id: continue
+      if ins2.id.wrappers or ins2.ex.wrappers: continue
+
       if ins.id.value == ins2.ex.value and ins.ex.value == ins2.id.value:
         ins2.deleted = True
         INS.remove(ins2)
@@ -106,13 +112,13 @@ def optimize_control_flow(INS, eyehole_length):
     original_ins = deepcopy(ins)
 
     ins.ex.type = inverse_operators[ins.ex.type]
-    copy_goto = deepcopy(goto)
-    ins.goto = copy_goto
+    goto_copy = deepcopy(goto)
+    ins.goto = goto_copy
 
-    goto.deleted = True
     INS.remove(goto)
-    true_tag.deleted = True
+    goto.deleted = True
     INS.remove(true_tag)
+    true_tag.deleted = True
 
     original = '\n'.join(str(i) for i in [original_ins, goto, true_tag, '...', target_tag])
     optimized = '\n'.join(str(i) for i in [ins, '...', target_tag])

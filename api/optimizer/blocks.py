@@ -1,7 +1,7 @@
 from copy import deepcopy
 from api.optimizer.analyzer import parse
 from api.optimizer.core import addReport, expressionsAreEqual, getBlocks, getIds, reset, reports
-from api.optimizer.symbols import Assignment, Expression, Number, Id, Number
+from api.optimizer.symbols import Assignment, Expression, Library, Number, Id, Number
 
 def optimize(input):
   global reports
@@ -58,6 +58,7 @@ def optimize_copies_propagation(INS):
   for ins in INS_COPY:
     if type(ins) is not Assignment: continue
     if type(ins.ex) is not Id: continue
+    if ins.ex.wrappers: continue
 
     index = INS_COPY.index(ins)
     INS2 = INS_COPY[index+1:]
@@ -80,19 +81,21 @@ def optimize_dead_code(INS):
   INS_COPY = INS.copy()
   for ins in INS_COPY:
     if type(ins) is not Assignment: continue
+    if ins.id.value in ['h', 'p']: continue
+    if ins.id.wrappers: continue
 
     index = INS_COPY.index(ins)
     INS2 = INS_COPY[index+1:]
     used = False
 
     for ins2 in INS2:
-      if type(ins2) is not Assignment: continue
+      if type(ins2) not in [Assignment, Library]: continue
 
-      ids = [ins2.id] + getIds(ins2.ex)
-      id_values = [id.value for id in ids]
-      if ins.id.value in id_values:
-        used = True
-        break
+      if type(ins2) is Assignment: ids = [ins2.id] + getIds(ins2.ex)
+      else: ids = getIds(ins2.parameters)
+
+      used = any(ins.id.value==id.value for id in ids)
+      if used: break
 
     if used: continue
 

@@ -5,6 +5,9 @@ class Function:
     self.id = id
     self.ins = ins
 
+    for ins in self.ins:
+      ins.owner = self.id
+
   def __str__(self):
     instructions = '\n'.join(str(i) for i in self.ins)
     return f'''func {self.id}(){{
@@ -19,7 +22,6 @@ class Expression:
     self.type = type
     self.left:Expression = left
     self.right:Expression = right
-    self.owner = None
 
   def __str__(self):
     return f'{self.left}{operators[self.type]}{self.right}'
@@ -128,9 +130,10 @@ class Return:
     return 'return;'
 
 class Library:
-  def __init__(self, ln, col, lexeme):
+  def __init__(self, ln, col, parameters, lexeme):
     self.ln = ln
     self.col = col
+    self.parameters = parameters
     self.lexeme = lexeme
     self.owner = None
 

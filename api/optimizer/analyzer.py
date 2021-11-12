@@ -146,12 +146,7 @@ def p_F(p):
   '''
   id, INS = p[2], p[6]
 
-  function = Function(p.lexer.lineno, getColumn(p.lexer), id, INS)
-
-  for ins in INS:
-    ins.owner = function
-
-  p[0] = function
+  p[0] = Function(p.lexer.lineno, getColumn(p.lexer), id, INS)
 
 def p_INS(p):
   '''
@@ -278,9 +273,10 @@ def p_LIBRERIA(p):
   '''
   LIBRARY : id punto id parA PARS parB
   '''
-  parameters = ','.join(p[5])
-  lexeme = f'{p[1]}.{p[3]}({parameters})'
-  p[0] = Library(p.lexer.lineno, getColumn(p.lexer), lexeme)
+  parameters = p[5]
+  parameters_str = ','.join(str(p) for p in parameters)
+  lexeme = f'{p[1]}.{p[3]}({parameters_str})'
+  p[0] = Library(p.lexer.lineno, getColumn(p.lexer), parameters, lexeme)
 
 def p_PARS(p):
   '''
@@ -297,8 +293,7 @@ def p_P(p):
   '''
   P : E
   '''
-  ex = str(p[1])
-  p[0] = ex
+  p[0] = p[1]
 
 def p_error(p):
   if p:

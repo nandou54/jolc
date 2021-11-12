@@ -67,6 +67,10 @@ def getIds(ex):
   if type(ex) is Id: return [ex]
   if type(ex) is Expression:
     return [*getIds(ex.left), *getIds(ex.right)]
+  if type(ex) is list:
+    ids = []
+    for e in ex: ids += getIds(e)
+    return ids
   return []
 
 def expressionsAreEqual(ex1, ex2):
@@ -75,5 +79,10 @@ def expressionsAreEqual(ex1, ex2):
   elif type(ex1) is Number and type(ex2) is Number:
     return ex1.value==ex2.value
   elif type(ex1) is Id and type(ex2) is Id:
-    return ex1.value==ex2.value
+    if len(ex1.wrappers)!=len(ex2.wrappers): return False
+    equal = ex1.value==ex2.value
+    for i in range(len(ex1.wrappers)):
+      equal &= ex1.wrappers[i].id==ex2.wrappers[i].id
+      equal &= ex1.wrappers[i].type==ex2.wrappers[i].type
+    return equal
   return False

@@ -83,7 +83,11 @@ function useSideBar() {
         setTimeout(
           () => {
             dispatch(appendOutput(data.output.split('\n')))
-            const reports = { errors: data.errors, c3d: data.output }
+            const reports = {
+              errors: data.errors,
+              symbols: data.symbols,
+              c3d: data.output
+            }
             dispatch(updateReports(reports))
 
             if (data.errors.length) {
@@ -130,18 +134,9 @@ function useSideBar() {
         const duration = performance.now() - start
         setTimeout(
           () => {
-            dispatch(appendOutput([data.output]))
-            const reports = { errors: data.errors, c3d: data.output }
+            dispatch(appendOutput(data.output.split('\n')))
+            const reports = { c3d: data.output, optimizations: data.reports }
             dispatch(updateReports(reports))
-
-            if (data.errors.length) {
-              dispatch(logOutput('Se encontraron errores'))
-              const errorsOutput = data.errors.map(
-                ([, ln, col, type, description]) =>
-                  `[${ln},${col}] ${type}: ${description}`
-              )
-              dispatch(appendOutput(errorsOutput))
-            }
 
             dispatch(logOutput(`Tiempo de ejecución: ${duration} ms`))
             dispatch(toggleLoading(false))
@@ -154,7 +149,7 @@ function useSideBar() {
         setTimeout(
           () => {
             console.log(error)
-            dispatch(logOutput('Hubo un problema interpretando el código'))
+            dispatch(logOutput('Hubo un problema optimizando el C3D'))
             dispatch(toggleLoading(false))
           },
           duration < 900 ? 900 - duration : 0
@@ -178,18 +173,9 @@ function useSideBar() {
         const duration = performance.now() - start
         setTimeout(
           () => {
-            dispatch(appendOutput([data.output]))
-            const reports = { errors: data.errors, c3d: data.output }
+            dispatch(appendOutput(data.output.split('\n')))
+            const reports = { c3d: data.output, optimizations: data.reports }
             dispatch(updateReports(reports))
-
-            if (data.errors.length) {
-              dispatch(logOutput('Se encontraron errores'))
-              const errorsOutput = data.errors.map(
-                ([, ln, col, type, description]) =>
-                  `[${ln},${col}] ${type}: ${description}`
-              )
-              dispatch(appendOutput(errorsOutput))
-            }
 
             dispatch(logOutput(`Tiempo de ejecución: ${duration} ms`))
             dispatch(toggleLoading(false))
@@ -202,7 +188,7 @@ function useSideBar() {
         setTimeout(
           () => {
             console.log(error)
-            dispatch(logOutput('Hubo un problema interpretando el código'))
+            dispatch(logOutput('Hubo un problema optimizando el C3D'))
             dispatch(toggleLoading(false))
           },
           duration < 900 ? 900 - duration : 0

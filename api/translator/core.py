@@ -66,6 +66,18 @@ def getOutput():
 def getErrors():
   return errors
 
+def getSymbols():
+  symbols = {"variables": [], "functions": [], "structs": []}
+  for env in envs:
+    for id, value in env.symbols.items():
+      symbol = [env.id, 0, 0, id, value.type]
+      symbols["variables"].append(symbol)
+  for function in functions:
+      symbol = ['global', function.ln, function.col, function.id.value, ', '.join(parameter.value for parameter in function.parameters)]
+      symbols["functions"].append(symbol)
+
+  return symbols
+
 def getTemps():
   if len(temps)==0: return '\n'
   return 'var ' + ','.join(temps) + ' float64;\n\n'
@@ -87,11 +99,12 @@ def ApplicationError(description):
 class Environment():
   def __init__(self, id = 'global', increment = True):
     self.id = id
-    self.increment = increment
     self.symbols = {}
     self.escape_label = None
-    if not increment: self.escape_label = Label()
-    envs.append(self)
+    self.increment = increment
+
+    if increment: envs.append(self)
+    else: self.escape_label = Label()
 
     self.base = self.top = STACK_TOP
     self.length = 0

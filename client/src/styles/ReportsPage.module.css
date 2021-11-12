@@ -63,41 +63,6 @@ td {
   background: rgb(147, 147, 179);
 }
 
-.errors th:nth-child(1),
-.variables th:nth-child(1),
-.functions th:nth-child(1),
-.structs th:nth-child(1) {
-  width: 180px;
-}
-
-.errors th:nth-child(2),
-.errors th:nth-child(3),
-.variables th:nth-child(2),
-.variables th:nth-child(3),
-.functions th:nth-child(2),
-.functions th:nth-child(3),
-.structs th:nth-child(2),
-.structs th:nth-child(3) {
-  width: 90px;
-}
-
-.errors th:nth-child(4) {
-  width: 110px;
-}
-
-.variables th:nth-child(4),
-.functions th:nth-child(4),
-.structs th:nth-child(4) {
-  width: 220px;
-}
-
-.errors th:nth-child(5),
-.variables th:nth-child(5),
-.functions th:nth-child(5),
-.structs th:nth-child(5) {
-  width: 400px;
-}
-
 @media only screen and (max-width: 768px) {
   .base {
     padding: 20px;

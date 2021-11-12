@@ -8,28 +8,35 @@ def optimize(input):
   reset()
 
   header = ''
-  for _ in range(10):
+  while True:
     index = input.find('\n')
     header += input[:index+1]
     input = input[index+1:]
+    if not input or input.startswith('func'): break
 
-  header += '\n'
   res = parse(input)
   functions = res['ast']
 
-  for function in functions:
-    for optimizer in optimization_functions:
-      optimizer(function.ins)
+  INS = []
+  for function in functions: INS.extend(function.ins)
+
+  eyehole_length = 20
+  for _ in range(10):
+    reports_length = len(reports)
+    for optimizer in optimization_functions: optimizer(INS, eyehole_length)
+    if len(reports) == reports_length:
+      if eyehole_length > len(INS): break
+      eyehole_length += 20
 
   output = header + str('\n\n'.join(str(function) for function in functions))
   return {'output': output, 'reports': reports}
 
-def optimize_redundant_instructions(INS: list):
-  INS_COPY = INS.copy()
+def optimize_redundant_instructions(INS, eyehole_length):
+  INS_COPY = INS[:eyehole_length]
   for ins in INS_COPY:
     if type(ins) is not Assignment: continue
-    if type(ins.ex) is not Id: continue
     if ins.deleted: continue
+    if type(ins.ex) is not Id: continue
 
     index = INS_COPY.index(ins)
     INS2 = INS_COPY[index+1:]
@@ -43,8 +50,8 @@ def optimize_redundant_instructions(INS: list):
         INS.remove(ins2)
         addReport(ins2.ln, 'Mirilla', 'Eliminacion de instrucciones redundantes R1', f'{ins}\n{ins2}', str(ins))
 
-def optimize_unreachable_code(INS: list):
-  INS_COPY = INS.copy()
+def optimize_unreachable_code(INS, eyehole_length):
+  INS_COPY = INS[:eyehole_length]
   for ins in INS_COPY:
     if type(ins) is not Goto: continue
     if ins.deleted: continue
@@ -70,8 +77,8 @@ def optimize_unreachable_code(INS: list):
       instructions = '\n'.join(str(i) for i in instructions_to_remove)
       addReport(ins2.ln, 'Mirilla', 'Eliminacion de codigo inalcanzable R2', f'{instructions}\n{tag}', str(tag))
 
-def optimize_control_flow(INS: list):
-  INS_COPY = INS.copy()
+def optimize_control_flow(INS, eyehole_length):
+  INS_COPY = INS[:eyehole_length]
   for ins in INS_COPY:
     if type(ins) is not If: continue
     if ins.deleted: continue
@@ -112,7 +119,6 @@ def optimize_control_flow(INS: list):
 
     addReport(ins.ln, 'Mirilla', 'Optimizaciones de flujo de control R3', original, optimized)
 
-  INS_COPY = INS.copy()
   for ins in INS_COPY:
     if type(ins) is not Goto: continue
     if ins.deleted: continue
@@ -143,7 +149,6 @@ def optimize_control_flow(INS: list):
 
     addReport(ins.ln, 'Mirilla', 'Optimizaciones de flujo de control R4', original, optimized)
 
-  INS_COPY = INS.copy()
   for ins in INS_COPY:
     if type(ins) is not If: continue
     if ins.deleted: continue
@@ -174,8 +179,8 @@ def optimize_control_flow(INS: list):
 
     addReport(ins.ln, 'Mirilla', 'Optimizaciones de flujo de control R4', original, optimized)
 
-def optimize_algebraic_expressions(INS: list):
-  INS_COPY = INS.copy()
+def optimize_algebraic_expressions(INS, eyehole_length):
+  INS_COPY = INS[:eyehole_length]
   for ins in INS_COPY:
     if type(ins) is not Assignment: continue
     if type(ins.ex) is not Expression: continue
@@ -189,32 +194,61 @@ def optimize_algebraic_expressions(INS: list):
       id = ins.ex.left
       other = ins.ex.right
 
-    original = deepcopy(ins)
-    optimized = ins
+    if type(id) is not Id: continue
+    if ins.id.value != id.value: continue
     if type(other) is not Number: continue
-    if ins.ex.type in ['suma', 'resta'] and ins.id.value == id.value and other.value == 0:
-      rule = 6
-      ins.deleted = True
-      INS.remove(ins)
-      optimized = ''
-    elif ins.ex.type in ['multiplicacion', 'division'] and ins.id.value == id.value and other.value == 1:
-      rule = 6
-      ins.deleted = True
-      INS.remove(ins)
-      optimized = ''
-    elif ins.ex.type in ['multiplicacion', 'division'] and other.value == 1:
-      rule = 7
-      ins.ex = id
-    elif ins.ex.type=='multiplicacion' and other.value == 2:
-      rule = 8
-      ins.ex.type = 'suma'
-      if other == ins.ex.left: ins.ex.left = id
-      else: ins.ex.right = id
-    elif ins.ex.type=='multiplicacion' and other.value == 0:
-      rule = 8
-      ins.ex = other
-    else: continue
 
-    addReport(ins.ln, 'Mirilla', f'Simplificacion algebraica R{rule}', str(original), str(optimized))
+    if ins.ex.type in ['suma', 'resta'] and other.value == 0 or ins.ex.type in ['multiplicacion', 'division'] and other.value == 1:
+        ins.deleted = True
+        INS.remove(ins)
+        addReport(ins.ln, 'Mirilla', 'Simplificacion algebraica R6', str(ins), '')
+
+  for ins in INS_COPY:
+    if type(ins) is not Assignment: continue
+    if type(ins.ex) is not Expression: continue
+    if ins.ex.type not in ['suma', 'resta', 'multiplicacion', 'division']: continue
+    if type(ins.ex.left) is not Id and type(ins.ex.right) is not Id: continue
+
+    if ins.ex.type in ['suma', 'multiplicacion']:
+      id = ins.ex.left if type(ins.ex.left) is Id else ins.ex.right
+      other = ins.ex.right if id==ins.ex.left else ins.ex.left
+    else:
+      id = ins.ex.left
+      other = ins.ex.right
+
+    if type(id) is not Id: continue
+    if ins.id.value == id.value: continue
+    if type(other) is not Number: continue
+
+    original = deepcopy(ins)
+    if ins.ex.type in ['suma', 'resta'] and other.value == 0 or ins.ex.type in ['multiplicacion', 'division'] and other.value == 1:
+        ins.ex = id
+        addReport(ins.ln, 'Mirilla', 'Simplificacion algebraica R7', str(original), str(ins))
+
+  for ins in INS_COPY:
+    if type(ins) is not Assignment: continue
+    if type(ins.ex) is not Expression: continue
+    if ins.ex.type not in ['multiplicacion', 'division']: continue
+    if type(ins.ex.left) is not Id and type(ins.ex.right) is not Id: continue
+
+    if ins.ex.type == 'multiplicacion':
+      id = ins.ex.left if type(ins.ex.left) is Id else ins.ex.right
+      other = ins.ex.right if id==ins.ex.left else ins.ex.left
+    else:
+      id = ins.ex.right
+      other = ins.ex.left
+
+    if type(id) is not Id: continue
+    if type(other) is not Number: continue
+
+    original = deepcopy(ins)
+    if ins.ex.type == 'multiplicacion' and other.value in [0, 2] or ins.ex.type == 'division' and other.value == 0:
+        if other.value==0:
+          ins.ex = other
+        else:
+          ins.ex.type = 'suma'
+          if id==ins.ex.left: ins.ex.right = id
+          else: ins.ex.left = id
+        addReport(ins.ln, 'Mirilla', 'Simplificacion algebraica R8', str(original), str(ins))
 
 optimization_functions = [optimize_redundant_instructions, optimize_unreachable_code, optimize_control_flow, optimize_algebraic_expressions]

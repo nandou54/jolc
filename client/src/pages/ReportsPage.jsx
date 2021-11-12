@@ -5,7 +5,7 @@ import { Link } from 'wouter'
 import { Graphviz } from 'graphviz-react'
 
 function ReportsPage() {
-  const { ast, symbols, errors } = useSelector((state) => state.reports)
+  const { ast, symbols, errors, optimizations } = useSelector((state) => state.reports)
   const { variables, functions, structs } = !!symbols && symbols
 
   const existsVariables = !!variables && !!variables.length
@@ -13,9 +13,10 @@ function ReportsPage() {
   const existsStructs = !!structs && !!structs.length
 
   const existsAST = !!ast
-  const existsErrors = !!errors && !!errors.length
   const existsSymbols = existsVariables || existsFunctions || existsStructs
-  const existsReports = existsAST || existsErrors || existsSymbols
+  const existsErrors = !!errors && !!errors.length
+  const existsOptimizations = !!optimizations && !!optimizations.length
+  const existsReports = existsAST || existsSymbols || existsErrors || existsOptimizations
 
   return (
     <div className={styles.base}>
@@ -51,6 +52,24 @@ function ReportsPage() {
                   headers={['Hora', 'Línea', 'Columna', 'Tipo', 'Descripción']}
                   body={errors}
                   className={styles.errors}
+                />
+              </div>
+            </>
+          )}
+          {existsOptimizations && (
+            <>
+              <h3>Reporte de Optimizaciones</h3>
+              <div className={styles.report}>
+                <Table
+                  headers={[
+                    'Línea',
+                    'Tipo',
+                    'Regla',
+                    'Expresión original',
+                    'Expresión optimizada'
+                  ]}
+                  body={optimizations}
+                  className={styles.optimizations}
                 />
               </div>
             </>
@@ -102,10 +121,10 @@ function ReportsPage() {
   )
 }
 
-function Table({ headers, body, className }) {
+function Table({ headers, body, ...props }) {
   return (
     <div>
-      <table className={className}>
+      <table {...props}>
         <thead>
           <tr>
             {headers.map((col, i) => (

@@ -6,10 +6,9 @@ from api.symbols import Expression, Value, Assignment, Function, Struct, Call, I
 from api.symbols import T_SENTENCE
 
 from .core import RESERVED_FUNCTIONS, Environment, SemanticError, addFunction, getFunction, getTemps, BINARY_OPERATIONS, UNARY_OPERATIONS
-from .core import getHeaderOutput, reset, getOutput, errors, Label, Temp, ApplicationError
+from .core import getHeaderOutput, reset, getOutput, getErrors, getSymbols, Label, Temp, ApplicationError
 
 def translate(input):
-  global errors
   reset()
   output = getOutput()
 
@@ -45,8 +44,10 @@ def translate(input):
     ApplicationError('Error en la traducción a C3D')
 
   res['output'] = output
-  res['errors'] += errors
-  return {'output': output, 'errors': res['errors'], 'symbols': []}
+  res['symbols'] = getSymbols()
+  res['errors'] += getErrors()
+  res.pop('ast')
+  return res
 
 def get_assignments(INS, env:Environment):
   for sen in INS:
@@ -169,15 +170,24 @@ def trCall(sen:Call, env:Environment):
     for id, symbol in function.env.symbols.items():
       new_env.declareSymbol(id, symbol.type)
 
+    for i in range(len(function.parameters)):
+      id = function.parameters[i].value
+      value = values[i]
+      new_env.symbols[id].setType(value.type)
+
+    trInstructions(function.ins, new_env)
+
     temp_base = Temp()
     new_base = new_env.base-env.base
     s += f'{temp_base}=p+{new_base}; // base de la nueva funcion\n'
     for i in range(len(function.parameters)):
       temp_par_pos = Temp()
       parameter = function.parameters[i].value
+      value = values[i]
+      symbol = new_env.getSymbol(parameter)
 
-      s += values[i].output
-      s += f'{temp_par_pos}={temp_base}+{new_env.getSymbol(parameter)}; // posicion de parametro {parameter}\n'
+      s += value.output
+      s += f'{temp_par_pos}={temp_base}+{symbol}; // posicion de parametro {parameter}\n'
       s += f'stack[int({temp_par_pos})]={values[i]}; // asignacion de parametro {parameter}\n'
 
     s += f'p=p+{new_base}; // cambio de entorno\n'
@@ -358,4 +368,6 @@ def execute(sen, env:Environment):
     if T is If: return trIf(sen, env)
     if T is While: return trWhile(sen, env)
     if T is For: return trFor(sen, env)
-  except: SemanticError(sen, f'Error al ejecutar {T.__name__}')
+  except:
+    print_exc()
+    return SemanticError(sen, f'Error al ejecutar {T.__name__}')

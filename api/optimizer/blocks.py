@@ -1,80 +1,131 @@
 from copy import deepcopy
 from api.optimizer.analyzer import parse
-from api.optimizer.core import Block, addReport, reset, reports
-from api.optimizer.symbols import Assignment, Expression, Goto, Id, If, Number, Tag, inverse_operators
+from api.optimizer.core import addReport, expressionsAreEqual, getBlocks, getIds, reset, reports
+from api.optimizer.symbols import Assignment, Expression, Number, Id, Number
 
 def optimize(input):
   global reports
   reset()
 
   header = ''
-  for _ in range(10):
+  while True:
     index = input.find('\n')
     header += input[:index+1]
     input = input[index+1:]
+    if not input or input.startswith('func'): break
 
-  header += '\n'
   res = parse(input)
   functions = res['ast']
 
   blocks = {function.id: getBlocks(function.ins) for function in functions}
 
-  for function_blocks in blocks:
+  for function_blocks in blocks.values():
     for block in function_blocks:
       for optimizer in optimization_functions:
         optimizer(block.ins)
 
   for function in functions:
     function.ins = []
-    for function_blocks in blocks[function.id]:
-      for block in function_blocks:
-        function.ins += block.ins
+    for block in blocks[function.id]: function.ins += block.ins
 
   output = header + str('\n\n'.join(str(function) for function in functions))
   return {'output': output, 'reports': reports}
 
-def getBlocks(INS):
-  blocks = []
-  instructions = []
-  add_block = False
+def optimize_common_subexpressions(INS):
+  INS_COPY = INS.copy()
+  for ins in INS_COPY:
+    if type(ins) is not Assignment: continue
 
-  for ins in INS:
-    if type(ins) is Tag or add_block:
-      instructions = []
-      blocks.append(Block(instructions))
-      add_block = False
-    elif type(ins) in [Goto, If]:
-      add_block = True
-    instructions.append(ins)
+    to_watch = [ins.id] + getIds(ins.ex)
 
-  previousBlock = None
-  for block in blocks:
-    if previousBlock: previousBlock.addNextBlock(block)
-    previousBlock = block
+    index = INS_COPY.index(ins)
+    INS2 = INS_COPY[index+1:]
 
-  for block in blocks:
-    ins = block.ins[-1]
-    if type(ins) not in [Goto, If]: continue
+    for ins2 in INS2:
+      if type(ins2) is not Assignment: continue
 
-    for nextBlock in blocks:
-      tag = nextBlock.ins[0]
-      if type(tag) is not Tag: continue
-      if (type(ins) is Goto and tag.id != ins.tag or
-          type(ins) is If   and tag.id != ins.goto.tag): continue
-      block.addNextBlock(nextBlock)
+      ids = [ins2.id.value] + [id.value for id in getIds(ins2.ex)]
 
-  return blocks
+      contained = any(id.value in ids for id in to_watch)
 
-def optimize_common_subexpressions(ins):
-  print(ins)
+      if not contained and expressionsAreEqual(ins.ex, ins2.ex):
+        original = deepcopy(ins)
+        ins2.ex = Id(ins2.ex.ln, ins2.ex.col, ins.id.value)
+        addReport(ins2.ln, 'Bloques', 'Subexpresiones comunes R1', f'{ins}\n...\n{original}', f'{ins}\n...\n{ins2}')
 
-def optimize_copies_propagation(ins):
-  print(ins)
+def optimize_copies_propagation(INS):
+  INS_COPY = INS.copy()
+  for ins in INS_COPY:
+    if type(ins) is not Assignment: continue
+    if type(ins.ex) is not Id: continue
 
-def optimize_dead_code(ins):
-  print(ins)
+    index = INS_COPY.index(ins)
+    INS2 = INS_COPY[index+1:]
 
-def optimize_constants_propagation(ins):
-  print(ins)
+    for ins2 in INS2:
+      if type(ins2) is not Assignment: continue
+      if ins2.id.value in [ins.id.value, ins.ex.value]: break
+
+      ids = getIds(ins2.ex)
+      id_values = [id.value for id in ids]
+
+      if ins.id.value in id_values:
+        original = deepcopy(ins2)
+        for id in ids:
+          if id.value == ins.id.value: id.value = ins.ex.value
+
+        addReport(ins2.ln, 'Bloques', 'Propagación de copias R2', f'{ins}\n...\n{original}', f'{ins}\n...\n{ins2}')
+
+def optimize_dead_code(INS):
+  INS_COPY = INS.copy()
+  for ins in INS_COPY:
+    if type(ins) is not Assignment: continue
+
+    index = INS_COPY.index(ins)
+    INS2 = INS_COPY[index+1:]
+    used = False
+
+    for ins2 in INS2:
+      if type(ins2) is not Assignment: continue
+
+      ids = [ins2.id] + getIds(ins2.ex)
+      id_values = [id.value for id in ids]
+      if ins.id.value in id_values:
+        used = True
+        break
+
+    if used: continue
+
+    ins.deleted = True
+    INS.remove(ins)
+    addReport(ins2.ln, 'Bloques', 'Eliminación de código muerto R3', str(ins), '')
+
+def optimize_constants_propagation(INS):
+  INS_COPY = INS.copy()
+  for ins in INS_COPY:
+    if type(ins) is not Assignment: continue
+    if type(ins.ex) is not Number: continue
+
+    index = INS_COPY.index(ins)
+    INS2 = INS_COPY[index+1:]
+
+    for ins2 in INS2:
+      if type(ins2) is not Assignment: continue
+      if ins2.id.value == ins.id.value: break
+
+      ids = getIds(ins2.ex)
+      id_values = [id.value for id in ids]
+
+      if ins.id.value in id_values:
+        original = deepcopy(ins2)
+        for id in ids:
+          if id.value == ins.id.value:
+            new_value = Number(id.ln, id.col, ins.ex.value)
+            if type(ins2.ex) is Id: ins2.ex = new_value
+            elif type(ins2.ex) is Expression:
+              if ins2.ex.left.value==ins.id.value: ins2.ex.left = new_value
+              else: ins2.ex.right = new_value
+
+        addReport(ins2.ln, 'Bloques', 'Propagación de constantes R4', f'{ins}\n...\n{original}', f'{ins}\n...\n{ins2}')
 
 optimization_functions = [optimize_common_subexpressions, optimize_copies_propagation, optimize_dead_code, optimize_constants_propagation]

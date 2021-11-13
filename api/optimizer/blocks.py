@@ -101,7 +101,7 @@ def optimize_dead_code(INS):
 
     ins.deleted = True
     INS.remove(ins)
-    addReport(ins2.ln, 'Bloques', 'Eliminación de código muerto R3', str(ins), '')
+    addReport(ins.ln, 'Bloques', 'Eliminación de código muerto R3', str(ins), '')
 
 def optimize_constants_propagation(INS):
   INS_COPY = INS.copy()

@@ -7,16 +7,14 @@ from api.optimizer.eyehole import optimize as optimize_eyehole
 from api.optimizer.blocks import optimize as optimize_blocks
 
 INPUT = r'''
-x = 5;
-y = 6/8;
-print("el resultado de ", x, "+", y, " es ", x+y);
+print(6/5, "  ", 6%4);
 '''
 
 LEXER = False
 PARSER = False
 INTERPRETER = False
-TRANSLATOR = False
-OPTIMIZER_EYEHOLE = True
+TRANSLATOR = True
+OPTIMIZER_EYEHOLE = False
 OPTIMIZER_BLOCKS = False
 
 if LEXER:

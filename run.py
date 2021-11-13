@@ -7,14 +7,7 @@ from api.optimizer.eyehole import optimize as optimize_eyehole
 from api.optimizer.blocks import optimize as optimize_blocks
 
 INPUT = r'''
-function fact(a)
-  if a > 0
-    return a*fact(a-1);
-  end;
-  return 1;
-end;
-
-x = fact(3);
+x = "Hello, World!";
 println(x);
 '''
 

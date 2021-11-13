@@ -21,12 +21,7 @@ def translate(input):
     FUNC_INS = [ins for ins in INS if type(ins) is Function]
     NEW_INS = [ins for ins in INS if type(ins) is not Function]
 
-    for sen in NEW_INS:
-      if type(sen) is Assignment or type(sen) is For:
-        mainEnv.declareSymbol(sen.id.value)
-      if hasattr(sen, 'ins'):
-        get_assignments(sen.ins, mainEnv)
-
+    get_assignments(NEW_INS, mainEnv)
     process_functions(FUNC_INS)
 
     func_output = '\n\n'.join(trFunction(ins, mainEnv) for ins in FUNC_INS)
@@ -38,7 +33,6 @@ def translate(input):
     output += ins_output
     output += '}\n\n'
     output += func_output
-
   except:
     print_exc()
     ApplicationError('Error en la traducción a C3D')
@@ -176,7 +170,7 @@ def trCall(sen:Call, env:Environment):
       new_env.symbols[id].setType(value.type)
 
     temp_base = Temp()
-    new_base = new_env.base-env.base
+    new_base = env.length
     s += f'{temp_base}=p+{new_base}; // base de la nueva funcion\n'
     for i in range(len(function.parameters)):
       temp_par_pos = Temp()
@@ -254,8 +248,8 @@ def trFunction(sen:Function, env:Environment):
   newEnv = getFunction(sen.id.value).env
 
   s += trInstructions(sen.ins, newEnv)
-  s += f'goto {newEnv.escape_label}; // goto para evitar error de go\n'
-  s += f'{newEnv.escape_label}: // etiqueta de retorno\n'
+  s += f'goto {newEnv.return_label}; // goto para evitar error de go\n'
+  s += f'{newEnv.return_label}: // etiqueta de retorno\n'
   s += 'return;\n}'
   return s
 
@@ -270,7 +264,7 @@ def trReturn(sen:Return, env:Environment):
     s += f'{t_position}=p+{s_return}; // posicion de retorno\n'
     s += t_return.output
     s += f'stack[int({t_position})]={t_return}; // valor de retorno\n'
-    s += f'goto {env.escape_label};\n'
+    s += f'goto {env.return_label};\n'
   return s
 
 def trStruct(sen:Struct, env:Environment):
@@ -307,9 +301,10 @@ def trWhile(sen:While, env:Environment):
   if condition.type!='bool':
     return SemanticError(sen, 'Se esperaba una condición en la sentencia while')
 
-  s = ''
-  loop_label = Label()
-  s += f'{loop_label}:\n'
+  loop_label = env.newLoopLabel()
+  escape_label = env.newEscapeLabel()
+
+  s = f'{loop_label}:\n'
 
   s += condition.output
   s += condition.printTrueTags()
@@ -318,6 +313,8 @@ def trWhile(sen:While, env:Environment):
 
   s += f'goto {loop_label};\n'
   s += condition.printFalseTags()
+  s += f'goto {escape_label}; // goto para evitar error de go\n'
+  s += f'{escape_label}:\n'
   return s
 
 def trFor(sen:For, env:Environment):
@@ -325,21 +322,24 @@ def trFor(sen:For, env:Environment):
   if not ex: return SemanticError(sen, 'No se pudo ejecutar la sentencia for')
   if ex.type not in ['string', 'array', 'range']: return SemanticError(sen, "No se puede iterar sobre un valor {}".format(ex.type))
 
-  loop_label = Label()
   true_label = Label()
   false_label = Label()
+  loop_label = env.newLoopLabel()
+  escape_label = env.newEscapeLabel()
+
   i = Temp()
-  char = Temp()
   val = Temp()
 
   symbol = env.getSymbol(sen.id.value)
-  symbol.type = 'string'
 
   s = ex.output
-  s += f'{i}={ex};\n'
-  s += f'{loop_label}:\n'
 
   if ex.type=='string':
+    char = Temp()
+    symbol.type = 'string'
+
+    s += f'{i}={ex};\n'
+    s += f'{loop_label}:\n'
     s += f'{char}=heap[int({i})];\n'
     s += f'if({char}!=34){{goto {true_label};}}\ngoto {false_label};\n'
     s += f'{true_label}:\n'
@@ -349,12 +349,38 @@ def trFor(sen:For, env:Environment):
     s += 'h=h+1;\n'
     s += 'heap[int(h)]=34;\n'
     s += 'h=h+1;\n'
-    s += trInstructions(sen.ins, env)
-    s += f'{i}={i}+1;\n'
-    s += f'goto {loop_label};\n'
-    s += f'{false_label}:\n'
 
+  elif ex.type=='range':
+    left, right = ex.value['l'], ex.value['r']
+
+    s += f'{i}={left};\n'
+    s += f'{loop_label}:\n'
+    s += f'if({i}<={right}){{goto {true_label};}}\ngoto {false_label};\n'
+    s += f'{true_label}:\n'
+    s += f'{val}=p+{symbol};\n'
+    s += f'stack[int({val})]={i};\n'
+
+  s += f'{i}={i}+1;\n'
+  s += trInstructions(sen.ins, env)
+  s += f'goto {loop_label};\n'
+  s += f'{false_label}:\n'
+  s += f'goto {escape_label}; // goto para evitar error de go\n'
+  s += f'{escape_label}:\n'
   return s
+
+def trBreak(sen:Break, env:Environment):
+  escape_label = env.getEscapeLabel()
+  if not escape_label:
+    return SemanticError(sen, 'No se puede usar break fuera de un loop')
+
+  return f'goto {escape_label};\n'
+
+def trContinue(sen:Continue, env:Environment):
+  loop_label = env.getLoopLabel()
+  if not loop_label:
+    return SemanticError(sen, 'No se puede usar continue fuera de un loop')
+
+  return f'goto {loop_label};\n'
 
 def execute(sen, env:Environment):
   try:
@@ -362,10 +388,12 @@ def execute(sen, env:Environment):
     if T is Assignment: return trAssignment(sen, env)
     # if T is Struct: return trStruct(sen, env)
     if T is Call: return trCall(sen, env).output
-    if T is Return: return trReturn(sen, env)
     if T is If: return trIf(sen, env)
     if T is While: return trWhile(sen, env)
     if T is For: return trFor(sen, env)
+    if T is Return: return trReturn(sen, env)
+    if T is Break: return trBreak(sen, env)
+    if T is Continue: return trContinue(sen, env)
   except:
     print_exc()
     return SemanticError(sen, f'Error al ejecutar {T.__name__}')

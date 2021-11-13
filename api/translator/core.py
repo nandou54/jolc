@@ -100,31 +100,43 @@ class Environment():
   def __init__(self, id = 'global', increment = True):
     self.id = id
     self.symbols = {}
-    self.escape_label = None
-    self.increment = increment
+    self.return_label = Label()
+    self.loop_labels = []
+    self.escape_labels = []
+    self.length = 0
 
     if increment: envs.append(self)
-    self.escape_label = Label()
-
-    self.base = self.top = STACK_TOP
-    self.length = 0
 
   def declareSymbol(self, id, type = 'int64'):
     if id in self.symbols.keys():
       self.symbols[id].setType(type)
     else:
       self.symbols[id] = Symbol(self.length, type)
-
-      self.top += 1
       self.length += 1
-
-      # if self.increment:
-      global STACK_TOP
-      STACK_TOP += 1
 
   def getSymbol(self, id):
     if id not in self.symbols.keys(): return None
     return self.symbols[id]
+
+  def newLoopLabel(self):
+    label = Label()
+    self.loop_labels.append(label)
+    return label
+
+  def getLoopLabel(self):
+    if len(self.loop_labels)==0: return None
+    return self.loop_labels[-1]
+
+  def newEscapeLabel(self):
+    label = Label()
+    self.escape_labels.append(label)
+    return label
+
+  def getEscapeLabel(self):
+    if len(self.escape_labels)==0: return None
+    return self.escape_labels[-1]
+
+  # def add
 
 class Symbol():
   def __init__(self, position, type):

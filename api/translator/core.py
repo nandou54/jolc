@@ -11,8 +11,8 @@ def getHeaderOutput():
     s += ');\n'
 
   s += '''
-var stack [1000]float64; // stack
-var heap [1000]float64;  // heap
+var stack [10000]float64; // stack
+var heap [10000]float64;  // heap
 var p,h float64;         // pointers
 '''
   return s
@@ -221,8 +221,9 @@ def _print(temps):
       s += f'{false_label}:\n'
     else:
       s += f'fmt.Printf("{format_types[temp.type]}", int({temp}));\n'
+    s += 'fmt.Printf("%c", 32);\n'
 
-  t = Temp('')
+  t = Temp(0)
   t.output = s
   return t
 
@@ -250,6 +251,7 @@ def _println(temps):
       s += f'{false_label}:\n'
     else:
       s += f'fmt.Printf("{format_types[temp.type]}", int({temp}));\n'
+    s += 'fmt.Printf("%c", 32);\n'
   s += 'fmt.Printf("%c", 10); // nueva linea\n'
 
   t = Temp('')
@@ -421,10 +423,44 @@ def unnest(val):
 def _string(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'string' recibe un parámetro")
 
-  newValue = deepcopy(values[0])
-  newValue.value = str(unnest(newValue.value))
-  newValue.type = 'string'
-  return newValue
+  t = values[0]
+  if t.type=='string': return t
+
+  setFmt()
+
+  t_result = Temp(None, 'string')
+  char_temp = Temp()
+  loop_label = Label()
+  true_label = Label()
+  false_label = Label()
+  true_label_num = Label()
+  true_label_num2 = Label()
+  false_label_num = Label()
+
+  s = ''
+  # for c in str(t.value):
+    # s += 
+
+  s = f'{loop_label}:\n'
+  s += f'{char_temp}=heap[int({t})];\n'
+  s += f'if({char_temp}!=34){{goto {true_label};}}\n'
+  s += f'goto {false_label};\n'
+  s += f'{true_label}:\n'
+  s += f'if({char_temp}>=48){{goto {true_label_num};}}\ngoto {false_label_num};\n'
+  s += f'{true_label_num}:\n'
+  s += f'if({char_temp}<=57){{goto {true_label_num2};}}\ngoto {false_label_num};\n'
+  s += f'{true_label_num2}:\n'
+  s += f'{char_temp}={char_temp}-48;\n'
+  s += f'{t_result}={t_result}*10;\n'
+  s += f'{t_result}={t_result}+{char_temp};\n'
+  s += f'{t}={t}+1;\n'
+  s += f'goto {loop_label};\n'
+  s += f'{false_label_num}:\n'
+  s += f'{false_label}:\n'
+
+  t_result.output = s
+  return t_result
+
 
 def _uppercase(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'uppercase' recibe un parámetro")
@@ -612,6 +648,7 @@ goto {lf};
 
 def _modulo(l:Temp, r:Temp):
   setFmt()
+  setMath()
 
   t = Temp()
   t.setOutput(l, r)
@@ -632,7 +669,7 @@ fmt.Printf("%c", 114); //r
 {t}=0;
 goto {lf};
 {lt}:
-{t}=float64(int({l})%int({r}));
+{t}=math.Mod({l},{r});
 {lf}:
 '''
   return t
@@ -723,7 +760,7 @@ def _negacion(l:Temp):
   return t
 
 def _menor(l:Temp, r:Temp):
-  t = Temp('')
+  t = Temp(0)
   true_tag = Label()
   false_tag = Label()
 
@@ -735,7 +772,7 @@ def _menor(l:Temp, r:Temp):
   return t
 
 def _menor_igual(l:Temp, r:Temp):
-  t = Temp('')
+  t = Temp(0)
   true_tag = Label()
   false_tag = Label()
 
@@ -747,7 +784,7 @@ def _menor_igual(l:Temp, r:Temp):
   return t
 
 def _mayor(l:Temp, r:Temp):
-  t = Temp('')
+  t = Temp(0)
   true_tag = Label()
   false_tag = Label()
 
@@ -759,7 +796,7 @@ def _mayor(l:Temp, r:Temp):
   return t
 
 def _mayor_igual(l:Temp, r:Temp):
-  t = Temp('')
+  t = Temp(0)
   true_tag = Label()
   false_tag = Label()
 
@@ -771,7 +808,7 @@ def _mayor_igual(l:Temp, r:Temp):
   return t
 
 def _igualacion(l:Temp, r:Temp):
-  t = Temp('')
+  t = Temp(0)
   true_tag = Label()
   false_tag = Label()
 
@@ -783,7 +820,7 @@ def _igualacion(l:Temp, r:Temp):
   return t
 
 def _diferenciacion(l:Temp, r:Temp):
-  t = Temp('')
+  t = Temp(0)
   true_tag = Label()
   false_tag = Label()
 
@@ -795,7 +832,7 @@ def _diferenciacion(l:Temp, r:Temp):
   return t
 
 def _or(l:Temp, r:Temp):
-  t = Temp('')
+  t = Temp(0)
   t.setOutput(l)
 
   t.true_tags = l.true_tags + r.true_tags
@@ -806,7 +843,7 @@ def _or(l:Temp, r:Temp):
   return t
 
 def _and(l:Temp, r:Temp):
-  t = Temp('')
+  t = Temp(0)
   t.setOutput(l)
 
   t.true_tags = r.true_tags

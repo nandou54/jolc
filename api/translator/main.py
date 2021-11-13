@@ -109,6 +109,7 @@ def trExpression(ex:Expression, env:Environment):
     val_temp.output += f'h=h+1;\n'
     return val_temp
   if ex.type=='char': return Temp(ord(ex.value), ex.type)
+  if ex.type=='bool': return Temp(1 if ex.value else 0, ex.type)
   if type(ex) is Value: return Temp(ex.value, ex.type)
 
   l = trExpression(ex.left, env) if ex.left else None

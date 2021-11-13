@@ -592,7 +592,7 @@ def _division(l:Temp, r:Temp):
   lt = Label()
   lf = Label()
 
-  t.output += f'''if {t}!=0 {{goto {lt};}}
+  t.output += f'''if ({t}!=0){{goto {lt};}}
 fmt.Printf("%c", 77);  //M
 fmt.Printf("%c", 97);  //a
 fmt.Printf("%c", 116); //t
@@ -602,7 +602,7 @@ fmt.Printf("%c", 114); //r
 fmt.Printf("%c", 114); //r
 fmt.Printf("%c", 111); //o
 fmt.Printf("%c", 114); //r
-{t}=0
+{t}=0;
 goto {lf};
 {lt}:
 {t}={l}/{r};
@@ -619,7 +619,7 @@ def _modulo(l:Temp, r:Temp):
   lt = Label()
   lf = Label()
 
-  t.output += f'''if {t}!=0 {{goto {lt};}}
+  t.output += f'''if ({t}!=0) {{goto {lt};}}
 fmt.Printf("%c", 77);  //M
 fmt.Printf("%c", 97);  //a
 fmt.Printf("%c", 116); //t

@@ -7,15 +7,16 @@ from api.optimizer.eyehole import optimize as optimize_eyehole
 from api.optimizer.blocks import optimize as optimize_blocks
 
 INPUT = r'''
-x = "Hello, World!";
-println(x);
+x = 5;
+y = 6/8;
+print("el resultado de ", x, "+", y, " es ", x+y);
 '''
 
 LEXER = False
 PARSER = False
 INTERPRETER = False
-TRANSLATOR = True
-OPTIMIZER_EYEHOLE = False
+TRANSLATOR = False
+OPTIMIZER_EYEHOLE = True
 OPTIMIZER_BLOCKS = False
 
 if LEXER:
@@ -64,8 +65,8 @@ if OPTIMIZER_EYEHOLE:
     print(res['output'])
     print(json.dumps(res['reports'], indent=2, ensure_ascii=False))
 
-  with open('./test.go', 'w') as file:
-    file.write(res['output'])
+  # with open('./test.go', 'w') as file:
+  #   file.write(res['output'])
 
 if OPTIMIZER_BLOCKS:
   print('=== OPTIMIZER BY BLOCKS ===')
@@ -77,8 +78,8 @@ if OPTIMIZER_BLOCKS:
     print(res['output'])
     print(json.dumps(res['reports'], indent=2, ensure_ascii=False))
 
-  with open('./test.go', 'w') as file:
-    file.write(res['output'])
+  # with open('./test.go', 'w') as file:
+  #   file.write(res['output'])
 
 if TRANSLATOR or OPTIMIZER_BLOCKS or OPTIMIZER_EYEHOLE:
   print('= GO OUTPUT =')

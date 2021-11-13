@@ -104,7 +104,7 @@ class Environment():
     self.increment = increment
 
     if increment: envs.append(self)
-    else: self.escape_label = Label()
+    self.escape_label = Label()
 
     self.base = self.top = STACK_TOP
     self.length = 0
@@ -118,9 +118,9 @@ class Environment():
       self.top += 1
       self.length += 1
 
-      if self.increment:
-        global STACK_TOP
-        STACK_TOP += 1
+      # if self.increment:
+      global STACK_TOP
+      STACK_TOP += 1
 
   def getSymbol(self, id):
     if id not in self.symbols.keys(): return None

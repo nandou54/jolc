@@ -54,7 +54,7 @@ def get_assignments(INS, env:Environment):
     if type(sen) is Assignment or type(sen) is For:
       env.declareSymbol(sen.id.value)
     if hasattr(sen, 'ins'):
-      get_assignments(sen.ins)
+      get_assignments(sen.ins, env)
 
 def process_functions(INS):
   for sen in INS:
@@ -174,8 +174,6 @@ def trCall(sen:Call, env:Environment):
       id = function.parameters[i].value
       value = values[i]
       new_env.symbols[id].setType(value.type)
-
-    trInstructions(function.ins, new_env)
 
     temp_base = Temp()
     new_base = new_env.base-env.base

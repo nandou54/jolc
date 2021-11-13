@@ -7,18 +7,22 @@ from api.optimizer.eyehole import optimize as optimize_eyehole
 from api.optimizer.blocks import optimize as optimize_blocks
 
 INPUT = r'''
-x=0;
-while x<5
-  x=x+1;
-  print(x);
+function fact(a)
+  if a > 0
+    return a*fact(a-1);
+  end;
+  return 1;
 end;
+
+x = fact(3);
+println(x);
 '''
 
 LEXER = False
 PARSER = False
 INTERPRETER = False
-TRANSLATOR = False
-OPTIMIZER_EYEHOLE = True
+TRANSLATOR = True
+OPTIMIZER_EYEHOLE = False
 OPTIMIZER_BLOCKS = False
 
 if LEXER:

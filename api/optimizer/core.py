@@ -1,21 +1,26 @@
 from api.optimizer.symbols import Expression, Goto, Id, If, Number, Tag
 
 block_counter = 0
-
 optimizations = 0
+global_optimizations = False
 reports = []
 
 def reset():
-  global optimizations
+  global optimizations, global_optimizations
   optimizations = 0
+  global_optimizations = False
 
   reports.clear()
+
+def setGlobalOptimizations():
+  global global_optimizations
+  global_optimizations = True
 
 def Report(ln, type, rule, original, optimized):
   return [ln, type, rule, original, optimized]
 
 def addReport(ln, type, rule, original, optimized):
-  reports.append(Report(ln, type, rule, original, optimized))
+  reports.append(Report(ln, type, f'{rule} {"global" if global_optimizations else "local"}', original, optimized))
 
 class Block():
   def __init__(self, ins):

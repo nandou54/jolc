@@ -131,26 +131,26 @@ def trExpression(ex:Expression, env:Environment):
     if ex.unary
     else BINARY_OPERATIONS[ex.type](l, r))
   result_temp.type = returnType
-  return result_temp
 
-def trId(ex, env:Environment):
-  s = ''
+  return result_temp
 
 def trCall(sen:Call, env:Environment):
   s = ''
   values = []
 
   for expression in sen.expressions:
-    temp_base = trExpression(expression, env)
-    if not temp_base:
+    temp = trExpression(expression, env)
+    if not temp:
       return SemanticError(sen, f"No se pudo realizar la llamada a '{sen.id}'")
-    values.append(temp_base)
+    values.append(temp)
 
   if sen.id.value in RESERVED_FUNCTIONS.keys():
     for value in values: s += value.output
-    t = RESERVED_FUNCTIONS[sen.id.value](values)
-    t.output = s+t.output
-    return t
+    temp_result = RESERVED_FUNCTIONS[sen.id.value](values)
+    if not temp_result: return SemanticError(sen, f"No se pudo realizar la llamada a '{sen.id}'")
+
+    temp_result.output = s+temp_result.output
+    return temp_result
 
   function = getFunction(sen.id.value)
 
@@ -170,9 +170,10 @@ def trCall(sen:Call, env:Environment):
       value = values[i]
       new_env.symbols[id].setType(value.type)
 
-    temp_base = Temp()
+    temp = Temp()
     new_base = env.length
-    s += f'{temp_base}=p+{new_base}; // base de la nueva funcion\n'
+    s += f'{temp}=p+{new_base}; // base de la nueva funcion\n'
+
     for i in range(len(function.parameters)):
       temp_par_pos = Temp()
       parameter = function.parameters[i].value
@@ -180,7 +181,7 @@ def trCall(sen:Call, env:Environment):
       symbol = new_env.getSymbol(parameter)
 
       s += value.output
-      s += f'{temp_par_pos}={temp_base}+{symbol}; // posicion de parametro {parameter}\n'
+      s += f'{temp_par_pos}={temp}+{symbol}; // posicion de parametro {parameter}\n'
       s += f'stack[int({temp_par_pos})]={values[i]}; // asignacion de parametro {parameter}\n'
 
     s += f'p=p+{new_base}; // cambio de entorno\n'
@@ -198,9 +199,6 @@ def trCall(sen:Call, env:Environment):
     return temp_return
 
 def trAccess(ex:Expression, env:Environment):
-  s = ''
-
-def trChain(ex:Expression, output, assignment = False):
   s = ''
 
 def trRange(ex:Expression, env:Environment):
@@ -257,8 +255,10 @@ def trFunction(sen:Function, env:Environment):
 def trReturn(sen:Return, env:Environment):
   s = ''
   if sen.ex:
-    t_position = Temp()
     t_return = trExpression(sen.ex, env)
+    if not t_return: return SemanticError(sen, 'No se pudo ejecutar el return')
+
+    t_position = Temp()
     s_return = env.getSymbol('return')
     s_return.setType(t_return.type)
 
@@ -273,8 +273,11 @@ def trStruct(sen:Struct, env:Environment):
 
 def trIf(sen:If, env:Environment):
   s = ''
-
   condition = trExpression(sen.ex, env)
+
+  if not condition: return SemanticError(sen, 'No se pudo ejecutar la sentencia while')
+  if condition.type!='bool': return SemanticError(sen, 'Se esperaba una condición en la sentencia while')
+
   s += condition.output
   s += condition.printTrueTags()
 
@@ -296,11 +299,8 @@ def trIf(sen:If, env:Environment):
 def trWhile(sen:While, env:Environment):
   condition = trExpression(sen.ex, env)
 
-  if not condition:
-    return SemanticError(sen, 'No se pudo ejecutar la sentencia while')
-
-  if condition.type!='bool':
-    return SemanticError(sen, 'Se esperaba una condición en la sentencia while')
+  if not condition: return SemanticError(sen, 'No se pudo ejecutar la sentencia while')
+  if condition.type!='bool': return SemanticError(sen, 'Se esperaba una condición en la sentencia while')
 
   loop_label = env.newLoopLabel()
   escape_label = env.newEscapeLabel()
@@ -321,7 +321,7 @@ def trWhile(sen:While, env:Environment):
 def trFor(sen:For, env:Environment):
   ex = trExpression(sen.ex, env)
   if not ex: return SemanticError(sen, 'No se pudo ejecutar la sentencia for')
-  if ex.type not in ['string', 'array', 'range']: return SemanticError(sen, "No se puede iterar sobre un valor {}".format(ex.type))
+  if ex.type not in ['string', 'array', 'range']: return SemanticError(sen, f'No se puede iterar sobre un valor {ex.type}')
 
   true_label = Label()
   false_label = Label()
@@ -395,6 +395,7 @@ def execute(sen, env:Environment):
     if T is Return: return trReturn(sen, env)
     if T is Break: return trBreak(sen, env)
     if T is Continue: return trContinue(sen, env)
+    return f'// "{T.__name__}" no soportado\n'
   except:
     print_exc()
     return SemanticError(sen, f'Error al ejecutar {T.__name__}')

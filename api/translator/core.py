@@ -1,4 +1,5 @@
 from copy import deepcopy
+from copy import deepcopy
 from api.symbols import Error, Struct
 
 def getHeaderOutput():
@@ -465,24 +466,90 @@ def _string(values):
 def _uppercase(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'uppercase' recibe un parámetro")
 
-  ex = values[0]
-  if ex.type!='string':
-    return SemanticError(ex, "La función nativa 'uppercase' recibe un valor string")
+  temp = values[0]
+  if temp.type!='string':
+    return SemanticError(temp, "La función nativa 'uppercase' recibe un valor string")
 
-  newValue = deepcopy(ex)
-  newValue.value = newValue.value.upper()
-  return newValue
+  res_temp = Temp(None, 'string')
+  res_temp.setOutput(temp)
+  char_temp = Temp()
+
+  s = f'{res_temp}=h; // inicio de uppercase\n'
+
+  loop_label = Label()
+  true_label = Label()
+  false_label = Label()
+  true_letter_label = Label()
+  true_letter_label2 = Label()
+  false_letter_label = Label()
+
+  s += f'{loop_label}:\n'
+  s += f'{char_temp}=heap[int({temp})];\n'
+  s += f'if({char_temp}!=34){{goto {true_label};}}\n'
+  s += f'goto {false_label};\n'
+  s += f'{true_label}:\n'
+  s += f'if({char_temp}>=97){{goto {true_letter_label};}}\n'
+  s += f'goto {false_letter_label};\n'
+  s += f'{true_letter_label}:\n'
+  s += f'if({char_temp}<=122){{goto {true_letter_label2};}}\n'
+  s += f'goto {false_letter_label};\n'
+  s += f'{true_letter_label2}:\n'
+  s += f'{char_temp}={char_temp}-32;\n'
+  s += f'{false_letter_label}:\n'
+  s += f'heap[int(h)]={char_temp};\n'
+  s += 'h=h+1;\n'
+  s += f'{temp}={temp}+1;\n'
+  s += f'goto {loop_label};\n'
+  s += f'{false_label}:\n'
+  s += 'heap[int(h)]=34; // fin de uppercase\n'
+  s += 'h=h+1;\n'
+
+  res_temp.output += s
+  return res_temp
 
 def _lowercase(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'lowercase' recibe un parámetro")
 
-  ex = values[0]
-  if ex.type!='string':
-    return SemanticError(ex, "La función nativa 'lowercase' recibe un valor string")
+  temp = values[0]
+  if temp.type!='string':
+    return SemanticError(temp, "La función nativa 'lowercase' recibe un valor string")
 
-  newValue = deepcopy(ex)
-  newValue.value = newValue.value.lower()
-  return newValue
+  res_temp = Temp(None, 'string')
+  res_temp.setOutput(temp)
+  char_temp = Temp()
+
+  s = f'{res_temp}=h; // inicio de lowercase\n'
+
+  loop_label = Label()
+  true_label = Label()
+  false_label = Label()
+  true_letter_label = Label()
+  true_letter_label2 = Label()
+  false_letter_label = Label()
+
+  s += f'{loop_label}:\n'
+  s += f'{char_temp}=heap[int({temp})];\n'
+  s += f'if({char_temp}!=34){{goto {true_label};}}\n'
+  s += f'goto {false_label};\n'
+  s += f'{true_label}:\n'
+  s += f'if({char_temp}>=65){{goto {true_letter_label};}}\n'
+  s += f'goto {false_letter_label};\n'
+  s += f'{true_letter_label}:\n'
+  s += f'if({char_temp}<=90){{goto {true_letter_label2};}}\n'
+  s += f'goto {false_letter_label};\n'
+  s += f'{true_letter_label2}:\n'
+  s += f'{char_temp}={char_temp}+32;\n'
+  s += f'{false_letter_label}:\n'
+  s += f'heap[int(h)]={char_temp};\n'
+  s += 'h=h+1;\n'
+  s += f'{temp}={temp}+1;\n'
+  s += f'goto {loop_label};\n'
+  s += f'{false_label}:\n'
+  s += 'heap[int(h)]=34; // fin de lowercase\n'
+  s += 'h=h+1;\n'
+
+  res_temp.output += s
+  return res_temp
 
 def _typeof(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'typeof' recibe un parámetro")
@@ -638,10 +705,11 @@ fmt.Printf("%c", 114); //r
 fmt.Printf("%c", 114); //r
 fmt.Printf("%c", 111); //o
 fmt.Printf("%c", 114); //r
+fmt.Printf("%c", 10);  // nueva linea
 {t}=0;
 goto {lf};
 {lt}:
-{t}={l}/{r};
+{'// ' if r.value==0 else ''}{t}={l}/{r};
 {lf}:
 '''
   return t
@@ -666,6 +734,7 @@ fmt.Printf("%c", 114); //r
 fmt.Printf("%c", 114); //r
 fmt.Printf("%c", 111); //o
 fmt.Printf("%c", 114); //r
+fmt.Printf("%c", 10);  // nueva linea
 {t}=0;
 goto {lf};
 {lt}:

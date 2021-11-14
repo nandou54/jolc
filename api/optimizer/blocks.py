@@ -1,6 +1,6 @@
 from copy import deepcopy
 from api.optimizer.analyzer import parse
-from api.optimizer.core import addReport, expressionsAreEqual, getBlocks, getIds, reset, reports
+from api.optimizer.core import addReport, expressionsAreEqual, getBlocks, getIds, reset, reports, setGlobalOptimizations
 from api.optimizer.symbols import Assignment, Expression, Library, Number, Id, Number
 
 def optimize(input):
@@ -18,11 +18,17 @@ def optimize(input):
   functions = res['ast']
 
   blocks = {function.id: getBlocks(function.ins) for function in functions}
+  INS = []
 
   for function_blocks in blocks.values():
     for block in function_blocks:
       for optimizer in optimization_functions:
         optimizer(block.ins)
+    INS += block.ins
+
+  setGlobalOptimizations()
+  for optimizer in optimization_functions:
+    optimizer(block.ins)
 
   for function in functions:
     function.ins = []

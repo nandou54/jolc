@@ -98,7 +98,7 @@ states = (
 )
 
 # Lexemas ignorados
-t_ignore                       =  ' \t'
+t_ignore                       =  ' \t\r'
 t_ignore_comentario            = r'[#].*'
 t_ignore_comentario_multilinea = r'[#]=([^=]|[\r\n]|(=+([^#])))*=+[#]'
 t_string_ignore = ""
@@ -354,13 +354,14 @@ def p_FUNCION(p):
   FUNCION : function id parA PAR parB BLOQUE
           | function id parA parB BLOQUE
   '''
-  id, parameters, instructions = p[2], [], p[5]
+  id, parameters, types, instructions = p[2], [], [], p[5]
 
   if len(p)==7:
-    parameters = p[4]
+    parameters = p[4]['parameters']
+    types = p[4]['types']
     instructions = p[6]
 
-  p[0] = Function(p.lexer.lineno, getColumn(p.lexer), id, parameters, instructions)
+  p[0] = Function(p.lexer.lineno, getColumn(p.lexer), id, parameters, types, instructions)
 
 def p_PAR(p):
   '''
@@ -369,15 +370,20 @@ def p_PAR(p):
   '''
   if len(p)==4:
     p[0] = p[1]
-    p[0].append(p[3])
-  else: p[0] = [p[1]]
+    parameter = p[3]
+    p[0]['parameters'].append(parameter['id'])
+    p[0]['types'].append(parameter['type'])
+  else:
+    parameter = p[1]
+    p[0] = {'parameters':[parameter['id']], 'types':[parameter['type']]}
 
 def p_P(p):
   '''
   P : id
     | id tipo TIPO
   '''
-  p[0] = p[1]
+  type = p[3] if len(p)==4 else None
+  p[0] = {'id':p[1], 'type':type}
 
 def p_STRUCT(p):
   '''

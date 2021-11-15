@@ -24,6 +24,8 @@ class Expression:
     self.right:Expression = right
 
   def __str__(self):
+    if self.unary:
+      return f'{operators[self.type]}{self.left}'
     return f'{self.left}{operators[self.type]}{self.right}'
 
 class Number:
@@ -74,7 +76,7 @@ class Assignment:
     self.deleted = False
 
   def __str__(self):
-    return f'{self.id}={self.ex};'
+    return f'{self.id}={self.ex}{"" if str(self.ex).endswith(";") else ";"}'
 
 class Tag:
   def __init__(self, ln, col, id):
@@ -165,7 +167,8 @@ operators = {
   'mayor':'>',
   'mayor_igual':'>=',
   'igualacion':'==',
-  'diferenciacion':'!='
+  'diferenciacion':'!=',
+  'negacion': '-'
 }
 
 inverse_operators = {

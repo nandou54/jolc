@@ -11,11 +11,12 @@ class Assignment:
     self.type = type
 
 class Function:
-  def __init__(self, ln, col, id, parameters, ins):
+  def __init__(self, ln, col, id, parameters, types, ins):
     self.ln = ln
     self.col = col
     self.id = id
     self.parameters = parameters
+    self.types = types
     self.ins:T_SENTENCE = ins
     self.env = None
 

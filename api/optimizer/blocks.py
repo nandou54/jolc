@@ -22,13 +22,13 @@ def optimize(input):
 
   for function_blocks in blocks.values():
     for block in function_blocks:
-      for optimizer in optimization_functions:
+      for optimizer in local_optimization_functions:
         optimizer(block.ins)
     INS += block.ins
 
   setGlobalOptimizations()
-  for optimizer in optimization_functions:
-    optimizer(block.ins)
+  for optimizer in global_optimization_functions:
+    optimizer(INS)
 
   for function in functions:
     function.ins = []
@@ -41,6 +41,7 @@ def optimize_common_subexpressions(INS):
   INS_COPY = INS.copy()
   for ins in INS_COPY:
     if type(ins) is not Assignment: continue
+    if ins.id.wrappers: continue
 
     to_watch = [ins.id] + getIds(ins.ex)
 
@@ -51,10 +52,10 @@ def optimize_common_subexpressions(INS):
       if type(ins2) is not Assignment: continue
 
       ids = [ins2.id.value] + [id.value for id in getIds(ins2.ex)]
-
       contained = any(id.value in ids for id in to_watch)
 
-      if not contained and expressionsAreEqual(ins.ex, ins2.ex):
+      if contained: break
+      if expressionsAreEqual(ins.ex, ins2.ex):
         original = deepcopy(ins)
         ins2.ex = Id(ins2.ex.ln, ins2.ex.col, ins.id.value)
         addReport(ins2.ln, 'Bloques', 'Subexpresiones comunes R1', f'{ins}\n...\n{original}', f'{ins}\n...\n{ins2}')
@@ -137,4 +138,6 @@ def optimize_constants_propagation(INS):
 
         addReport(ins2.ln, 'Bloques', 'Propagación de constantes R4', f'{ins}\n...\n{original}', f'{ins}\n...\n{ins2}')
 
-optimization_functions = [optimize_common_subexpressions, optimize_copies_propagation, optimize_dead_code, optimize_constants_propagation]
+local_optimization_functions = [optimize_common_subexpressions, optimize_copies_propagation, optimize_constants_propagation]
+
+global_optimization_functions = [optimize_common_subexpressions, optimize_copies_propagation, optimize_dead_code, optimize_constants_propagation]

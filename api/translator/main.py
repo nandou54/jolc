@@ -5,7 +5,7 @@ from api.interpreter.core import BINARY_OPERATION_RESULTS, UNARY_OPERATION_RESUL
 from api.symbols import Expression, Value, Assignment, Function, Struct, Call, If, Else, While, For, Return, Break, Continue
 from api.symbols import T_SENTENCE
 
-from .core import RESERVED_FUNCTIONS, Environment, SemanticError, addFunction, getFunction, getTemps, BINARY_OPERATIONS, UNARY_OPERATIONS
+from .core import RESERVED_FUNCTIONS, Environment, SemanticError, addFunction, get_assignments, getFunction, getTemps, BINARY_OPERATIONS, UNARY_OPERATIONS, process_functions
 from .core import getHeaderOutput, reset, getOutput, getErrors, getSymbols, Label, Temp, ApplicationError
 
 def translate(input):
@@ -43,25 +43,6 @@ def translate(input):
   res.pop('ast')
   return res
 
-def get_assignments(INS, env:Environment):
-  for sen in INS:
-    if type(sen) is Assignment or type(sen) is For:
-      env.declareSymbol(sen.id.value)
-    if hasattr(sen, 'ins'):
-      get_assignments(sen.ins, env)
-
-def process_functions(INS):
-  for sen in INS:
-    newEnv = Environment(sen.id.value, False)
-
-    for parameter in sen.parameters:
-      newEnv.declareSymbol(parameter.value)
-
-    get_assignments(sen.ins, newEnv)
-    newEnv.declareSymbol('return')
-    sen.env = newEnv
-    addFunction(sen)
-
 def trInstructions(INS:T_SENTENCE, env:Environment):
   return '\n'.join(
     f'// ***** iniciando {type(ins).__name__} *****\n' +
@@ -82,10 +63,11 @@ def trExpression(ex:Expression, env:Environment):
   if ex.type=='range': return trRange(ex, env)
   # if ex.type=='ternary': return trTernary(ex, env)
   if ex.type=='id':
-    if env.getSymbol(ex.value) is None:
+    symbol = env.getSymbol(ex.value)
+
+    if not symbol:
       return SemanticError(ex, f"No se declaró '{ex.value}'")
 
-    symbol = env.getSymbol(ex.value)
     pos_temp = Temp()
     val_temp = Temp()
 
@@ -141,13 +123,13 @@ def trCall(sen:Call, env:Environment):
   for expression in sen.expressions:
     temp = trExpression(expression, env)
     if not temp:
-      return SemanticError(sen, f"No se pudo realizar la llamada a '{sen.id}'")
+      return SemanticError(sen, f"No se pudo realizar la llamada a '{sen.id.value}'")
     values.append(temp)
 
   if sen.id.value in RESERVED_FUNCTIONS.keys():
     for value in values: s += value.output
     temp_result = RESERVED_FUNCTIONS[sen.id.value](values)
-    if not temp_result: return SemanticError(sen, f"No se pudo realizar la llamada a '{sen.id}'")
+    if not temp_result: return SemanticError(sen, f"No se pudo realizar la llamada a '{sen.id.value}'")
 
     temp_result.output = s+temp_result.output
     return temp_result
@@ -166,9 +148,9 @@ def trCall(sen:Call, env:Environment):
       new_env.declareSymbol(id, symbol.type)
 
     for i in range(len(function.parameters)):
-      id = function.parameters[i].value
-      value = values[i]
-      new_env.symbols[id].setType(value.type)
+      id, p_type, value = function.parameters[i].value, function.types[i], values[i]
+      if p_type and p_type!=value.type: return SemanticError(sen, f"La función '{sen.id.value}' recibe un parámetro '{id}' de tipo '{p_type}'")
+      new_env.symbols[id].setType(p_type)
 
     temp = Temp()
     new_base = env.length
@@ -208,7 +190,6 @@ def trRange(ex:Expression, env:Environment):
   r = trExpression(ex.right, env)
 
   if l.type!='int64' or r.type!='int64': return SemanticError(ex, "Se esperaba un int64 en el rango")
-  if l.value>r.value: return SemanticError(ex, "El rango no es válido")
 
   t = Temp({"l": l, "r": r}, 'range')
   t.setOutput(l, r)
@@ -219,8 +200,6 @@ def trTernary(ex:Expression, env:Environment):
 
 def trAssignment(sen:Assignment, env:Environment):
   s = ''
-  env.declareSymbol(sen.id.value, sen.type or 'int64')
-
   if not sen.ex: return s
 
   pos_temp = Temp()
@@ -278,15 +257,17 @@ def trIf(sen:If, env:Environment):
   if not condition: return SemanticError(sen, 'No se pudo ejecutar la sentencia while')
   if condition.type!='bool': return SemanticError(sen, 'Se esperaba una condición en la sentencia while')
 
-  s += condition.output
-  s += condition.printTrueTags()
-
-  s += trInstructions(sen.ins, env)
-
+  true_tag = Label()
+  false_tag = Label()
   escape_label = Label()
-  s += f'goto {escape_label};\n'
-  s += condition.printFalseTags()
 
+  s += condition.output
+  s += f'if({condition}==1){{goto {true_tag};}}\n'
+  s += f'goto {false_tag};\n'
+  s += f'{true_tag}:\n'
+  s += trInstructions(sen.ins, env)
+  s += f'goto {escape_label};\n'
+  s += f'{false_tag}:\n'
   if type(sen.elseif) is Else:
     s += trInstructions(sen.elseif.ins, env)
     s += f'goto {escape_label};\n'
@@ -303,17 +284,16 @@ def trWhile(sen:While, env:Environment):
   if condition.type!='bool': return SemanticError(sen, 'Se esperaba una condición en la sentencia while')
 
   loop_label = env.newLoopLabel()
+  true_label = Label()
   escape_label = env.newEscapeLabel()
 
   s = f'{loop_label}:\n'
-
   s += condition.output
-  s += condition.printTrueTags()
-
+  s += f'if({condition}==1){{goto {true_label};}}\n'
+  s += f'goto {escape_label};\n'
+  s += f'{true_label}:\n'
   s += trInstructions(sen.ins, env)
-
   s += f'goto {loop_label};\n'
-  s += condition.printFalseTags()
   s += f'goto {escape_label}; // goto para evitar error de go\n'
   s += f'{escape_label}:\n'
   return s

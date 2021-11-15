@@ -1,6 +1,6 @@
 from copy import deepcopy
 from copy import deepcopy
-from api.symbols import Error, Struct
+from api.symbols import Error, Assignment, For
 
 def getHeaderOutput():
   s = 'package main;\n'
@@ -108,7 +108,8 @@ class Environment():
 
     if increment: envs.append(self)
 
-  def declareSymbol(self, id, type = 'int64'):
+  def declareSymbol(self, id, type=None):
+    type = type or 'int64'
     if id in self.symbols.keys():
       self.symbols[id].setType(type)
     else:
@@ -136,8 +137,6 @@ class Environment():
   def getEscapeLabel(self):
     if len(self.escape_labels)==0: return None
     return self.escape_labels[-1]
-
-  # def add
 
 class Symbol():
   def __init__(self, position, type):
@@ -173,10 +172,7 @@ class Temp:
       addTemp(self.value)
       temp_counter += 1
 
-
     self.output = ''
-    self.true_tags = []
-    self.false_tags = []
 
   def __str__(self):
     return str(self.value)
@@ -184,19 +180,25 @@ class Temp:
   def setOutput(self, *args):
     for t in args: self.output += t.output
 
-  def printTrueTags(self):
-    return ''.join(str(tag) + ':\n' for tag in self.true_tags)
+def get_assignments(INS, env:Environment):
+  for sen in INS:
+    if type(sen) is Assignment or type(sen) is For:
+      env.declareSymbol(sen.id.value)
+    if hasattr(sen, 'ins'):
+      get_assignments(sen.ins, env)
 
-  def printFalseTags(self):
-    return ''.join(str(tag) + ':\n' for tag in self.false_tags)
+def process_functions(INS):
+  for sen in INS:
+    newEnv = Environment(sen.id.value, False)
 
-format_types = {
-  'int64': '%d',
-  'float64': '%f',
-  'string': '%c',
-  'char': '%c',
-  'bool': '%t'
-}
+    for i in range(len(sen.parameters)):
+      parameter, type = sen.parameters[i], sen.types[i]
+      newEnv.declareSymbol(parameter.value, type)
+
+    get_assignments(sen.ins, newEnv)
+    newEnv.declareSymbol('return')
+    sen.env = newEnv
+    addFunction(sen)
 
 def _print(temps):
   setFmt()
@@ -204,7 +206,28 @@ def _print(temps):
 
   for temp in temps:
     if temp.type == 'float64':
-      s += f'fmt.Printf("{format_types[temp.type]}", {temp});\n'
+      s += f'fmt.Printf("%f", {temp});\n'
+    elif temp.type == 'bool':
+      true_label = Label()
+      false_label = Label()
+      escape_label = Label()
+
+      s += f'if({temp}==1){{goto {true_label};}}\n'
+      s += f'goto {false_label};\n'
+      s += f'{true_label}:\n'
+      s += 'fmt.Printf("%c", 116); // t\n'
+      s += 'fmt.Printf("%c", 114); // r\n'
+      s += 'fmt.Printf("%c", 117); // u\n'
+      s += 'fmt.Printf("%c", 101); // e\n'
+      s += f'goto {escape_label};\n'
+      s += f'{false_label}:\n'
+      s += 'fmt.Printf("%c", 102); // f\n'
+      s += 'fmt.Printf("%c", 97); // a\n'
+      s += 'fmt.Printf("%c", 108); // l\n'
+      s += 'fmt.Printf("%c", 115); // s\n'
+      s += 'fmt.Printf("%c", 101); // e\n'
+      s += f'goto {escape_label};\n'
+      s += f'{escape_label}:\n'
     elif temp.type == 'string':
       char_temp = Temp()
       loop_label = Label()
@@ -221,12 +244,12 @@ def _print(temps):
       s += f'goto {loop_label};\n'
       s += f'{false_label}:\n'
     else:
-      s += f'fmt.Printf("{format_types[temp.type]}", int({temp}));\n'
+      s += f'fmt.Printf("%d", int({temp}));\n'
     s += 'fmt.Printf("%c", 32);\n'
 
-  t = Temp(0)
-  t.output = s
-  return t
+  temp_bool = Temp()
+  temp_bool.output = s
+  return temp_bool
 
 def _println(temps):
   setFmt()
@@ -234,7 +257,28 @@ def _println(temps):
 
   for temp in temps:
     if temp.type == 'float64':
-      s += f'fmt.Printf("{format_types[temp.type]}", {temp});\n'
+      s += f'fmt.Printf("%f", {temp});\n'
+    elif temp.type == 'bool':
+      true_label = Label()
+      false_label = Label()
+      escape_label = Label()
+
+      s += f'if({temp}==1){{goto {true_label};}}\n'
+      s += f'goto {false_label};\n'
+      s += f'{true_label}:\n'
+      s += 'fmt.Printf("%c", 116); // t\n'
+      s += 'fmt.Printf("%c", 114); // r\n'
+      s += 'fmt.Printf("%c", 117); // u\n'
+      s += 'fmt.Printf("%c", 101); // e\n'
+      s += f'goto {escape_label};\n'
+      s += f'{false_label}:\n'
+      s += 'fmt.Printf("%c", 102); // f\n'
+      s += 'fmt.Printf("%c", 97); // a\n'
+      s += 'fmt.Printf("%c", 108); // l\n'
+      s += 'fmt.Printf("%c", 115); // s\n'
+      s += 'fmt.Printf("%c", 101); // e\n'
+      s += f'goto {escape_label};\n'
+      s += f'{escape_label}:\n'
     elif temp.type == 'string':
       char_temp = Temp()
       loop_label = Label()
@@ -251,7 +295,7 @@ def _println(temps):
       s += f'goto {loop_label};\n'
       s += f'{false_label}:\n'
     else:
-      s += f'fmt.Printf("{format_types[temp.type]}", int({temp}));\n'
+      s += f'fmt.Printf("%d", int({temp}));\n'
     s += 'fmt.Printf("%c", 32);\n'
   s += 'fmt.Printf("%c", 10); // nueva linea\n'
 
@@ -410,58 +454,185 @@ def _float(values):
   newValue.value = float(newValue.value)
   return newValue
 
-def unnest(val):
-  if type(val) is list:
-    for i in range(len(val)):
-      val[i] = unnest(val[i].value)
-  elif type(val) is Struct:
-    d = {'struct': val.id.value}
-    for a in val.attributes:
-      d[a.id.value] = unnest(a.value.value)
-    val = d
-  return val
+# def unnest(val):
+#   if type(val) is list:
+#     for i in range(len(val)):
+#       val[i] = unnest(val[i].value)
+#   elif type(val) is Struct:
+#     d = {'struct': val.id.value}
+#     for a in val.attributes:
+#       d[a.id.value] = unnest(a.value.value)
+#     val = d
+#   return val
 
 def _string(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'string' recibe un parámetro")
 
   t = values[0]
   if t.type=='string': return t
-
-  setFmt()
-
   t_result = Temp(None, 'string')
-  char_temp = Temp()
-  loop_label = Label()
-  true_label = Label()
-  false_label = Label()
-  true_label_num = Label()
-  true_label_num2 = Label()
-  false_label_num = Label()
+  t_result.setOutput(t)
+  t_result.output = f'{t_result}=h;\n'
 
-  s = ''
-  # for c in str(t.value):
-    # s += 
+  if t.type=='char':
+    s = f'heap[int(h)]={t.value};\n'
+    s += 'h=h+1;\n'
+    s += 'heap[int(h)]=34;\n'
+    s += 'h=h+1;\n'
 
-  s = f'{loop_label}:\n'
-  s += f'{char_temp}=heap[int({t})];\n'
-  s += f'if({char_temp}!=34){{goto {true_label};}}\n'
-  s += f'goto {false_label};\n'
-  s += f'{true_label}:\n'
-  s += f'if({char_temp}>=48){{goto {true_label_num};}}\ngoto {false_label_num};\n'
-  s += f'{true_label_num}:\n'
-  s += f'if({char_temp}<=57){{goto {true_label_num2};}}\ngoto {false_label_num};\n'
-  s += f'{true_label_num2}:\n'
-  s += f'{char_temp}={char_temp}-48;\n'
-  s += f'{t_result}={t_result}*10;\n'
-  s += f'{t_result}={t_result}+{char_temp};\n'
-  s += f'{t}={t}+1;\n'
-  s += f'goto {loop_label};\n'
-  s += f'{false_label_num}:\n'
-  s += f'{false_label}:\n'
+  elif t.type=='int64':
+    temp = Temp()
+    divisor_temp = Temp()
+    char_temp = Temp()
+    excess_temp = Temp()
+    loop_label = Label()
+    true_label = Label()
+    false_label = Label()
+    escape_label = Label()
+    loop_label2 = Label()
+    true_label2 = Label()
+    false_label2 = Label()
+    escape_label2 = Label()
 
-  t_result.output = s
+    s = f'{temp}={t};\n'
+    s += f'{divisor_temp}=1;\n'
+    s += f'{loop_label}:\n'
+    s += f'if({divisor_temp}>{temp}){{goto {true_label};}}\n'
+    s += f'goto {false_label};\n'
+    s += f'{true_label}:\n'
+    s += f'{divisor_temp}={divisor_temp}/10;\n'
+    s += f'goto {escape_label};\n'
+    s += f'{false_label}:\n'
+    s += f'{divisor_temp}={divisor_temp}*10;\n'
+    s += f'goto {loop_label};\n'
+    s += f'{escape_label}:\n'
+    s += f'{loop_label2}:\n'
+    s += f'{char_temp}={temp}/{divisor_temp};\n'
+    s += f'{char_temp}=float64(int({char_temp}));\n'
+    s += f'{char_temp}={char_temp}+48;\n'
+    s += f'heap[int(h)]={char_temp};\n'
+    s += 'h=h+1;\n'
+    s += f'{char_temp}={char_temp}-48;\n'
+    s += f'if({divisor_temp}>1){{goto {true_label2};}}\n'
+    s += f'goto {false_label2};\n'
+    s += f'{true_label2}:\n'
+    s += f'{excess_temp}={char_temp}*{divisor_temp};\n'
+    s += f'{temp}={temp}-{excess_temp};\n'
+    s += f'{divisor_temp}={divisor_temp}/10;\n'
+    s += f'goto {loop_label2};\n'
+    s += f'{false_label2}:\n'
+    s += 'heap[int(h)]=34;\n'
+    s += 'h=h+1;\n'
+    s += f'goto {escape_label2};\n'
+    s += f'{escape_label2}:\n'
+
+  elif t.type=='float64':
+    temp = Temp()
+    divisor_temp = Temp()
+    char_temp = Temp()
+    excess_temp = Temp()
+    loop_label = Label()
+    true_label = Label()
+    false_label = Label()
+    escape_label = Label()
+    loop_label2 = Label()
+    true_label2 = Label()
+    false_label2 = Label()
+    escape_label2 = Label()
+    loop_label3 = Label()
+    true_label3 = Label()
+    false_label3 = Label()
+    escape_label3 = Label()
+
+    s = f'{temp}={t};\n'
+    s += f'{divisor_temp}=1;\n'
+    s += f'{loop_label}:\n'
+    s += f'if({divisor_temp}>{temp}){{goto {true_label};}}\n'
+    s += f'goto {false_label};\n'
+    s += f'{true_label}:\n'
+    # s += f'{divisor_temp}={divisor_temp}/10;\n'
+    s += f'goto {escape_label};\n'
+    s += f'{false_label}:\n'
+    s += f'{divisor_temp}={divisor_temp}*10;\n'
+    s += f'goto {loop_label};\n'
+    s += f'{escape_label}:\n'
+    s += f'{loop_label2}:\n'
+    s += f'{char_temp}={temp}/{divisor_temp};\n'
+    s += f'{char_temp}=float64(int({char_temp}));\n'
+    s += f'{char_temp}={char_temp}+48;\n'
+    s += f'heap[int(h)]={char_temp};\n'
+    s += 'h=h+1;\n'
+    s += f'{char_temp}={char_temp}-48;\n'
+    s += f'if({divisor_temp}>1){{goto {true_label2};}}\n'
+    s += f'goto {false_label2};\n'
+    s += f'{true_label2}:\n'
+    s += f'{excess_temp}={divisor_temp}*{char_temp};\n'
+    s += f'{temp}={temp}-{excess_temp};\n'
+    s += f'{divisor_temp}={divisor_temp}/10;\n'
+    s += f'goto {loop_label2};\n'
+    s += f'{false_label2}:\n'
+    s += f'{excess_temp}={divisor_temp}*{char_temp};\n'
+    s += f'{temp}={temp}-{excess_temp};\n'
+    s += f'{divisor_temp}=10;\n'
+    s += 'heap[int(h)]=46;\n'
+    s += 'h=h+1;\n'
+    s += f'goto {escape_label2};\n'
+    s += f'{escape_label2}:\n'
+    s += f'{loop_label3}:\n'
+    s += f'{char_temp}={temp}*{divisor_temp};\n'
+    s += f'{char_temp}=float64(int({char_temp}));\n'
+    s += f'{char_temp}={char_temp}+48;\n'
+    s += f'heap[int(h)]={char_temp};\n'
+    s += 'h=h+1;\n'
+    s += f'{char_temp}={char_temp}-48;\n'
+    s += f'if({divisor_temp}<100){{goto {true_label3};}}\n'
+    s += f'goto {false_label3};\n'
+    s += f'{true_label3}:\n'
+    s += f'{excess_temp}={char_temp}/{divisor_temp};\n'
+    s += f'{temp}={temp}-{excess_temp};\n'
+    s += f'{divisor_temp}={divisor_temp}*10;\n'
+    s += f'goto {loop_label3};\n'
+    s += f'{false_label3}:\n'
+    s += 'heap[int(h)]=34;\n'
+    s += 'h=h+1;\n'
+    s += f'goto {escape_label3};\n'
+    s += f'{escape_label3}:\n'
+
+  elif t.type=='bool':
+    true_label = Label()
+    false_label = Label()
+    escape_label = Label()
+
+    s = f'if({t}==1){{goto {true_label};}}\n'
+    s += f'goto {false_label};\n'
+    s += f'{true_label}:\n'
+    s += 'heap[int(h)]=116;\n'
+    s += 'h=h+1;\n'
+    s += 'heap[int(h)]=114;\n'
+    s += 'h=h+1;\n'
+    s += 'heap[int(h)]=117;\n'
+    s += 'h=h+1;\n'
+    s += 'heap[int(h)]=101;\n'
+    s += 'h=h+1;\n'
+    s += f'goto {escape_label};\n'
+    s += f'{false_label}:\n'
+    s += 'heap[int(h)]=102;\n'
+    s += 'h=h+1;\n'
+    s += 'heap[int(h)]=97;\n'
+    s += 'h=h+1;\n'
+    s += 'heap[int(h)]=108;\n'
+    s += 'h=h+1;\n'
+    s += 'heap[int(h)]=115;\n'
+    s += 'h=h+1;\n'
+    s += 'heap[int(h)]=101;\n'
+    s += 'h=h+1;\n'
+    s += f'goto {escape_label};\n'
+    s += f'{escape_label}:\n'
+    s += 'heap[int(h)]=34;\n'
+    s += 'h=h+1;\n'
+
+  t_result.output += s
   return t_result
-
 
 def _uppercase(values):
   if len(values)!=1: return SemanticError(values[0], "La función nativa 'uppercase' recibe un parámetro")
@@ -471,7 +642,6 @@ def _uppercase(values):
     return SemanticError(temp, "La función nativa 'uppercase' recibe un valor string")
 
   res_temp = Temp(None, 'string')
-  res_temp.setOutput(temp)
   char_temp = Temp()
 
   s = f'{res_temp}=h; // inicio de uppercase\n'
@@ -515,7 +685,6 @@ def _lowercase(values):
     return SemanticError(temp, "La función nativa 'lowercase' recibe un valor string")
 
   res_temp = Temp(None, 'string')
-  res_temp.setOutput(temp)
   char_temp = Temp()
 
   s = f'{res_temp}=h; // inicio de lowercase\n'
@@ -829,103 +998,183 @@ def _negacion(l:Temp):
   return t
 
 def _menor(l:Temp, r:Temp):
-  t = Temp(0)
+  t = Temp()
+  t.setOutput(l, r)
   true_tag = Label()
   false_tag = Label()
+  escape_tag = Label()
 
-  t.true_tags.append(true_tag)
-  t.false_tags.append(false_tag)
-
-  t.setOutput(l, r)
-  t.output += f'if ({l}<{r}){{goto {true_tag};}}\ngoto {false_tag};\n'
+  t.output += f'''if ({l}<{r}){{goto {true_tag};}}
+goto {false_tag};
+{true_tag}:
+{t}=1;
+goto {escape_tag};
+{false_tag}:
+{t}=0;
+goto {escape_tag};
+{escape_tag}:
+'''
   return t
 
 def _menor_igual(l:Temp, r:Temp):
-  t = Temp(0)
+  t = Temp()
+  t.setOutput(l, r)
   true_tag = Label()
   false_tag = Label()
+  escape_tag = Label()
 
-  t.true_tags.append(true_tag)
-  t.false_tags.append(false_tag)
-
-  t.setOutput(l, r)
-  t.output += f'if ({l}<={r}){{goto {true_tag};}}\ngoto {false_tag};\n'
+  t.output += f'''if ({l}<={r}){{goto {true_tag};}}
+goto {false_tag};
+{true_tag}:
+{t}=1;
+goto {escape_tag};
+{false_tag}:
+{t}=0;
+goto {escape_tag};
+{escape_tag}:
+'''
   return t
 
 def _mayor(l:Temp, r:Temp):
-  t = Temp(0)
+  t = Temp()
+  t.setOutput(l, r)
   true_tag = Label()
   false_tag = Label()
+  escape_tag = Label()
 
-  t.true_tags.append(true_tag)
-  t.false_tags.append(false_tag)
-
-  t.setOutput(l, r)
-  t.output += f'if ({l}>{r}){{goto {true_tag};}}\ngoto {false_tag};\n'
+  t.output += f'''if ({l}>{r}){{goto {true_tag};}}
+goto {false_tag};
+{true_tag}:
+{t}=1;
+goto {escape_tag};
+{false_tag}:
+{t}=0;
+goto {escape_tag};
+{escape_tag}:
+'''
   return t
 
 def _mayor_igual(l:Temp, r:Temp):
-  t = Temp(0)
+  t = Temp()
+  t.setOutput(l, r)
   true_tag = Label()
   false_tag = Label()
+  escape_tag = Label()
 
-  t.true_tags.append(true_tag)
-  t.false_tags.append(false_tag)
-
-  t.setOutput(l, r)
-  t.output += f'if ({l}>={r}){{goto {true_tag};}}\ngoto {false_tag};\n'
+  t.output += f'''if ({l}>={r}){{goto {true_tag};}}
+goto {false_tag};
+{true_tag}:
+{t}=1;
+goto {escape_tag};
+{false_tag}:
+{t}=0;
+goto {escape_tag};
+{escape_tag}:
+'''
   return t
 
 def _igualacion(l:Temp, r:Temp):
-  t = Temp(0)
+  t = Temp()
+  t.setOutput(l, r)
   true_tag = Label()
   false_tag = Label()
+  escape_tag = Label()
 
-  t.true_tags.append(true_tag)
-  t.false_tags.append(false_tag)
-
-  t.setOutput(l, r)
-  t.output += f'if ({l}=={r}){{goto {true_tag};}}\ngoto {false_tag};\n'
+  t.output += f'''if ({l}=={r}){{goto {true_tag};}}
+goto {false_tag};
+{true_tag}:
+{t}=1;
+goto {escape_tag};
+{false_tag}:
+{t}=0;
+goto {escape_tag};
+{escape_tag}:
+'''
   return t
 
 def _diferenciacion(l:Temp, r:Temp):
-  t = Temp(0)
+  t = Temp()
+  t.setOutput(l, r)
   true_tag = Label()
   false_tag = Label()
+  escape_tag = Label()
 
-  t.true_tags.append(true_tag)
-  t.false_tags.append(false_tag)
-
-  t.setOutput(l, r)
-  t.output += f'if ({l}!={r}){{goto {true_tag};}}\ngoto {false_tag};\n'
+  t.output += f'''if ({l}!={r}){{goto {true_tag};}}
+goto {false_tag};
+{true_tag}:
+{t}=1;
+goto {escape_tag};
+{false_tag}:
+{t}=0;
+goto {escape_tag};
+{escape_tag}:
+'''
   return t
 
 def _or(l:Temp, r:Temp):
-  t = Temp(0)
-  t.setOutput(l)
+  t = Temp()
+  t.setOutput(l, r)
+  true_tag = Label()
+  false_tag = Label()
+  false_tag2 = Label()
+  escape_tag = Label()
 
-  t.true_tags = l.true_tags + r.true_tags
-  t.false_tags = r.false_tags
-
-  t.output += l.printFalseTags()
-  t.setOutput(r)
+  t.output += f'''if({l}==1){{goto {true_tag};}}
+goto {false_tag};
+{false_tag}:
+if({r}==1){{goto {true_tag};}}
+goto {false_tag2};
+{true_tag}:
+{t}=1;
+goto {escape_tag};
+{false_tag2}:
+{t}=0;
+goto {escape_tag};
+{escape_tag}:
+'''
   return t
 
 def _and(l:Temp, r:Temp):
-  t = Temp(0)
-  t.setOutput(l)
+  t = Temp()
+  t.setOutput(l, r)
+  true_tag = Label()
+  true_tag2 = Label()
+  false_tag = Label()
+  escape_tag = Label()
 
-  t.true_tags = r.true_tags
-  t.false_tags = l.false_tags + r.false_tags
-
-  t.output += l.printTrueTags()
-  t.setOutput(r)
+  t.output += f'''if({l}==1){{goto {true_tag};}}
+goto {false_tag};
+{true_tag}:
+if({r}==1){{goto {true_tag2};}}
+goto {false_tag};
+{true_tag2}:
+{t}=1;
+goto {escape_tag};
+{false_tag}:
+{t}=0;
+goto {escape_tag};
+{escape_tag}:
+'''
   return t
 
 def _not(l:Temp):
-  temp_tags = l.true_tags
-  l.true_tags = l.false_tags
-  l.false_tags = temp_tags
+  t = Temp()
+  t.setOutput(l)
+  true_tag = Label()
+  false_tag = Label()
+  escape_tag = Label()
+
+  t.output += f'''if({l}==1){{goto {true_tag};}}
+goto {false_tag};
+{true_tag}:
+{t}=0;
+goto {escape_tag};
+{false_tag}:
+{t}=1;
+goto {escape_tag};
+{escape_tag}:
+'''
+  return t
 
 BINARY_OPERATIONS = {
   'suma': _suma,

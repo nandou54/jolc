@@ -120,7 +120,6 @@ def exId(ex, env:Environment):
   id = env.getGlobalSymbol(ex.value)
   if not id: return SemanticError(ex, "No se ha declarado '{}'".format(ex.value))
   if type(id) is Function:
-    print("es funcion")
     return SemanticError(ex, 'Error al obtener una funcion')
   if type(id) is Struct: return SemanticError(ex, 'Error al obtener un struct')
   return id
@@ -147,7 +146,9 @@ def exCall(sen:Call, env:Environment):
     newEnv = Environment(env.id+"$"+sen.id.value, env)
 
     for i in range(len(function.parameters)):
-      newEnv.declareSymbol(function.parameters[i].value, values[i])
+      id, p_type, value = function.parameters[i].value, function.types[i], values[i]
+      if p_type and p_type!=value.type: return SemanticError(sen, f"La función '{sen.id.value}' recibe un parámetro '{id}' de tipo '{p_type}'")
+      newEnv.declareSymbol(id, value)
 
     functions.append(sen.id.value)
     result = exInstructions(function.ins, newEnv)

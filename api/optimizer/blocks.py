@@ -24,17 +24,16 @@ def optimize(input):
     for block in function_blocks:
       for optimizer in local_optimization_functions:
         optimizer(block.ins)
-    INS += block.ins
+      INS += block.ins
 
   setGlobalOptimizations()
   for optimizer in global_optimization_functions:
     optimizer(INS)
 
   for function in functions:
-    function.ins = []
-    for block in blocks[function.id]: function.ins += block.ins
+    function.ins = [ins for ins in INS if ins.owner == function.id]
 
-  output = header + str('\n\n'.join(str(function) for function in functions))
+  output = header + str('\n\n'.join(str(function) for function in functions)) + '\n'
   return {'output': output, 'reports': reports}
 
 def optimize_common_subexpressions(INS):

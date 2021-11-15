@@ -31,7 +31,7 @@ def optimize(input):
   for function in functions:
     function.ins = [ins for ins in INS if ins.owner == function.id]
 
-  output = header + str('\n\n'.join(str(function) for function in functions))
+  output = header + str('\n\n'.join(str(function) for function in functions)) + '\n'
   return {'output': output, 'reports': reports}
 
 def optimize_redundant_instructions(INS, eyehole_length):

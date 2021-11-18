@@ -1,43 +1,72 @@
 import styles from '@/styles/WelcomePage.module.css'
 import React from 'react'
 
-import logo from '@img/logo_usac.png'
-
 function WelcomePage() {
   return (
     <div className={styles.base}>
-      <div className={styles.small}>Agosto - Septiembre de 2021</div>
-      <div className={styles.title}>
-        <h2>Universidad de San Carlos de Guatemala</h2>
-        <img src={logo} width={100} />
-      </div>
+      <div className={styles.small}>Agosto - Noviembre de 2021</div>
       <div className={styles.group}>
-        <h3>¡Bienvenido a Jolc!</h3>
-        <p>El primer proyecto del curso de Organización de Lenguajes y Compiladores 2</p>
+        <h2>JOLC</h2>
       </div>
       <div className={styles.group}>
         <h3>¿Qué es Jolc?</h3>
-        <p>
-          Un intérprete de un lenguaje llamado Jolc, una lenguaje basado en Julia
-          ejecutable en la web.
-        </p>
+        <ul>
+          <li>
+            Un intérprete de Jolc, una lenguaje de programación basado en Julia ejecutable
+            en la web.
+          </li>
+          <li>
+            Un compilador de Jolc, que genera código intermedio de Go totalmente
+            funcional.
+          </li>
+          <li>
+            Un optimizador de código intermedio de Go, a través de optimizaciones locales
+            y globales.
+          </li>
+        </ul>
       </div>
       <div className={styles.group}>
         <h3>Autor</h3>
-        <p>Nombre: Pablo Cabrera</p>
-        <p>Carné: 201901698</p>
-        <li>
-          <a target='blank' href='mailto:pablofernando50259107@gmail.com'>
-            E-mail
-          </a>
-        </li>
-        <br />
-        <div>
+        <ul>
+          <li>
+            <a target='blank' href='https://github.com/pabloc54'>
+              Pablo Cabrera
+            </a>
+          </li>
+          <li>
+            <a target='blank' href='mailto:pablofernando54@outlook.com'>
+              pablofernando54@outlook.com
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div className={styles.group}>
+        <h3>Enlaces útiles</h3>
+        <ul>
+          <li>
+            <a target='blank' href='https://julialang.org/'>
+              The Julia Programming Language
+            </a>
+          </li>
+          <li>
+            <a
+              target='blank'
+              href='https://www.tutorialspoint.com/julia/julia_basic_syntax.htm'>
+              Julia Programming - Basic Syntax
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <p>
           Source del proyecto: <a href='https://github.com/pabloc54/jolc'>GitHub</a>
-        </div>
-        <div>
-          Icons by <a href='https://icons8.com'>Icons8</a>
-        </div>
+        </p>
+      </div>
+      <div>
+        <p>
+          Iconos proporcionados por <a href='https://icons8.com'>Icons8</a>. Créditos a
+          sus respectivos autores.
+        </p>
       </div>
     </div>
   )

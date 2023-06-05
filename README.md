@@ -1,2 +1,2 @@
 # JOLC
-deployed on [heroku](https://jolc2.herokuapp.com/client/)!
+deployed on [GitHub Pages](https://pabloc54.github.io/jolc/)!

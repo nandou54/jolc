@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "bash ./build.sh"
+buildCommand = "npm run build"
 
 [deploy]
 startCommand = "uvicorn api.main:app --host=0.0.0.0 --port=${PORT:-5000}"

@@ -2,7 +2,7 @@
   "name": "jolc",
   "version": "2.0.3",
   "scripts": {
-    "start": "uvicorn api.main:app --reload",
+    "start": "python3 -m uvicorn api.main:app --host=0.0.0.0 --port=${PORT:-5000}",
     "dev:client": "cd client && vite",
     "dev:api": "cd api && uvicorn main:app --reload --port 300",
     "build": "cd client && vite build",

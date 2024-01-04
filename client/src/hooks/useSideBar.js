@@ -8,6 +8,16 @@ import { updateReports } from '@/actions/reportsActions'
 import useKeyPress from './useKeyPress'
 import { API_URL } from '@/constants'
 
+import homeIcon from '/assets/home.svg?react'
+import editorIcon from '/assets/editor.svg?react'
+import reportsIcon from '/assets/reports.svg?react'
+
+import menuIcon from '/assets/menu.svg?react'
+import playIcon from '/assets/play.svg?react'
+import compileIcon from '/assets/compile.svg?react'
+import blocksOptimizeIcon from '/assets/blocks-optimize.svg?react'
+import peepholeOptimizeIcon from '/assets/peephole-optimize.svg?react'
+
 function useSideBar() {
   const [location] = useLocation()
   const { show, loading } = useSelector(({ app }) => app)
@@ -37,7 +47,11 @@ function useSideBar() {
         setTimeout(
           () => {
             dispatch(appendOutput(data.output))
-            const reports = { ast: data.ast, errors: data.errors, symbols: data.symbols }
+            const reports = {
+              ast: data.ast,
+              errors: data.errors,
+              symbols: data.symbols
+            }
             dispatch(updateReports(reports))
 
             if (data.errors.length) {
@@ -199,60 +213,64 @@ function useSideBar() {
   useKeyPress('Escape', handleToggleSideBar)
   useKeyPress('r', location == 'editor' && handleRun, { alt: true })
   useKeyPress('c', location == 'editor' && handleCompile, { alt: true })
-  useKeyPress('m', location == 'editor' && handleOptimizeByEyeHole, { alt: true })
-  useKeyPress('b', location == 'editor' && handleOptimizeByBlocks, { alt: true })
+  useKeyPress('m', location == 'editor' && handleOptimizeByEyeHole, {
+    alt: true
+  })
+  useKeyPress('b', location == 'editor' && handleOptimizeByBlocks, {
+    alt: true
+  })
 
   const items = [
     {
       label: 'Inicio',
-      to: '.',
-      img: 'ios-glyphs/30/home.png',
+      to: '/',
+      icon: homeIcon,
       active: location == '/'
     },
     {
       label: 'Editor',
-      to: 'editor',
-      img: 'ios-filled/50/web.png',
-      active: location == 'editor'
+      to: '/editor',
+      icon: editorIcon,
+      active: location == '/editor'
     },
     {
       label: 'Reportes',
-      to: 'reports',
-      img: 'pastel-glyph/64/report-file--v4.png',
-      active: location == 'reports'
+      to: '/reports',
+      icon: reportsIcon,
+      active: location == '/reports'
     }
   ]
 
   const buttons = [
     {
       onClick: handleToggleSideBar,
-      img: 'ios-filled/50/FFFFFF/menu-rounded.png',
+      icon: menuIcon,
       tooltip: 'Abrir menú [esc]'
     },
     {
       onClick: handleRun,
-      img: 'ios-filled/24/FFFFFF/play--v1.png',
+      icon: playIcon,
       tooltip: 'Ejecutar código [alt]+[r]',
       highlight: true,
-      condition: location == 'editor'
+      condition: location == '/editor'
     },
     {
       onClick: handleCompile,
-      img: 'material-outlined/24/FFFFFF/play-property.png',
+      icon: compileIcon,
       tooltip: 'Compilar código [alt]+[c]',
-      condition: location == 'editor'
+      condition: location == '/editor'
     },
     {
       onClick: handleOptimizeByEyeHole,
-      img: 'external-those-icons-fill-those-icons/24/FFFFFF/external-strainer-kitchen-those-icons-fill-those-icons.png',
+      icon: peepholeOptimizeIcon,
       tooltip: 'Optimizar por mirilla [alt]+[m]',
-      condition: location == 'editor'
+      condition: location == '/editor'
     },
     {
       onClick: handleOptimizeByBlocks,
-      img: 'ios-glyphs/24/FFFFFF/prototype.png',
+      icon: blocksOptimizeIcon,
       tooltip: 'Optimizar por bloques [alt]+[b]',
-      condition: location == 'editor'
+      condition: location == '/editor'
     }
   ]
 

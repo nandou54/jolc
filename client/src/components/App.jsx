@@ -10,17 +10,17 @@ const ReportsPage = lazy(() => import('@/pages/ReportsPage'))
 
 function App() {
   return (
-    <Router base='/'>
+    <Router base="/jolc">
       <SideBar />
       <div className={styles.base}>
-        <Suspense fallback={<div className='loader'>Un momento...</div>}>
-          <Route path=''>
+        <Suspense fallback={<div className="loader">Un momento...</div>}>
+          <Route path="/">
             <WelcomePage />
           </Route>
-          <Route path='editor'>
+          <Route path="/editor">
             <EditorPage />
           </Route>
-          <Route path='reports'>
+          <Route path="/reports">
             <ReportsPage />
           </Route>
         </Suspense>

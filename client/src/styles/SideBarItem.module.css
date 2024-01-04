@@ -14,7 +14,8 @@
   border-bottom: 2px rgba(55, 55, 70, 0.5) solid;
 }
 
-.base img {
+.base svg {
   width: 25px;
   margin: 0 15px;
+  fill: white;
 }

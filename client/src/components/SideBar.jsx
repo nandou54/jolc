@@ -30,7 +30,10 @@ function SideBar() {
       </nav>
       {loading && <Loader />}
       {(show || loading) && (
-        <div className={styles.outside} onClick={() => handleHideSideBar(false)} />
+        <div
+          className={styles.outside}
+          onClick={() => handleHideSideBar(false)}
+        />
       )}
     </div>
   )

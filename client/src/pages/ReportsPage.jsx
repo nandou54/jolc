@@ -5,7 +5,9 @@ import { Link } from 'wouter'
 import { Graphviz } from 'graphviz-react'
 
 function ReportsPage() {
-  const { ast, symbols, errors, optimizations } = useSelector((state) => state.reports)
+  const { ast, symbols, errors, optimizations } = useSelector(
+    (state) => state.reports
+  )
   const { variables, functions, structs } = !!symbols && symbols
 
   const existsVariables = !!variables && !!variables.length
@@ -16,17 +18,17 @@ function ReportsPage() {
   const existsSymbols = existsVariables || existsFunctions || existsStructs
   const existsErrors = !!errors && !!errors.length
   const existsOptimizations = !!optimizations && !!optimizations.length
-  const existsReports = existsAST || existsSymbols || existsErrors || existsOptimizations
+  const existsReports =
+    existsAST || existsSymbols || existsErrors || existsOptimizations
 
   return (
     <div className={styles.base}>
-      <div className={styles.small}>Agosto - Septiembre de 2021</div>
       <h2>Reportes de la aplicación</h2>
       <p>Datos sobre la última ejecución de código</p>
       {!existsReports ? (
         <p>
-          No existen reportes para mostrar. Ve al <Link to='editor'>Editor</Link> para
-          generar reportes.
+          No existen reportes para mostrar. Ve al{' '}
+          <Link to="/editor">Editor</Link> para generar reportes.
         </p>
       ) : (
         <>
@@ -94,7 +96,13 @@ function ReportsPage() {
                   <>
                     <h4>Funciones</h4>
                     <Table
-                      headers={['Entorno', 'Línea', 'Columna', 'ID', 'Parámetros']}
+                      headers={[
+                        'Entorno',
+                        'Línea',
+                        'Columna',
+                        'ID',
+                        'Parámetros'
+                      ]}
                       body={functions}
                       className={styles.functions}
                     />
@@ -106,7 +114,13 @@ function ReportsPage() {
                   <>
                     <h4>Structs</h4>
                     <Table
-                      headers={['Entorno', 'Línea', 'Columna', 'ID', 'Atributos']}
+                      headers={[
+                        'Entorno',
+                        'Línea',
+                        'Columna',
+                        'ID',
+                        'Atributos'
+                      ]}
                       body={structs}
                       className={styles.structs}
                     />

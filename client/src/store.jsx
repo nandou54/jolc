@@ -1,5 +1,4 @@
 import { combineReducers, createStore } from 'redux'
-import { composeWithDevTools } from 'redux-devtools-extension'
 
 import appReducer from '@/reducers/appReducer'
 import outputReducer from '@/reducers/outputReducer'
@@ -28,6 +27,6 @@ const initialState = {
   reports
 }
 
-const store = createStore(reducer, initialState, composeWithDevTools())
+const store = createStore(reducer, initialState)
 
 export default store

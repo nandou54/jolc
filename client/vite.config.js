@@ -7,7 +7,7 @@ export default defineConfig({
   base: '/jolc/',
   publicDir: 'src/public',
   build: {
-    outDir: '../api/dist',
+    outDir: '../dist',
     emptyOutDir: true,
     assetsDir: 'static'
   },

@@ -1,33 +1,19 @@
 from os import path
 from pydantic import BaseModel
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import FileResponse, RedirectResponse
-from starlette.templating import Jinja2Templates
 from starlette.exceptions import HTTPException
 
-from api.interpreter.main import interpret
-from api.translator.main import translate
-from api.optimizer.eyehole import optimize as optimize_eyehole
-from api.optimizer.blocks import optimize as optimize_blocks
+from interpreter.main import interpret
+from translator.main import translate
+from optimizer.eyehole import optimize as optimize_eyehole
+from optimizer.blocks import optimize as optimize_blocks
+
 
 class InputData(BaseModel):
   content: str
-
-app = FastAPI()
-
-origins = [
-  'http://localhost:3000'
-]
-
-app.add_middleware(
-  CORSMiddleware,
-  allow_origins=origins,
-  allow_methods=['POST'],
-  allow_credentials=True,
-  allow_headers=['*']
-)
 
 mime_types = {
   'txt':'text/plain',
@@ -39,30 +25,49 @@ mime_types = {
   'svg':'image/svg+xml'
 }
 
-templates = Jinja2Templates(directory='dist')
 
-@app.post('/api/interpret')
+app = FastAPI()
+
+app.add_middleware(
+  CORSMiddleware,
+  allow_credentials = True,
+  allow_headers = ['*'],
+  allow_methods = ['POST'],
+  allow_origins = ['http://localhost:3000']
+)
+
+@app.get('/')
+async def redirect_base():
+  return RedirectResponse('/jolc/')
+
+router = APIRouter(prefix = '/jolc')
+
+@router.post('/api/interpret')
 def analyze_input(input_data: InputData):
   return interpret(input_data.content)
 
-@app.post('/api/translate')
+@router.post('/api/translate')
 def analyze_input(input_data: InputData):
   return translate(input_data.content)
 
-@app.post('/api/optimize/eyehole')
+@router.post('/api/optimize/eyehole')
 def analyze_input(input_data: InputData):
   return optimize_eyehole(input_data.content)
 
-@app.post('/api/optimize/blocks')
+@router.post('/api/optimize/blocks')
 def analyze_input(input_data: InputData):
   return optimize_blocks(input_data.content)
 
-@app.get('/static/{filename}')
+@router.get('/')
+async def read_index():
+    return FileResponse('dist/index.html')
+
+@router.get('/{filename:path}')
 async def serve_file(request: Request, filename):
-  file_path ='dist/static/'+filename
+  file_path = 'dist/' + filename
 
   if not path.exists(file_path):
-    return {'error': 'File not found'}
+    return FileResponse('dist/index.html')
 
   file_array = filename.split('.')
 
@@ -72,9 +77,8 @@ async def serve_file(request: Request, filename):
 
   return FileResponse(file_path, media_type=mime_types[extension])
 
-@app.get('/{rest_of_path:path}')
-async def serve_app(request: Request, rest_of_path):
-  return templates.TemplateResponse('index.html', {'request': request})
+
+app.include_router(router)
 
 @app.exception_handler(HTTPException)
 async def custom_http_exception_handler(request, exc):

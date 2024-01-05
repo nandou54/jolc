@@ -1,9 +1,9 @@
 from traceback import print_exc
 
-from api.analyzer.main import parse
-from api.interpreter.core import BINARY_OPERATION_RESULTS, UNARY_OPERATION_RESULTS
-from api.symbols import Expression, Value, Assignment, Function, Struct, Call, If, Else, While, For, Return, Break, Continue
-from api.symbols import T_SENTENCE
+from analyzer.main import parse
+from interpreter.core import BINARY_OPERATION_RESULTS, UNARY_OPERATION_RESULTS
+from symbols import Expression, Value, Assignment, Function, Struct, Call, If, Else, While, For, Return, Break, Continue
+from symbols import T_SENTENCE
 
 from .core import RESERVED_FUNCTIONS, Environment, SemanticError, addFunction, get_assignments, getFunction, getTemps, BINARY_OPERATIONS, UNARY_OPERATIONS, process_functions
 from .core import getHeaderOutput, reset, getOutput, getErrors, getSymbols, Label, Temp, ApplicationError

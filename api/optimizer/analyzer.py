@@ -1,7 +1,7 @@
-from api.ply.yacc import yacc
-from api.ply.lex import lex
+from ply.yacc import yacc
+from ply.lex import lex
 
-from api.optimizer.symbols import Assignment, Call, Expression, Function, Goto, Id, If, Library, Number, Return, String, Tag, Wrapper, operations
+from optimizer.symbols import Assignment, Call, Expression, Function, Goto, Id, If, Library, Number, Return, String, Tag, Wrapper, operations
 
 INPUT = ''
 errors = []

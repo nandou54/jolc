@@ -1,4 +1,4 @@
-from api.optimizer.symbols import Expression, Goto, Id, If, Number, Tag
+from optimizer.symbols import Expression, Goto, Id, If, Number, Tag
 
 block_counter = 0
 optimizations = 0

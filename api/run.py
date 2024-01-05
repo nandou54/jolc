@@ -81,11 +81,11 @@ OPTIMIZER_BLOCKS = True
 
 import json
 import os
-from api.analyzer.main import lexer, parse
-from api.interpreter.main import interpret
-from api.translator.main import translate
-from api.optimizer.eyehole import optimize as optimize_eyehole
-from api.optimizer.blocks import optimize as optimize_blocks
+from analyzer.main import lexer, parse
+from interpreter.main import interpret
+from translator.main import translate
+from optimizer.eyehole import optimize as optimize_eyehole
+from optimizer.blocks import optimize as optimize_blocks
 
 if LEXER:
   print('=== LEXER ===')

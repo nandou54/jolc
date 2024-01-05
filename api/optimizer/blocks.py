@@ -1,7 +1,7 @@
 from copy import deepcopy
-from api.optimizer.analyzer import parse
-from api.optimizer.core import addReport, expressionsAreEqual, getBlocks, getIds, reset, reports, setGlobalOptimizations
-from api.optimizer.symbols import Assignment, Expression, Library, Number, Id, Number
+from optimizer.analyzer import parse
+from optimizer.core import addReport, expressionsAreEqual, getBlocks, getIds, reset, reports, setGlobalOptimizations
+from optimizer.symbols import Assignment, Expression, Library, Number, Id, Number
 
 def optimize(input):
   global reports

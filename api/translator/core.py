@@ -1,6 +1,6 @@
 from copy import deepcopy
 from copy import deepcopy
-from api.symbols import Error, Assignment, For
+from symbols import Error, Assignment, For
 
 def getHeaderOutput():
   s = 'package main;\n'

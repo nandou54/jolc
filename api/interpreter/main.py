@@ -1,10 +1,10 @@
 from copy import deepcopy
 from traceback import print_exc
 
-from api.analyzer.main import parse
+from analyzer.main import parse
 from .grapher import graphAST
-from api.symbols import Expression, Value, Assignment, Function, Struct, Call, If, Else, While, For, Return, Break, Continue
-from api.symbols import T_SENTENCE, EXECUTABLE_SENTENCE
+from symbols import Expression, Value, Assignment, Function, Struct, Call, If, Else, While, For, Return, Break, Continue
+from symbols import T_SENTENCE, EXECUTABLE_SENTENCE
 
 from .core import Environment, SemanticError, ApplicationError, getOutput, getErrors, getSymbols, envs, functions, loops, reset
 from .core import RESERVED_FUNCTIONS, BINARY_OPERATIONS, UNARY_OPERATIONS, BINARY_OPERATION_RESULTS, UNARY_OPERATION_RESULTS

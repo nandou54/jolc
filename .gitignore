@@ -7,7 +7,8 @@ test.*
 __pycache__
 .mypy_cache
 
-# interpreter
+# api
+api/env
 parser.out
 parsetab.py
 

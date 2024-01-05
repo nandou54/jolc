@@ -1,2 +1,5 @@
 # JOLC
-deployed on [GitHub Pages](https://pabloc54.github.io/jolc/)!
+
+Ver en [GitHub Pages](https://nanndo54.dev/jolc/)
+
+Ver [Gramática](/grammar/doc.md)

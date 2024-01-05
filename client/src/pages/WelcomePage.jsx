@@ -28,7 +28,7 @@ function WelcomePage() {
         <h3>Autor</h3>
         <ul>
           <li>
-            <a target="blank" href="https://github.com/pabloc54">
+            <a target="blank" href="https://github.com/nanndo54">
               Pablo Cabrera
             </a>
           </li>
@@ -60,13 +60,14 @@ function WelcomePage() {
       <div>
         <p>
           Source del proyecto:{' '}
-          <a href="https://github.com/pabloc54/jOLC">GitHub</a>
+          <a href="https://github.com/nanndo54/jolc">GitHub</a>
         </p>
       </div>
       <div>
         <p>
-          Iconos proporcionados por <a href="https://icons8.com">Icons8</a>.
-          Créditos a sus respectivos autores.
+          Iconos proporcionados por{' '}
+          <a href="https://www.svgrepo.com/">SVG Repo</a>. Créditos a sus
+          respectivos autores.
         </p>
       </div>
     </div>

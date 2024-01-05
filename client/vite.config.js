@@ -6,11 +6,6 @@ import path from 'path'
 export default defineConfig({
   base: '/jolc/',
   publicDir: 'src/public',
-  build: {
-    outDir: '../docs',
-    emptyOutDir: true,
-    assetsDir: 'static'
-  },
   plugins: [
     react(),
     svgr({

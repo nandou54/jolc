@@ -20,7 +20,7 @@ app.add_middleware(
   CORSMiddleware,
   allow_credentials = True,
   allow_headers = ['*'],
-  allow_methods = ['POST', 'GET'],
+  allow_methods = ['POST'],
   allow_origins = ['http://localhost:3000', 'https://nanndo54.dev']
 )
 

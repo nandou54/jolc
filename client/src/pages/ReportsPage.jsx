@@ -1,7 +1,6 @@
 import styles from '@/styles/ReportsPage.module.css'
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Link } from 'wouter'
 import { Graphviz } from 'graphviz-react'
 
 function ReportsPage() {
@@ -26,10 +25,7 @@ function ReportsPage() {
       <h2>Reportes de la aplicación</h2>
       <p>Datos sobre la última ejecución de código</p>
       {!existsReports ? (
-        <p>
-          No existen reportes para mostrar. Ve al{' '}
-          <Link to="/editor">Editor</Link> para generar reportes.
-        </p>
+        <p>No existen reportes para mostrar.</p>
       ) : (
         <>
           {existsAST && (

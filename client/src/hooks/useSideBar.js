@@ -1,16 +1,11 @@
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
-import { useLocation } from 'wouter'
 
 import { toggleLoading, toggleSideBar } from '@/actions/appActions'
 import { appendOutput, clearOutput, logOutput } from '@/actions/outputActions'
 import { updateReports } from '@/actions/reportsActions'
 import useKeyPress from './useKeyPress'
 import { API_URL } from '@/constants'
-
-import homeIcon from '/assets/home.svg?react'
-import editorIcon from '/assets/editor.svg?react'
-import reportsIcon from '/assets/reports.svg?react'
 
 import menuIcon from '/assets/menu.svg?react'
 import playIcon from '/assets/play.svg?react'
@@ -19,7 +14,6 @@ import blocksOptimizeIcon from '/assets/blocks-optimize.svg?react'
 import peepholeOptimizeIcon from '/assets/peephole-optimize.svg?react'
 
 function useSideBar() {
-  const [location] = useLocation()
   const { show, loading } = useSelector(({ app }) => app)
   const content = useSelector(({ editor }) => editor)
   const { c3d } = useSelector(({ reports }) => reports)
@@ -211,35 +205,14 @@ function useSideBar() {
   }
 
   useKeyPress('Escape', handleToggleSideBar)
-  useKeyPress('r', location == 'editor' && handleRun, { alt: true })
-  useKeyPress('c', location == 'editor' && handleCompile, { alt: true })
-  useKeyPress('m', location == 'editor' && handleOptimizeByEyeHole, {
+  useKeyPress('r', handleRun, { alt: true })
+  useKeyPress('c', handleCompile, { alt: true })
+  useKeyPress('m', handleOptimizeByEyeHole, {
     alt: true
   })
-  useKeyPress('b', location == 'editor' && handleOptimizeByBlocks, {
+  useKeyPress('b', handleOptimizeByBlocks, {
     alt: true
   })
-
-  const items = [
-    {
-      label: 'Inicio',
-      to: '/',
-      icon: homeIcon,
-      active: location == '/'
-    },
-    {
-      label: 'Editor',
-      to: '/editor',
-      icon: editorIcon,
-      active: location == '/editor'
-    },
-    {
-      label: 'Reportes',
-      to: '/reports',
-      icon: reportsIcon,
-      active: location == '/reports'
-    }
-  ]
 
   const buttons = [
     {
@@ -251,30 +224,26 @@ function useSideBar() {
       onClick: handleRun,
       icon: playIcon,
       tooltip: 'Ejecutar código [alt]+[r]',
-      highlight: true,
-      condition: location == '/editor'
+      highlight: true
     },
     {
       onClick: handleCompile,
       icon: compileIcon,
-      tooltip: 'Compilar código [alt]+[c]',
-      condition: location == '/editor'
+      tooltip: 'Compilar código [alt]+[c]'
     },
     {
       onClick: handleOptimizeByEyeHole,
       icon: peepholeOptimizeIcon,
-      tooltip: 'Optimizar por mirilla [alt]+[m]',
-      condition: location == '/editor'
+      tooltip: 'Optimizar por mirilla [alt]+[m]'
     },
     {
       onClick: handleOptimizeByBlocks,
       icon: blocksOptimizeIcon,
-      tooltip: 'Optimizar por bloques [alt]+[b]',
-      condition: location == '/editor'
+      tooltip: 'Optimizar por bloques [alt]+[b]'
     }
   ]
 
-  return { show, loading, items, buttons, handleHideSideBar }
+  return { show, loading, buttons, handleHideSideBar }
 }
 
 export default useSideBar

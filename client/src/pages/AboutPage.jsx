@@ -1,7 +1,7 @@
-import styles from '@/styles/WelcomePage.module.css'
+import styles from '@/styles/AboutModal.module.css'
 import React from 'react'
 
-function WelcomePage() {
+function AboutModal() {
   return (
     <div className={styles.base}>
       <div className={styles.group}>
@@ -74,4 +74,4 @@ function WelcomePage() {
   )
 }
 
-export default WelcomePage
+export default AboutModal

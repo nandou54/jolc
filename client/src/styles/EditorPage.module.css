@@ -1,18 +1,4 @@
 .base {
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 10px 400px;
-}
-
-.gutter {
-  background: rgb(35, 35, 50);
-  border-right: 3px rgb(50, 50, 70) solid;
-  cursor: col-resize;
-}
-
-@media only screen and (max-width: 768px) {
-  .base {
-    grid-template-columns: none;
-    grid-template-rows: 1fr 0 1fr;
-  }
+  height: 100%;
 }

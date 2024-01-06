@@ -21,8 +21,8 @@ function EditorArea() {
       <div className={`${styles.title} unselectable`}>editor</div>
       <AceEditor
         className={styles.editor}
-        mode='julia'
-        theme='dracula'
+        mode="julia"
+        theme="dracula"
         onChange={handleChange}
         fontSize={16}
         showPrintMargin={true}
@@ -33,8 +33,8 @@ function EditorArea() {
           tabSize: 2
         }}
         wrapEnabled
-        width='100%'
-        height='calc(100% - 35px)'
+        width="100%"
+        height="100%"
       />
     </div>
   )

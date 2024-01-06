@@ -7,9 +7,10 @@
 .button {
   background: rgb(40, 40, 65);
 
-  margin-left: 10%;
-  width: calc(90% - 3px);
+  margin-left: 10px;
+  width: calc(100% - 13px);
   height: 52px;
+  padding: 0 12px;
 
   border: none;
   border-right: 3px rgb(20, 20, 40) solid;
@@ -18,12 +19,22 @@
 
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .button.highlight {
+  color: black;
   background: rgb(100, 210, 100);
   border-right: 3px rgb(70, 150, 70) solid;
+}
+
+.label {
+  opacity: 0;
+  transition: opacity 0.3s ease 0.1s;
+}
+
+.base.show .label {
+  opacity: 1;
 }
 
 .tooltip {
@@ -31,9 +42,10 @@
   position: absolute;
   background-color: rgb(30, 30, 50);
 
-  padding: 5px 8px 2px 10px;
-  height: calc(50% - 4px);
+  padding: 10px;
+  height: 25px;
   border-radius: 20px;
+  line-height: 0.5;
 
   top: 25%;
   left: 100%;
@@ -42,15 +54,20 @@
   pointer-events: none;
 
   opacity: 0;
-  transition: opacity 0.5s ease 0.5s;
+  transition: opacity 0.5s ease 0.1s;
 }
 
 .base:hover .tooltip {
   opacity: 1;
 }
 
+.base.show .tooltip {
+  opacity: 0;
+}
+
 .button svg {
-  height: 40%;
+  flex-shrink: 0;
+  height: 24px;
   margin-left: 5px;
   fill: white;
 }

@@ -1,42 +1,38 @@
 import styles from '@/styles/SideBar.module.css'
 import React from 'react'
+import { useSelector } from 'react-redux'
 
-import Logo from './Logo'
-import SideBarButton from './SideBarButton'
+import Logo from '@/components/Logo'
+import SideBarButton from '@/components/SideBarButton'
 
 import useSideBar from '@/hooks/useSideBar'
 
 function SideBar() {
-  const { show, loading, buttons, handleHideSideBar } = useSideBar()
+  const { buttons, handleHideSideBar } = useSideBar()
+  const { show, loading } = useSelector(({ app }) => app)
 
   return (
-    <div className={styles.base}>
-      <nav className={`${styles.sidebar} ${show ? styles.show : ''}`}>
-        <div>
-          <Logo />
-          <div className={styles.buttons}>
-            {buttons.map(
-              ({ condition = true, ...button }, i) =>
-                condition && <SideBarButton key={i} {...button} />
-            )}
-          </div>
+    <div className={`${styles.base} ${show ? styles.show : ''}`}>
+      <nav className={styles.sidebar}>
+        <Logo className={styles.logo} />
+        <div className={styles.buttons}>
+          {buttons.map(
+            ({ condition = true, ...button }, i) =>
+              condition && <SideBarButton key={i} {...button} />
+          )}
         </div>
       </nav>
-      {loading && <Loader />}
+      {loading && (
+        <div className={styles.loader}>
+          <div className={styles.bar} />
+        </div>
+      )}
       {(show || loading) && (
         <div
           className={styles.outside}
           onClick={() => handleHideSideBar(false)}
         />
       )}
-    </div>
-  )
-}
-
-function Loader() {
-  return (
-    <div className={styles.loader}>
-      <div className={styles.bar} />
     </div>
   )
 }

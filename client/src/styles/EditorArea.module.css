@@ -1,3 +1,8 @@
+.base {
+  height: 100%;
+  width: 100%;
+}
+
 .title {
   background: rgb(25, 25, 40);
   color: white;
@@ -10,10 +15,4 @@
 
 .editor {
   font-family: 'Source Code Pro', monospace;
-}
-
-@media only screen and (max-width: 768px) {
-  .base {
-    height: 80vh;
-  }
 }

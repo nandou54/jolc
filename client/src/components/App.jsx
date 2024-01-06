@@ -7,9 +7,9 @@ const EditorPage = lazy(() => import('@/pages/EditorPage'))
 
 function App() {
   return (
-    <div>
+    <div className={styles.base}>
       <SideBar />
-      <div className={styles.base}>
+      <div className={styles.content}>
         <Suspense fallback={<div className="loader">Un momento...</div>}>
           <EditorPage />
         </Suspense>

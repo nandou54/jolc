@@ -1,11 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@700&display=swap'); /*logo*/
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap'); /*regular*/
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap'); /*code*/
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
 
 body {
   font-family: 'Poppins', sans-serif;
   margin: 0;
-  color: rgb(25, 25, 25);
+  color: white;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -20,7 +24,6 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Poppins', serif;
   margin: 0;
   color: rgb(40, 38, 117);
 }
@@ -35,8 +38,11 @@ a:hover {
   text-decoration: 3px underline rgb(22, 43, 197);
 }
 
-button:hover {
+button {
   cursor: pointer;
+  color: inherit;
+  font-weight: 600;
+  font-family: 'Source Code Pro', monospace;
 }
 
 li {
@@ -75,6 +81,4 @@ body::-webkit-scrollbar {
   align-items: center;
   justify-content: center;
   height: 100vh;
-
-  color: rgb(60, 60, 90);
 }

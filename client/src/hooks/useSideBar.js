@@ -11,7 +11,7 @@ import menuIcon from '/assets/menu.svg?react'
 import playIcon from '/assets/play.svg?react'
 import compileIcon from '/assets/compile.svg?react'
 import blocksOptimizeIcon from '/assets/blocks-optimize.svg?react'
-import peepholeOptimizeIcon from '/assets/peephole-optimize.svg?react'
+import eyeholeOptimizeIcon from '/assets/eyehole-optimize.svg?react'
 
 function useSideBar() {
   const { show, loading } = useSelector(({ app }) => app)
@@ -217,29 +217,34 @@ function useSideBar() {
   const buttons = [
     {
       onClick: handleToggleSideBar,
+      label: 'Abrir menú',
       icon: menuIcon,
-      tooltip: 'Abrir menú [esc]'
+      shortcut: '[esc]'
     },
     {
       onClick: handleRun,
+      label: 'Ejecutar código',
       icon: playIcon,
-      tooltip: 'Ejecutar código [alt]+[r]',
+      shortcut: '[alt]+[r]',
       highlight: true
     },
     {
       onClick: handleCompile,
+      label: 'Compilar código',
       icon: compileIcon,
-      tooltip: 'Compilar código [alt]+[c]'
+      shortcut: '[alt]+[c]'
     },
     {
       onClick: handleOptimizeByEyeHole,
-      icon: peepholeOptimizeIcon,
-      tooltip: 'Optimizar por mirilla [alt]+[m]'
+      label: 'Optimizar por mirilla',
+      icon: eyeholeOptimizeIcon,
+      shortcut: '[alt]+[m]'
     },
     {
       onClick: handleOptimizeByBlocks,
+      label: 'Optimizar por bloques',
       icon: blocksOptimizeIcon,
-      tooltip: 'Optimizar por bloques [alt]+[b]'
+      shortcut: '[alt]+[b]'
     }
   ]
 

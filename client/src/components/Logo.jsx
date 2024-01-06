@@ -2,14 +2,12 @@ import styles from '@/styles/Logo.module.css'
 import React from 'react'
 import { useSelector } from 'react-redux'
 
-function Logo({ className }) {
+function Logo() {
   const { show } = useSelector(({ app }) => app)
 
   return (
     <header
-      className={`${className} ${styles.base} ${
-        show ? styles.show : ''
-      } unselectable`}
+      className={`${styles.base} ${show ? styles.show : ''} unselectable`}
     >
       JOLC
       <img src="favicon.svg" />

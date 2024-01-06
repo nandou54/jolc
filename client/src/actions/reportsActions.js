@@ -1,6 +1,6 @@
-const updateReports = (reports) => ({
+const updateReports = (payload) => ({
   type: '@reports/update',
-  payload: reports
+  payload
 })
 
 export { updateReports }

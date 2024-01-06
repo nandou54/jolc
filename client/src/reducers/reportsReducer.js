@@ -1,7 +1,7 @@
 const defaultState = {
   ast: '',
   errors: [],
-  symbols: [],
+  symbols: { variables: [], functions: [], structs: [] },
   c3d: ''
 }
 

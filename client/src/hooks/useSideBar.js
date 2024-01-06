@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { toggleLoading, toggleSideBar } from '@/actions/appActions'
 import { appendOutput, clearOutput, logOutput } from '@/actions/outputActions'
 import { updateReports } from '@/actions/reportsActions'
-import useKeyPress from './useKeyPress'
+import useKeyPress from '@/hooks/useKeyPress'
 import { API_URL } from '@/constants'
 
 import menuIcon from '/assets/menu.svg?react'

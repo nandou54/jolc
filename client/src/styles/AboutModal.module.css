@@ -1,5 +1,47 @@
 .base {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(20, 20, 20, 0.5);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   padding: 20px 60px;
+
+  z-index: 10;
+  opacity: 0;
+
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.base.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+
+  margin: auto;
+  height: min(80%, 750px);
+  width: min(80%, 750px);
+  padding: 30px;
+
+  background: rgb(25, 25, 40);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+  border-radius: 15px;
+
+  overflow: hidden;
+}
+
+.content {
+  overflow: hidden auto;
 }
 
 .title,

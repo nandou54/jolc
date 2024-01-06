@@ -12,21 +12,6 @@ const reducer = combineReducers({
   reports: reportsReducer
 })
 
-const editor = localStorage.getItem('editor') || 'println("hello, world!");'
-
-const reports = {
-  ast: '',
-  errors: [],
-  symbols: { variables: [], functions: [], structs: [] }
-}
-
-const initialState = {
-  app: { show: false, loading: false },
-  output: [],
-  editor,
-  reports
-}
-
-const store = createStore(reducer, initialState)
+const store = createStore(reducer)
 
 export default store

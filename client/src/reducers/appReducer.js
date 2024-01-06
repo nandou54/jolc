@@ -1,13 +1,21 @@
-const defaultState = { show: false, loading: false, content: '' }
+const defaultState = { show: false, loading: false, showAboutModal: false }
 
 const appReducer = (state = defaultState, action) => {
   switch (action.type) {
     case '@app/toggleSideBar': {
-      const newState = { show: action.payload, loading: state.loading }
+      const newState = {
+        ...state,
+        show: action.payload,
+        loading: state.loading
+      }
       return newState
     }
     case '@app/toggleLoading': {
-      const newState = { show: state.show, loading: action.payload }
+      const newState = { ...state, show: state.show, loading: action.payload }
+      return newState
+    }
+    case '@app/toggleAboutModal': {
+      const newState = { ...state, showAboutModal: action.payload }
       return newState
     }
     default:

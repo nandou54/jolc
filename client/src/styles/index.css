@@ -25,22 +25,21 @@ h4,
 h5,
 h6 {
   margin: 0;
-  color: rgb(40, 38, 117);
+  color: rgb(211, 214, 255);
 }
 
-a:link,
-a:visited {
-  color: rgb(46, 57, 207);
-  text-decoration: 2.5px underline rgb(35, 52, 180);
-}
-a:hover {
-  color: rgb(25, 37, 206);
-  text-decoration: 3px underline rgb(22, 43, 197);
+a {
+  color: rgb(150, 157, 255);
+  text-decoration: 2.5px underline rgb(171, 177, 255);
 }
 
 button {
   cursor: pointer;
   color: inherit;
+  background-color: transparent;
+  border: none;
+  outline: none;
+
   font-weight: 600;
   font-family: 'Source Code Pro', monospace;
 }

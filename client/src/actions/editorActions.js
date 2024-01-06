@@ -1,6 +1,6 @@
-const updateContent = (content) => ({
+const updateContent = (payload) => ({
   type: '@editor/update',
-  payload: content
+  payload
 })
 
 export { updateContent }

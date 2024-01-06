@@ -1,4 +1,7 @@
-const editorReducer = (state = '', action) => {
+const defaultState =
+  localStorage.getItem('editor') || 'println("hello, world!");'
+
+const editorReducer = (state = defaultState, action) => {
   switch (action.type) {
     case '@editor/update': {
       const newContent = action.payload

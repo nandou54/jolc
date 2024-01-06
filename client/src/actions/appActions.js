@@ -8,9 +8,14 @@ const toggleLoading = (payload) => ({
   payload
 })
 
+const changeSelectedTab = (payload) => ({
+  type: '@app/changeSelectedTab',
+  payload
+})
+
 const toggleAboutModal = (payload) => ({
   type: '@app/toggleAboutModal',
   payload
 })
 
-export { toggleSideBar, toggleLoading, toggleAboutModal }
+export { toggleSideBar, toggleLoading, changeSelectedTab, toggleAboutModal }

@@ -7,7 +7,6 @@ function ConsoleArea() {
 
   return (
     <div className={styles.base}>
-      <div className={`${styles.title} unselectable`}>console</div>
       <div className={styles.console}>
         <ul>
           {output.map((line, i) => (

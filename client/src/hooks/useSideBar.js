@@ -1,7 +1,11 @@
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { toggleLoading, toggleSideBar } from '@/actions/appActions'
+import {
+  changeSelectedTab,
+  toggleLoading,
+  toggleSideBar
+} from '@/actions/appActions'
 import { appendOutput, clearOutput, logOutput } from '@/actions/outputActions'
 import { updateReports } from '@/actions/reportsActions'
 import useKeyPress from '@/hooks/useKeyPress'
@@ -28,6 +32,7 @@ function useSideBar() {
 
   const handleRun = () => {
     if (loading) return
+    if (show) handleHideSideBar()
     dispatch(clearOutput())
 
     const start = performance.now()
@@ -74,10 +79,14 @@ function useSideBar() {
           duration < 900 ? 900 - duration : 0
         )
       })
+      .finally(() => {
+        dispatch(changeSelectedTab('console'))
+      })
   }
 
   const handleCompile = () => {
     if (loading) return
+    if (show) handleHideSideBar()
     dispatch(clearOutput())
 
     const start = performance.now()
@@ -124,10 +133,14 @@ function useSideBar() {
           duration < 900 ? 900 - duration : 0
         )
       })
+      .finally(() => {
+        dispatch(changeSelectedTab('console'))
+      })
   }
 
   const handleOptimizeByEyeHole = () => {
     if (loading) return
+    if (show) handleHideSideBar()
     if (!c3d) return dispatch(logOutput('No hay código C3D para optimizar'))
 
     dispatch(clearOutput())
@@ -163,10 +176,14 @@ function useSideBar() {
           duration < 900 ? 900 - duration : 0
         )
       })
+      .finally(() => {
+        dispatch(changeSelectedTab('console'))
+      })
   }
 
   const handleOptimizeByBlocks = () => {
     if (loading) return
+    if (show) handleHideSideBar()
     if (!c3d) return dispatch(logOutput('No hay código C3D para optimizar'))
 
     dispatch(clearOutput())
@@ -201,6 +218,9 @@ function useSideBar() {
           },
           duration < 900 ? 900 - duration : 0
         )
+      })
+      .finally(() => {
+        dispatch(changeSelectedTab('console'))
       })
   }
 

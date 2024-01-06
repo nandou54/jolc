@@ -25,12 +25,12 @@
   color: white;
 
   pointer-events: all;
+  transition: transform 0.5s;
 }
 
 .sidebar,
 .loader {
   transform: translateX(-195px);
-  transition: transform 0.5s;
 }
 
 .base.show .sidebar,
@@ -82,7 +82,7 @@
   background: rgba(50, 50, 70);
   opacity: 0;
 
-  transition: opacity 0.2s ease-in;
+  transition: transform 0.5s, opacity 0.2s ease-in;
 }
 
 .base.loading .loader {

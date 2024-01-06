@@ -1,4 +1,9 @@
-const defaultState = { show: false, loading: false, showAboutModal: false }
+const defaultState = {
+  show: false,
+  loading: false,
+  selectedTab: 'editor',
+  showAboutModal: false
+}
 
 const appReducer = (state = defaultState, action) => {
   switch (action.type) {
@@ -12,6 +17,10 @@ const appReducer = (state = defaultState, action) => {
     }
     case '@app/toggleLoading': {
       const newState = { ...state, show: state.show, loading: action.payload }
+      return newState
+    }
+    case '@app/changeSelectedTab': {
+      const newState = { ...state, selectedTab: action.payload }
       return newState
     }
     case '@app/toggleAboutModal': {

@@ -2,11 +2,49 @@
   height: 100vh;
   width: 100vw;
 
+  background: rgb(40 42 54);
   overflow: hidden;
 }
 
 .content {
   height: 100%;
-  width: 100%;
+  width: calc(100% - 50px);
   margin-left: 50px;
+}
+
+.tabs {
+  background: rgb(25, 25, 40);
+  color: white;
+  height: 45px;
+  padding: 0 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 50px;
+}
+
+.tab {
+  height: 100%;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: center;
+}
+
+.tab.current {
+  background: rgb(35, 35, 55);
+}
+
+.tab > svg {
+  height: 24px;
+  width: 24px;
+  fill: white;
+}
+
+.component {
+  height: 100%;
+  width: 100%;
 }

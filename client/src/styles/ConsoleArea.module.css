@@ -1,23 +1,15 @@
 .base {
-  height: 100vh;
-}
-
-.title {
-  background: rgb(25, 25, 40);
-  color: white;
-  height: 35px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 100%;
+  width: 100%;
 }
 
 .console {
   font-family: 'Source Code Pro', monospace;
-  background: rgb(40 42 54);
   color: rgb(220, 230, 230);
 
-  height: calc(100% - 55px);
+  height: 100%;
+  width: 100%;
+
   overflow-y: auto;
   overflow-x: hidden;
   padding-bottom: 20px;
@@ -28,10 +20,4 @@
   margin: 2px 0;
   word-wrap: break-word;
   list-style-type: '$ ';
-}
-
-@media only screen and (max-width: 768px) {
-  .base {
-    height: 80vh;
-  }
 }

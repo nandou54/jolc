@@ -1,9 +1,11 @@
-import styles from '@/styles/ReportsPage.module.css'
+import styles from '@/styles/ReportsArea.module.css'
 import React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Graphviz } from 'graphviz-react'
+import { changeSelectedTab } from '@/actions/appActions'
 
-function ReportsPage() {
+function ReportsArea() {
+  const dispatch = useDispatch()
   const { ast, symbols, errors, optimizations } = useSelector(
     (state) => state.reports
   )
@@ -23,11 +25,17 @@ function ReportsPage() {
   return (
     <div className={styles.base}>
       <h2>Reportes de la aplicación</h2>
-      <p>Datos sobre la última ejecución de código</p>
-      {!existsReports ? (
-        <p>No existen reportes para mostrar.</p>
+      {existsReports ? (
+        <p>Datos sobre la última ejecución de código:</p>
       ) : (
         <>
+          <p>
+            No existen reportes para mostrar. Ver al{' '}
+            <button onClick={() => dispatch(changeSelectedTab('editor'))}>
+              editor
+            </button>{' '}
+            y ejecuta código.
+          </p>
           {existsAST && (
             <div>
               <h3>AST</h3>
@@ -156,4 +164,4 @@ function Table({ headers, body, ...props }) {
   )
 }
 
-export default ReportsPage
+export default ReportsArea

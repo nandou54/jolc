@@ -39,6 +39,8 @@ button {
   background-color: transparent;
   border: none;
   outline: none;
+  padding: 0;
+  color: rgb(220, 222, 240);
 
   font-weight: 600;
   font-family: 'Source Code Pro', monospace;

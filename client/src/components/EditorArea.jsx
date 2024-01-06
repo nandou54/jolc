@@ -18,7 +18,6 @@ function EditorArea() {
 
   return (
     <div className={styles.base}>
-      <div className={`${styles.title} unselectable`}>editor</div>
       <AceEditor
         className={styles.editor}
         mode="julia"

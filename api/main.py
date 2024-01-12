@@ -9,10 +9,8 @@ from translator.main import translate
 from optimizer.eyehole import optimize as optimize_eyehole
 from optimizer.blocks import optimize as optimize_blocks
 
-
 class InputData(BaseModel):
   content: str
-
 
 app = FastAPI()
 
@@ -21,7 +19,7 @@ app.add_middleware(
   allow_credentials = True,
   allow_headers = ['*'],
   allow_methods = ['POST'],
-  allow_origins = ['http://localhost:3000', 'https://nanndo54.dev']
+  allow_origins = ['http://localhost:3000', 'https://jolc.nanndo54.dev']
 )
 
 @app.post('/api/interpret')

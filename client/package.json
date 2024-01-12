@@ -9,6 +9,7 @@
   "dependencies": {
     "@svgr/plugin-jsx": "8.1.0",
     "@svgr/plugin-svgo": "8.1.0",
+    "@vercel/analytics": "^1.1.1",
     "@vitejs/plugin-react": "4.2.1",
     "ace-builds": "1.32.3",
     "axios": "1.6.5",

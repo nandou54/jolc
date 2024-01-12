@@ -3,7 +3,7 @@
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 500;
-  src: url('fonts/poppins-v20-latin-500.woff2') format('woff2');
+  src: url('/fonts/poppins-v20-latin-500.woff2') format('woff2');
 }
 
 @font-face {
@@ -11,7 +11,7 @@
   font-family: 'Source Code Pro';
   font-style: normal;
   font-weight: 400;
-  src: url('fonts/source-code-pro-v23-latin-regular.woff2') format('woff2');
+  src: url('/fonts/source-code-pro-v23-latin-regular.woff2') format('woff2');
 }
 
 * {

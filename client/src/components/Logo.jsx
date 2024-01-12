@@ -10,7 +10,7 @@ function Logo() {
       className={`${styles.base} ${show ? styles.show : ''} unselectable`}
     >
       JOLC
-      <img src="favicon.svg" />
+      <img src="favicon.svg" alt="Website icon" />
     </header>
   )
 }

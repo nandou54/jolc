@@ -1,5 +1,5 @@
 # JOLC
 
-Ver en [GitHub Pages](https://nanndo54.dev/jolc/)
+Subido en [Vercel](https://jolc.nanndo54.dev/)
 
 Ver [Gramática](/docs/grammar.md)

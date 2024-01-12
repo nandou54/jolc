@@ -1,12 +1,10 @@
 {
-  "name": "jolc",
+  "name": "jolc-client",
   "version": "2.0.4",
   "scripts": {
-    "start": "python3 -m uvicorn api.main:app --host=0.0.0.0 --port=${PORT:-5000}",
-    "dev:client": "cd client && vite",
-    "dev:api": "cd api && python3 -m uvicorn main:app --reload --port 3000",
-    "build": "cd client && vite build",
-    "serve": "cd client && vite preview"
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
   },
   "dependencies": {
     "@svgr/plugin-jsx": "8.1.0",

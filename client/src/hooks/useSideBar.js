@@ -8,24 +8,29 @@ import {
 } from '@/actions/appActions'
 import { appendOutput, clearOutput, logOutput } from '@/actions/outputActions'
 import { updateReports } from '@/actions/reportsActions'
-import useKeyPress from '@/hooks/useKeyPress'
 import { API_URL } from '@/constants'
+import useKeyPress from '@/hooks/useKeyPress'
 
+import blocksOptimizeIcon from '/assets/blocks-optimize.svg?react'
+import compileIcon from '/assets/compile.svg?react'
+import eyeholeOptimizeIcon from '/assets/eyehole-optimize.svg?react'
 import menuIcon from '/assets/menu.svg?react'
 import playIcon from '/assets/play.svg?react'
-import compileIcon from '/assets/compile.svg?react'
-import blocksOptimizeIcon from '/assets/blocks-optimize.svg?react'
-import eyeholeOptimizeIcon from '/assets/eyehole-optimize.svg?react'
 
 function useSideBar() {
-  const { show, loading } = useSelector(({ app }) => app)
+  const { show, loading, selectedTab } = useSelector(({ app }) => app)
   const content = useSelector(({ editor }) => editor)
   const { c3d } = useSelector(({ reports }) => reports)
   const dispatch = useDispatch()
 
+  const handleHidePanel = () => {
+    dispatch(changeSelectedTab('editor'))
+  }
+
   const handleToggleSideBar = () => {
     dispatch(toggleSideBar(!show))
   }
+
   const handleHideSideBar = () => {
     dispatch(toggleSideBar(false))
   }
@@ -224,8 +229,11 @@ function useSideBar() {
       })
   }
 
-  useKeyPress('Escape', handleToggleSideBar)
-  useKeyPress('r', handleRun, { alt: true })
+  useKeyPress(
+    'Escape',
+    selectedTab === 'editor' ? handleToggleSideBar : handleHidePanel
+  )
+  useKeyPress('Enter', handleRun, { ctrl: true })
   useKeyPress('c', handleCompile, { alt: true })
   useKeyPress('m', handleOptimizeByEyeHole, {
     alt: true
@@ -237,7 +245,7 @@ function useSideBar() {
   const buttons = [
     {
       onClick: handleToggleSideBar,
-      label: 'Abrir menú',
+      label: 'Menú',
       icon: menuIcon,
       shortcut: '[esc]'
     },
@@ -245,7 +253,7 @@ function useSideBar() {
       onClick: handleRun,
       label: 'Ejecutar código',
       icon: playIcon,
-      shortcut: '[alt]+[r]',
+      shortcut: '[ctrl]+[enter]',
       highlight: true
     },
     {

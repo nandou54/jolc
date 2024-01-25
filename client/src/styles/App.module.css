@@ -12,17 +12,31 @@
   margin-left: 55px;
 }
 
+.component {
+  height: calc(100% - 45px);
+  width: 100%;
+  z-index: -1;
+}
+
 .tabs {
-  background: rgb(25, 25, 40);
-  color: white;
+  position: fixed;
+  bottom: 0;
+
   height: 45px;
+  width: calc(100% - 55px);
+
+  color: white;
 
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+
+  z-index: 10;
 }
 
 .tab {
+  background-color: rgb(25, 25, 40);
+
   height: 100%;
   width: 100%;
   padding: 0 10px;
@@ -34,16 +48,11 @@
 }
 
 .tab.current {
-  background: rgb(35, 35, 55);
+  background-color: rgb(45, 45, 70);
 }
 
 .tab > svg {
   height: 20px;
   width: 20px;
   fill: white;
-}
-
-.component {
-  height: 100%;
-  width: 100%;
 }

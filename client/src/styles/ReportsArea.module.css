@@ -1,5 +1,71 @@
 .base {
-  padding: 20px 60px;
+  position: absolute;
+  top: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  height: calc(100% - 45px);
+  width: calc(100% - 55px);
+
+  cursor: pointer;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.base.open {
+  pointer-events: all;
+}
+
+.base > * {
+  position: relative;
+  box-shadow: 0px -10px 30px 20px #00000070;
+  border-top: 3px solid rgb(15, 15, 30);
+
+  height: 0;
+  opacity: 0;
+
+  transition: height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  cursor: initial;
+}
+
+.base.open > * {
+  height: 60%;
+  opacity: 1;
+}
+
+.base.open.expanded > * {
+  height: 100%;
+}
+
+.base.open.expanded .expand {
+  opacity: 0;
+}
+
+.expand {
+  width: 28px;
+  margin: auto;
+
+  position: absolute;
+  left: calc(50% - 16px);
+  top: -32px;
+
+  overflow: visible;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.content {
+  background-color: #23263b;
+
+  width: 100%;
+  padding: 12px;
+}
+
+.reports {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
 }
 
 .small {
@@ -13,12 +79,12 @@
 .graph {
   margin: 20px 0;
   height: 500px;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .graph svg {
-  height: calc(100% - 7px);
-  width: max-content;
+  height: 100%;
+  width: 100%;
 }
 
 .report {
@@ -54,16 +120,16 @@ table {
 
 th {
   padding: 5px 0;
-  background: rgb(112, 112, 175);
+  background: rgb(117, 117, 165);
 }
 
 td {
   padding: 5px 0;
-  background: rgb(147, 147, 179);
+  background: rgb(88, 88, 112);
 }
 
-@media only screen and (max-width: 768px) {
+/* @media only screen and (max-width: 768px) {
   .base {
     padding: 20px;
   }
-}
+} */

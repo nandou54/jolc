@@ -1,17 +1,16 @@
 import styles from '@/styles/App.module.css'
-import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { changeSelectedTab } from '@/actions/appActions'
 import AboutModal from '@/components/AboutModal'
 import SideBar from '@/components/SideBar'
-import { changeSelectedTab } from '@/actions/appActions'
 
-import EditorArea from '@/components/EditorArea'
 import ConsoleArea from '@/components/ConsoleArea'
-import ReportsArea from '@/components/ReportsArea'
+import EditorArea from '@/components/EditorArea'
 
-import editorIcon from '/assets/editor.svg?react'
+import ReportsArea from '@/components/ReportsArea'
 import consoleIcon from '/assets/console.svg?react'
+import editorIcon from '/assets/editor.svg?react'
 import reportsIcon from '/assets/reports.svg?react'
 
 const tabs = [
@@ -37,30 +36,34 @@ const tabs = [
 
 function App() {
   const dispatch = useDispatch()
-  const { selectedTab: selectedTabId } = useSelector(({ app }) => app)
-
-  const selectedTab = tabs.find(({ id }) => id === selectedTabId)
+  const { selectedTab } = useSelector(({ app }) => app)
 
   return (
     <div className={styles.base}>
       <SideBar />
       <div className={styles.content}>
+        <div className={styles.component}>
+          {tabs.map((tab) => (
+            <tab.component key={tab.id} open={selectedTab === tab.id} />
+          ))}
+        </div>
         <div className={styles.tabs}>
           {tabs.map((tab) => (
             <button
               key={tab.name}
               className={`${styles.tab} ${
-                tab.id === selectedTabId ? styles.current : ''
+                tab.id === selectedTab ? styles.current : ''
               }`}
-              onClick={() => dispatch(changeSelectedTab(tab.id))}
+              onClick={() =>
+                dispatch(
+                  changeSelectedTab(tab.id === selectedTab ? 'editor' : tab.id)
+                )
+              }
             >
               <span>{tab.name}</span>
               <tab.icon />
             </button>
           ))}
-        </div>
-        <div className={styles.component}>
-          <selectedTab.component />
         </div>
       </div>
       <AboutModal />

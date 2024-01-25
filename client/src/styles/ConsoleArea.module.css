@@ -1,19 +1,74 @@
 .base {
+  position: absolute;
+  top: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  height: calc(100% - 45px);
+  width: calc(100% - 55px);
+
+  cursor: pointer;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.base.open {
+  pointer-events: all;
+}
+
+.base > * {
+  position: relative;
+  box-shadow: 0px -10px 30px 20px #00000070;
+  border-top: 3px solid rgb(15, 15, 30);
+
+  height: 0;
+  opacity: 0;
+
+  transition: height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  cursor: initial;
+}
+
+.base.open > * {
+  height: 60%;
+  opacity: 1;
+}
+
+.base.open.expanded > * {
   height: 100%;
+}
+
+.base.open.expanded .expand {
+  opacity: 0;
+}
+
+.expand {
+  width: 28px;
+  margin: auto;
+
+  position: absolute;
+  left: calc(50% - 16px);
+  top: -32px;
+
+  overflow: visible;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.content {
+  font-family: 'Source Code Pro', monospace;
+  background-color: #23263b;
+
   width: 100%;
+  padding: 10px 5px;
 }
 
 .console {
-  font-family: 'Source Code Pro', monospace;
-  color: rgb(220, 230, 230);
-
   height: 100%;
   width: 100%;
+  font-size: 14px;
 
   overflow-y: auto;
-  overflow-x: hidden;
-  padding-bottom: 20px;
-  padding-right: 10px;
 }
 
 .console li {

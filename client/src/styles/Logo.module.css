@@ -10,6 +10,7 @@
   align-items: center;
   justify-content: center;
   gap: 25px;
+  margin-bottom: 15px;
 
   transition: opacity 0.25s;
 }
@@ -24,10 +25,11 @@
 
 @media (max-height: 600px) {
   .base {
-    font-size: 3em;
+    font-size: 2.5em;
+    margin-bottom: 7.5px;
   }
 
   .base img {
-    height: 50px;
+    height: 40px;
   }
 }

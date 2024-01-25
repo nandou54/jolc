@@ -9,7 +9,7 @@
 
   margin-left: 10px;
   width: calc(100% - 13px);
-  height: 52px;
+  height: 48px;
   padding: 0 12px;
 
   border-right: 3px rgb(20, 20, 40) solid;
@@ -69,4 +69,11 @@
   height: 24px;
   margin-left: 5px;
   fill: white;
+}
+
+@media (max-height: 600px) {
+  .button {
+    height: 42px;
+    font-size: 0.8em;
+  }
 }

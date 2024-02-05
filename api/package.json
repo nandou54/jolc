@@ -2,7 +2,7 @@
   "name": "jolc-api",
   "version": "2.0.4",
   "scripts": {
-    "start": "python3 -m uvicorn api.main:app --host=0.0.0.0 --port=${PORT:-5000}",
+    "start": "python3 -m uvicorn main:app --host=0.0.0.0 --port=8000",
     "dev": "python3 -m uvicorn main:app --reload --port 3000"
   },
   "license": "MIT"

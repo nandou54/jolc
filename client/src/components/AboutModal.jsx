@@ -12,8 +12,7 @@ function AboutModal() {
       className={`${styles.base} ${showAboutModal ? styles.show : ''}`}
       onClick={() => {
         dispatch(toggleAboutModal(false))
-      }}
-    >
+      }}>
       <div className={styles.modal} onClick={(ev) => ev.stopPropagation()}>
         <div className={styles.group}>
           <h2>Más información</h2>
@@ -23,16 +22,15 @@ function AboutModal() {
             <h3>¿Qué es JOLC?</h3>
             <ul>
               <li>
-                Un intérprete de JOLC, una lenguaje de programación basado en
-                Julia ejecutable en la web.
+                Un intérprete de JOLC, una lenguaje de programación basado en Julia ejecutable en la
+                web.
               </li>
               <li>
-                Un compilador de JOLC, que genera código intermedio de Go
-                totalmente funcional.
+                Un compilador de JOLC, que genera código intermedio de Go totalmente funcional.
               </li>
               <li>
-                Un optimizador de código intermedio de Go, a través de
-                optimizaciones locales y globales.
+                Un optimizador de código intermedio de Go, a través de optimizaciones locales y
+                globales.
               </li>
             </ul>
           </div>
@@ -40,13 +38,13 @@ function AboutModal() {
             <h3>Autor</h3>
             <ul>
               <li>
-                <a target="blank" href="https://github.com/nanndo54">
-                  Pablo Cabrera
+                <a target="blank" href="https://github.com/nandou54">
+                  Pablo Pineda
                 </a>
               </li>
               <li>
-                <a target="blank" href="mailto:pablofernando54@outlook.com">
-                  pablofernando54@outlook.com
+                <a target="blank" href="mailto:nandou54@outlook.com">
+                  nandou54@outlook.com
                 </a>
               </li>
             </ul>
@@ -62,8 +60,7 @@ function AboutModal() {
               <li>
                 <a
                   target="blank"
-                  href="https://www.tutorialspoint.com/julia/julia_basic_syntax.htm"
-                >
+                  href="https://www.tutorialspoint.com/julia/julia_basic_syntax.htm">
                   Julia Programming - Basic Syntax
                 </a>
               </li>
@@ -71,15 +68,13 @@ function AboutModal() {
           </div>
           <div>
             <p>
-              Source del proyecto:{' '}
-              <a href="https://github.com/nanndo54/jolc">GitHub</a>
+              Source del proyecto: <a href="https://github.com/nandou54/jolc">GitHub</a>
             </p>
           </div>
           <div>
             <p>
-              Iconos proporcionados por{' '}
-              <a href="https://www.svgrepo.com/">SVG Repo</a>. Créditos a sus
-              respectivos autores.
+              Iconos proporcionados por <a href="https://www.svgrepo.com/">SVG Repo</a>. Créditos a
+              sus respectivos autores.
             </p>
           </div>
         </div>

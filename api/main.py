@@ -18,8 +18,8 @@ app.add_middleware(
   CORSMiddleware,
   allow_credentials = True,
   allow_headers = ['*'],
-  allow_methods = ['POST'],
-  allow_origins = ['http://localhost:3000', 'https://jolc.nanndo54.dev']
+  allow_methods = ['POST', 'OPTIONS'],
+  allow_origins = ['http://localhost:3001', 'https://jolc.nandous.com']
 )
 
 @app.post('/api/interpret')
